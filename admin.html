@@ -100,6 +100,8 @@
   .tslider{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:.3s}
   .tslider:before{content:'';position:absolute;height:18px;width:18px;right:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
   input:checked+.tslider{background:var(--danger)}input:checked+.tslider:before{transform:translateX(-20px)}
+  .img-upload-box{border:2px dashed var(--border);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;background:var(--off-white);min-height:100px;display:flex;align-items:center;justify-content:center}
+  .img-upload-box:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
   .logo-drop{border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:all .3s;background:var(--off-white)}
   .logo-drop:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
   .logo-drop input{display:none}
@@ -153,10 +155,13 @@
   <div class="nav-div"></div>
   <div class="nav-sec">
     <div class="nav-sec-title">إدارة المحتوى</div>
+    <div class="nav-item" onclick="showPage('hero',this)"><i class="fa fa-wand-magic-sparkles"></i>قسم Hero</div>
+    <div class="nav-item" onclick="showPage('about',this)"><i class="fa fa-circle-info"></i>قسم عن المركز</div>
     <div class="nav-item" onclick="showPage('doctors',this)"><i class="fa fa-user-doctor"></i>الأطباء</div>
     <div class="nav-item" onclick="showPage('specialties',this)"><i class="fa fa-stethoscope"></i>التخصصات</div>
     <div class="nav-item" onclick="showPage('hours',this)"><i class="fa fa-clock"></i>ساعات العمل</div>
     <div class="nav-item" onclick="showPage('reviews',this)"><i class="fa fa-star"></i>التقييمات</div>
+    <div class="nav-item" onclick="showPage('social',this)"><i class="fa fa-share-nodes"></i>التواصل الاجتماعي</div>
     <div class="nav-item" onclick="showPage('logo',this)"><i class="fa fa-image"></i>الشعار والهوية</div>
   </div>
   <div class="nav-div"></div>
@@ -304,11 +309,99 @@
       <div class="card-header"><div><div class="card-title"><i class="fa fa-image"></i>شعار المركز</div></div><button class="btn btn-gold" onclick="saveLogo()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
       <div class="logo-drop" onclick="document.getElementById('logo-file').click()">
         <input type="file" id="logo-file" accept="image/*" onchange="previewLogo(this)">
-        <img id="logo-preview" src="" style="max-height:80px;max-width:200px;display:none;margin:0 auto 12px;border-radius:8px;display:none">
+        <img id="logo-preview" src="" style="max-height:80px;max-width:200px;display:none;margin:0 auto 12px;border-radius:8px">
         <div id="logo-ph"><i class="fa fa-cloud-arrow-up" style="font-size:48px;color:var(--gold);opacity:.6;margin-bottom:12px"></i><p style="font-size:14px;color:var(--text-mid)">انقر لاختيار صورة الشعار</p><p style="font-size:12px;color:#bbb;margin-top:6px">PNG, JPG, SVG — خلفية شفافة مُفضَّلة</p></div>
       </div>
     </div>
   </div>
+
+  <!-- HERO PAGE -->
+  <div class="page" id="page-hero">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title"><i class="fa fa-wand-magic-sparkles"></i>قسم Hero — الصفحة الرئيسية</div><div class="card-sub">العنوان الكبير والإحصائيات والصورة</div></div><button class="btn btn-gold" onclick="saveHero()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">صورة Hero (الصورة الكبيرة على اليمين)</label>
+          <div class="img-upload-box" onclick="document.getElementById('hero-img-file').click()" id="hero-img-drop">
+            <input type="file" id="hero-img-file" accept="image/*" style="display:none" onchange="previewImg(this,'hero-img-prev','hero-img-drop')">
+            <img id="hero-img-prev" src="" style="max-height:120px;max-width:300px;display:none;margin:0 auto;border-radius:8px;object-fit:cover">
+            <div id="hero-img-ph" style="text-align:center;padding:20px"><i class="fa fa-image" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i><p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة الـ Hero</p></div>
+          </div>
+          <p style="font-size:12px;color:#bbb;margin-top:8px">أو أدخل رابطاً مباشراً:</p>
+          <input type="url" class="form-input" id="hero-img-url" placeholder="https://..." dir="ltr" style="margin-top:8px" oninput="syncImgUrl('hero-img-url','hero-img-prev','hero-img-ph')">
+        </div>
+        <div class="form-group full"><label class="form-label">نص الشارة (Badge)</label><input type="text" class="form-input" id="h-badge" placeholder="مركز متخصص في طب الأسنان"></div>
+        <div class="form-group"><label class="form-label">سطر العنوان الأول</label><input type="text" class="form-input" id="h-t1" placeholder="ابتسامة"></div>
+        <div class="form-group"><label class="form-label">سطر العنوان الذهبي</label><input type="text" class="form-input" id="h-tg" placeholder="أكثر إشراقاً"></div>
+        <div class="form-group full"><label class="form-label">سطر العنوان الثالث</label><input type="text" class="form-input" id="h-t2" placeholder="في يد خبراء"></div>
+        <div class="form-group full"><label class="form-label">النص التوضيحي</label><textarea class="form-textarea" id="h-desc" rows="3"></textarea></div>
+        <div class="form-group"><label class="form-label">نص الزر الرئيسي</label><input type="text" class="form-input" id="h-btn1" placeholder="احجز موعدك الآن"></div>
+        <div class="form-group"><label class="form-label">نص الزر الثانوي</label><input type="text" class="form-input" id="h-btn2" placeholder="تعرّف علينا"></div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin:20px 0;padding-top:20px">
+        <p class="form-label" style="margin-bottom:16px">الإحصائيات الأربعة</p>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">إحصائية 1 — الرقم</label><input type="text" class="form-input" id="h-s1n" placeholder="+5000"></div>
+          <div class="form-group"><label class="form-label">إحصائية 1 — النص</label><input type="text" class="form-input" id="h-s1l" placeholder="مريض راضٍ"></div>
+          <div class="form-group"><label class="form-label">إحصائية 2 — الرقم</label><input type="text" class="form-input" id="h-s2n" placeholder="+15"></div>
+          <div class="form-group"><label class="form-label">إحصائية 2 — النص</label><input type="text" class="form-input" id="h-s2l" placeholder="سنة خبرة"></div>
+          <div class="form-group"><label class="form-label">إحصائية 4 — الرقم</label><input type="text" class="form-input" id="h-s4n" placeholder="4.9"></div>
+          <div class="form-group"><label class="form-label">إحصائية 4 — النص</label><input type="text" class="form-input" id="h-s4l" placeholder="تقييم المراجعين"></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin:20px 0;padding-top:20px">
+        <p class="form-label" style="margin-bottom:16px">البطاقتان العائمتان</p>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">بطاقة 1 — العنوان</label><input type="text" class="form-input" id="h-c1t" placeholder="معتمد دولياً"></div>
+          <div class="form-group"><label class="form-label">بطاقة 1 — النص الفرعي</label><input type="text" class="form-input" id="h-c1s" placeholder="JCI Accredited"></div>
+          <div class="form-group"><label class="form-label">بطاقة 2 — العنوان</label><input type="text" class="form-input" id="h-c2t" placeholder="معقّم بالكامل"></div>
+          <div class="form-group"><label class="form-label">بطاقة 2 — النص الفرعي</label><input type="text" class="form-input" id="h-c2s" placeholder="معايير عالمية"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT PAGE -->
+  <div class="page" id="page-about">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title"><i class="fa fa-circle-info"></i>قسم "عن المركز"</div><div class="card-sub">الصورة والنصوص والمميزات الأربعة</div></div><button class="btn btn-gold" onclick="saveAbout()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">صورة القسم</label>
+          <div class="img-upload-box" onclick="document.getElementById('about-img-file').click()" id="about-img-drop">
+            <input type="file" id="about-img-file" accept="image/*" style="display:none" onchange="previewImg(this,'about-img-prev','about-img-drop')">
+            <img id="about-img-prev" src="" style="max-height:120px;max-width:300px;display:none;margin:0 auto;border-radius:8px;object-fit:cover">
+            <div id="about-img-ph" style="text-align:center;padding:20px"><i class="fa fa-image" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i><p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة القسم</p></div>
+          </div>
+          <p style="font-size:12px;color:#bbb;margin-top:8px">أو أدخل رابطاً مباشراً:</p>
+          <input type="url" class="form-input" id="about-img-url" placeholder="https://..." dir="ltr" style="margin-top:8px" oninput="syncImgUrl('about-img-url','about-img-prev','about-img-ph')">
+        </div>
+        <div class="form-group"><label class="form-label">وسم الصورة (Tag)</label><input type="text" class="form-input" id="ab-tag" placeholder="منذ 2009"></div>
+        <div class="form-group full"><label class="form-label">جملة Lead</label><input type="text" class="form-input" id="ab-lead"></div>
+        <div class="form-group"><label class="form-label">ميزة 1</label><input type="text" class="form-input" id="ab-f1"></div>
+        <div class="form-group"><label class="form-label">ميزة 2</label><input type="text" class="form-input" id="ab-f2"></div>
+        <div class="form-group"><label class="form-label">ميزة 3</label><input type="text" class="form-input" id="ab-f3"></div>
+        <div class="form-group"><label class="form-label">ميزة 4</label><input type="text" class="form-input" id="ab-f4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOCIAL PAGE -->
+  <div class="page" id="page-social">
+    <div class="card">
+      <div class="card-header"><div><div class="card-title"><i class="fa fa-share-nodes"></i>روابط التواصل الاجتماعي</div><div class="card-sub">تظهر في الفوتر — اتركها فارغة لإخفائها</div></div><button class="btn btn-gold" onclick="saveSocial()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label"><i class="fab fa-instagram" style="color:#E1306C;margin-left:8px"></i>Instagram</label><input type="url" class="form-input" id="soc-instagram" placeholder="https://instagram.com/..." dir="ltr"></div>
+        <div class="form-group"><label class="form-label"><i class="fab fa-twitter" style="color:#1DA1F2;margin-left:8px"></i>Twitter / X</label><input type="url" class="form-input" id="soc-twitter" placeholder="https://twitter.com/..." dir="ltr"></div>
+        <div class="form-group"><label class="form-label"><i class="fab fa-snapchat" style="color:#FFFC00;margin-left:8px;text-shadow:0 0 1px #aaa"></i>Snapchat</label><input type="url" class="form-input" id="soc-snapchat" placeholder="https://snapchat.com/add/..." dir="ltr"></div>
+        <div class="form-group"><label class="form-label"><i class="fab fa-tiktok" style="color:#010101;margin-left:8px"></i>TikTok</label><input type="url" class="form-input" id="soc-tiktok" placeholder="https://tiktok.com/@..." dir="ltr"></div>
+        <div class="form-group"><label class="form-label"><i class="fab fa-facebook-f" style="color:#1877F2;margin-left:8px"></i>Facebook</label><input type="url" class="form-input" id="soc-facebook" placeholder="https://facebook.com/..." dir="ltr"></div>
+        <div class="form-group"><label class="form-label"><i class="fab fa-youtube" style="color:#FF0000;margin-left:8px"></i>YouTube</label><input type="url" class="form-input" id="soc-youtube" placeholder="https://youtube.com/@..." dir="ltr"></div>
+      </div>
+      <p style="font-size:12px;color:#bbb;margin-top:8px">رقم واتساب يُدار من صفحة "معلومات المركز"</p>
+    </div>
+  </div>
+
 </main>
 
 <!-- MODAL: DOCTOR -->
@@ -320,7 +413,15 @@
         <input type="hidden" id="d-idx">
         <div class="form-group"><label class="form-label">اسم الطبيب</label><input type="text" class="form-input" id="d-name" placeholder="د. اسم الطبيب"></div>
         <div class="form-group"><label class="form-label">التخصص</label><input type="text" class="form-input" id="d-spec"></div>
-        <div class="form-group full"><label class="form-label">رابط الصورة (اختياري)</label><input type="url" class="form-input" id="d-img" placeholder="https://..." dir="ltr"></div>
+        <div class="form-group full">
+          <label class="form-label">صورة الطبيب</label>
+          <div class="img-upload-box" onclick="document.getElementById('d-img-file').click()" id="d-img-drop" style="min-height:80px">
+            <input type="file" id="d-img-file" accept="image/*" style="display:none" onchange="previewImg(this,'d-img-prev','d-img-drop')">
+            <img id="d-img-prev" src="" style="max-height:80px;max-width:160px;display:none;margin:0 auto;border-radius:8px;object-fit:cover">
+            <div id="d-img-ph" style="text-align:center"><i class="fa fa-camera" style="font-size:24px;color:var(--gold);opacity:.6;margin-bottom:6px;display:block"></i><p style="font-size:12px;color:var(--text-mid)">انقر لرفع صورة</p></div>
+          </div>
+          <input type="url" class="form-input" id="d-img" placeholder="أو أدخل رابطاً مباشراً https://..." dir="ltr" style="margin-top:8px" oninput="syncImgUrl('d-img','d-img-prev','d-img-ph')">
+        </div>
         <div class="form-group full"><label class="form-label">أيام العمل</label><div class="days-wrap" id="days-cbs"></div></div>
         <div class="form-group"><label class="form-label">وقت البداية</label><input type="time" class="form-input" id="d-start" value="09:00"></div>
         <div class="form-group"><label class="form-label">وقت الانتهاء</label><input type="time" class="form-input" id="d-end" value="17:00"></div>
@@ -394,8 +495,8 @@ function doLogout(){localStorage.removeItem('adminAuth');location.reload()}
 document.getElementById('lp').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin()});
 
 /* ---- PAGES ---- */
-const titles = {dashboard:'لوحة المعلومات',setup:'إعداد قاعدة البيانات',clinic:'معلومات المركز',doctors:'الكادر الطبي',specialties:'التخصصات',hours:'ساعات العمل',reviews:'التقييمات',logo:'الشعار والهوية'};
-const subs   = {dashboard:'نظرة عامة',setup:'ربط JSONBin.io كقاعدة بيانات سحابية',clinic:'تعديل البيانات الأساسية',doctors:'إضافة وتعديل وحذف الأطباء',specialties:'إدارة التخصصات',hours:'ضبط ساعات الدوام',reviews:'إدارة التقييمات',logo:'تحديث الشعار'};
+const titles = {dashboard:'لوحة المعلومات',setup:'إعداد قاعدة البيانات',clinic:'معلومات المركز',hero:'قسم Hero',about:'قسم عن المركز',social:'التواصل الاجتماعي',doctors:'الكادر الطبي',specialties:'التخصصات',hours:'ساعات العمل',reviews:'التقييمات',logo:'الشعار والهوية'};
+const subs   = {dashboard:'نظرة عامة',setup:'ربط JSONBin.io كقاعدة بيانات سحابية',clinic:'تعديل البيانات الأساسية',hero:'العنوان والصورة والإحصائيات',about:'الصورة والنصوص والمميزات',social:'روابط منصات التواصل الاجتماعي',doctors:'إضافة وتعديل وحذف الأطباء',specialties:'إدارة التخصصات',hours:'ضبط ساعات الدوام',reviews:'إدارة التقييمات',logo:'تحديث الشعار'};
 function showPage(name, el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -406,6 +507,9 @@ function showPage(name, el){
   if(name==='dashboard')  renderDash();
   if(name==='setup')      loadSetupForm();
   if(name==='clinic')     loadClinicForm();
+  if(name==='hero')       loadHeroForm();
+  if(name==='about')      loadAboutForm();
+  if(name==='social')     loadSocialForm();
   if(name==='doctors')    renderDocs();
   if(name==='specialties')renderSpecs();
   if(name==='hours')      renderHoursAdmin();
@@ -552,13 +656,21 @@ function openDocModal(idx){
     document.getElementById('doc-modal-t').textContent='تعديل بيانات الطبيب';
     document.getElementById('d-idx').value=idx;
     document.getElementById('d-name').value=d.name;document.getElementById('d-spec').value=d.specialty;
-    document.getElementById('d-img').value=d.img||'';document.getElementById('d-start').value=d.startTime||'09:00';
+    document.getElementById('d-img').value=d.img||'';
+    // عرض الصورة الحالية
+    const prev=document.getElementById('d-img-prev');
+    const drop=document.getElementById('d-img-drop');
+    if(d.img&&prev){prev.src=d.img;prev.style.display='block';if(drop)drop.dataset.b64=''}
+    else if(prev){prev.style.display='none'}
+    document.getElementById('d-start').value=d.startTime||'09:00';
     document.getElementById('d-end').value=d.endTime||'17:00';document.getElementById('d-dur').value=d.slotDuration||30;
     (d.workDays||[]).forEach(i=>{const c=document.getElementById('dc-'+i);if(c)c.checked=true});
   } else {
     document.getElementById('doc-modal-t').textContent='إضافة طبيب جديد';
     document.getElementById('d-idx').value='';
     ['d-name','d-spec','d-img'].forEach(id=>document.getElementById(id).value='');
+    const prev=document.getElementById('d-img-prev'); if(prev)prev.style.display='none';
+    const drop=document.getElementById('d-img-drop'); if(drop)drop.dataset.b64='';
     document.getElementById('d-start').value='09:00';document.getElementById('d-end').value='17:00';document.getElementById('d-dur').value=30;
     [0,1,2,3,4].forEach(i=>{const c=document.getElementById('dc-'+i);if(c)c.checked=true});
   }
@@ -567,7 +679,8 @@ function closeDocModal(){document.getElementById('doc-modal').classList.remove('
 async function saveDoc(){
   const idx=document.getElementById('d-idx').value;
   const days=[];for(let i=0;i<7;i++){const c=document.getElementById('dc-'+i);if(c?.checked)days.push(i)}
-  const doc={id:idx!==''?DATA.doctors[parseInt(idx)].id:Date.now(),name:document.getElementById('d-name').value,specialty:document.getElementById('d-spec').value,img:document.getElementById('d-img').value,workDays:days,startTime:document.getElementById('d-start').value,endTime:document.getElementById('d-end').value,slotDuration:parseInt(document.getElementById('d-dur').value)};
+  const imgVal=getImgVal('d-img-drop','d-img')||(idx!==''?DATA.doctors[parseInt(idx)]?.img:'')||'';
+  const doc={id:idx!==''?DATA.doctors[parseInt(idx)].id:Date.now(),name:document.getElementById('d-name').value,specialty:document.getElementById('d-spec').value,img:imgVal,workDays:days,startTime:document.getElementById('d-start').value,endTime:document.getElementById('d-end').value,slotDuration:parseInt(document.getElementById('d-dur').value)};
   const docs=[...DATA.doctors||[]];
   if(idx!=='')docs[parseInt(idx)]=doc;else docs.push(doc);
   DATA.doctors=docs;await save(DATA);closeDocModal();renderDocs();
@@ -656,22 +769,145 @@ async function saveRev(){
 }
 async function deleteRev(idx){if(!confirm('حذف؟'))return;DATA.reviews.splice(idx,1);await save(DATA);renderRevs()}
 
+/* ---- IMAGE UPLOAD HELPERS ---- */
+// يقرأ الصورة كـ base64 ويعرضها في العنصر المحدد
+function previewImg(input, previewId, dropId){
+  const f=input.files[0]; if(!f) return;
+  // ضغط الصورة قبل الحفظ
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=800;
+      let w=img.width, h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX}
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const b64=canvas.toDataURL('image/jpeg',0.82);
+      const prev=document.getElementById(previewId);
+      const ph=document.getElementById(dropId.replace('-drop','-ph')||dropId+'_ph');
+      if(prev){prev.src=b64;prev.style.display='block'}
+      // نخزن في data attribute مؤقتاً
+      document.getElementById(dropId).dataset.b64=b64;
+      // إخفاء placeholder
+      const phEl=document.querySelector('#'+dropId+' div[id$="-ph"],#'+dropId+' div[id$="_ph"]');
+      if(phEl)phEl.style.display='none';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+
+// مزامنة رابط URL مع عنصر المعاينة
+function syncImgUrl(inputId, previewId, phId){
+  const url=document.getElementById(inputId).value.trim();
+  const prev=document.getElementById(previewId);
+  if(!prev) return;
+  if(url){prev.src=url;prev.style.display='block';const ph=document.getElementById(phId);if(ph)ph.style.display='none';}
+  else{prev.style.display='none'}
+}
+
+// تحصيل قيمة الصورة: base64 من الرفع، أو URL من الحقل
+function getImgVal(dropId, urlInputId){
+  const drop=document.getElementById(dropId);
+  if(drop&&drop.dataset.b64) return drop.dataset.b64;
+  const urlEl=document.getElementById(urlInputId);
+  return urlEl?urlEl.value.trim():'';
+}
+
+/* ---- HERO ---- */
+function loadHeroForm(){
+  const h=DATA?.hero||{};
+  const f=id=>document.getElementById(id);
+  f('h-badge').value=h.badge||''; f('h-t1').value=h.title1||''; f('h-tg').value=h.titleGold||''; f('h-t2').value=h.title2||'';
+  f('h-desc').value=h.desc||''; f('h-btn1').value=h.btnPrimary||''; f('h-btn2').value=h.btnSecondary||'';
+  f('h-s1n').value=h.stat1Num||''; f('h-s1l').value=h.stat1Label||'';
+  f('h-s2n').value=h.stat2Num||''; f('h-s2l').value=h.stat2Label||'';
+  f('h-s4n').value=h.stat4Num||''; f('h-s4l').value=h.stat4Label||'';
+  f('h-c1t').value=h.card1Title||''; f('h-c1s').value=h.card1Sub||'';
+  f('h-c2t').value=h.card2Title||''; f('h-c2s').value=h.card2Sub||'';
+  if(h.heroImg){const p=f('hero-img-prev');if(p){p.src=h.heroImg;p.style.display='block';}; f('hero-img-url').value=h.heroImg;}
+}
+
+async function saveHero(){
+  const f=id=>document.getElementById(id).value;
+  const img=getImgVal('hero-img-drop','hero-img-url')||DATA?.hero?.heroImg||'';
+  const hero={
+    badge:f('h-badge'), title1:f('h-t1'), titleGold:f('h-tg'), title2:f('h-t2'),
+    desc:f('h-desc'), btnPrimary:f('h-btn1'), btnSecondary:f('h-btn2'),
+    stat1Num:f('h-s1n'), stat1Label:f('h-s1l'),
+    stat2Num:f('h-s2n'), stat2Label:f('h-s2l'),
+    stat4Num:f('h-s4n'), stat4Label:f('h-s4l'),
+    card1Title:f('h-c1t'), card1Sub:f('h-c1s'),
+    card2Title:f('h-c2t'), card2Sub:f('h-c2s'),
+    heroImg:img,
+  };
+  const newData={...DATA, hero};
+  await save(newData);
+}
+
+/* ---- ABOUT ---- */
+function loadAboutForm(){
+  const a=DATA?.about||{};
+  const f=id=>document.getElementById(id);
+  f('ab-tag').value=a.tag||''; f('ab-lead').value=a.lead||'';
+  f('ab-f1').value=a.feat1||''; f('ab-f2').value=a.feat2||''; f('ab-f3').value=a.feat3||''; f('ab-f4').value=a.feat4||'';
+  if(a.img){const p=f('about-img-prev');if(p){p.src=a.img;p.style.display='block';}; f('about-img-url').value=a.img;}
+}
+
+async function saveAbout(){
+  const f=id=>document.getElementById(id).value;
+  const img=getImgVal('about-img-drop','about-img-url')||DATA?.about?.img||'';
+  const about={img, tag:f('ab-tag'), lead:f('ab-lead'), feat1:f('ab-f1'), feat2:f('ab-f2'), feat3:f('ab-f3'), feat4:f('ab-f4')};
+  const newData={...DATA, about};
+  await save(newData);
+}
+
+/* ---- SOCIAL ---- */
+function loadSocialForm(){
+  const s=DATA?.social||{};
+  ['instagram','twitter','snapchat','tiktok','facebook','youtube'].forEach(k=>{
+    const el=document.getElementById('soc-'+k); if(el) el.value=s[k]||'';
+  });
+}
+
+async function saveSocial(){
+  const social={};
+  ['instagram','twitter','snapchat','tiktok','facebook','youtube'].forEach(k=>{
+    const el=document.getElementById('soc-'+k); if(el) social[k]=el.value.trim();
+  });
+  const newData={...DATA, social};
+  await save(newData);
+}
+
 /* ---- LOGO ---- */
-let logoB64='';
 function previewLogo(input){
   const f=input.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    logoB64=e.target.result;
-    const img=document.getElementById('logo-preview');
-    img.src=logoB64;img.style.display='block';
-    document.getElementById('logo-ph').style.display='none';
-  };r.readAsDataURL(f);
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=400;
+      let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const b64=canvas.toDataURL('image/png',0.9);
+      const prev=document.getElementById('logo-preview');
+      prev.src=b64;prev.style.display='block';
+      document.getElementById('logo-ph').style.display='none';
+      // تخزين مؤقت
+      document.querySelector('.logo-drop').dataset.b64=b64;
+    };img.src=e.target.result;
+  };reader.readAsDataURL(f);
 }
 async function saveLogo(){
-  if(!logoB64){toast('اختر صورة أولاً');return}
+  const b64=document.querySelector('.logo-drop')?.dataset?.b64;
+  if(!b64){toast('اختر صورة أولاً');return}
   if(!DATA.clinicInfo)DATA.clinicInfo={};
-  DATA.clinicInfo.logoUrl=logoB64;
+  DATA.clinicInfo.logoUrl=b64;
   await save(DATA);
 }
 

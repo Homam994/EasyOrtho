@@ -222,18 +222,18 @@
 <section class="hero" id="home">
   <div class="hero-inner">
     <div>
-      <div class="hero-badge"><i class="fa fa-star"></i><span>مركز متخصص في طب الأسنان</span></div>
-      <h1 class="hero-title"><span>ابتسامة</span><span class="gold-text">أكثر إشراقاً</span><span>في يد خبراء</span></h1>
+      <div class="hero-badge"><i class="fa fa-star"></i><span id="hero-badge">مركز متخصص في طب الأسنان</span></div>
+      <h1 class="hero-title"><span id="hero-title1">ابتسامة</span><span class="gold-text" id="hero-title-gold">أكثر إشراقاً</span><span id="hero-title2">في يد خبراء</span></h1>
       <p class="hero-desc" id="hero-desc">نقدّم لك رعاية أسنان عالية المستوى في بيئة راقية تجمع بين الخبرة الطبية الاحترافية وأحدث التقنيات.</p>
       <div class="hero-actions">
-        <button class="btn-primary" onclick="openBooking()"><i class="fa fa-calendar-check"></i>احجز موعدك الآن</button>
-        <a href="#about" class="btn-secondary"><i class="fa fa-play"></i>تعرّف علينا</a>
+        <button class="btn-primary" onclick="openBooking()"><i class="fa fa-calendar-check"></i><span id="hero-btn1">احجز موعدك الآن</span></button>
+        <a href="#about" class="btn-secondary"><i class="fa fa-play"></i><span id="hero-btn2">تعرّف علينا</span></a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><div class="stat-num">+5000</div><div class="stat-label">مريض راضٍ</div></div>
-        <div class="stat"><div class="stat-num">+15</div><div class="stat-label">سنة خبرة</div></div>
+        <div class="stat"><div class="stat-num" id="stat1-num">+5000</div><div class="stat-label" id="stat1-label">مريض راضٍ</div></div>
+        <div class="stat"><div class="stat-num" id="stat2-num">+15</div><div class="stat-label" id="stat2-label">سنة خبرة</div></div>
         <div class="stat"><div class="stat-num" id="stat-docs">—</div><div class="stat-label">أطباء متخصصون</div></div>
-        <div class="stat"><div class="stat-num">4.9</div><div class="stat-label">تقييم المراجعين</div></div>
+        <div class="stat"><div class="stat-num" id="stat4-num">4.9</div><div class="stat-label" id="stat4-label">تقييم المراجعين</div></div>
       </div>
     </div>
     <div class="hero-image-wrap">
@@ -242,11 +242,11 @@
       </div>
       <div class="floating-card float-card-1">
         <div class="fc-icon"><i class="fa fa-award"></i></div>
-        <div><div class="fc-title">معتمد دولياً</div><div class="fc-sub">JCI Accredited</div></div>
+        <div><div class="fc-title" id="card1-title">معتمد دولياً</div><div class="fc-sub" id="card1-sub">JCI Accredited</div></div>
       </div>
       <div class="floating-card float-card-2">
         <div class="fc-icon"><i class="fa fa-shield-halved"></i></div>
-        <div><div class="fc-title">معقّم بالكامل</div><div class="fc-sub">معايير عالمية</div></div>
+        <div><div class="fc-title" id="card2-title">معقّم بالكامل</div><div class="fc-sub" id="card2-sub">معايير عالمية</div></div>
       </div>
     </div>
   </div>
@@ -255,17 +255,17 @@
 <section id="about">
   <div class="container">
     <div class="about-grid">
-      <div class="about-image" id="about-img-wrap"><i class="fa fa-hospital"></i><span class="about-tag">منذ 2009</span></div>
+      <div class="about-image" id="about-img-wrap"><i class="fa fa-hospital"></i><span class="about-tag" id="about-tag">منذ 2009</span></div>
       <div class="about-content reveal">
         <div class="section-badge"><span>من نحن</span></div>
         <h2 class="section-title" style="text-align:right;margin-bottom:20px">مركز طبي متكامل<br><span>بمعايير عالمية فائقة</span></h2>
-        <p class="lead">رواد في تقديم الرعاية الأسنانية الشاملة منذ أكثر من خمسة عشر عاماً.</p>
+        <p class="lead" id="about-lead">رواد في تقديم الرعاية الأسنانية الشاملة منذ أكثر من خمسة عشر عاماً.</p>
         <p id="about-p1"></p><p id="about-p2"></p>
         <div class="about-features">
-          <div class="feat-item"><div class="feat-icon"><i class="fa fa-microscope"></i></div><div class="feat-text">أجهزة تشخيص حديثة</div></div>
-          <div class="feat-item"><div class="feat-icon"><i class="fa fa-user-doctor"></i></div><div class="feat-text">أطباء معتمدون دولياً</div></div>
-          <div class="feat-item"><div class="feat-icon"><i class="fa fa-shield-virus"></i></div><div class="feat-text">بروتوكولات تعقيم متقدمة</div></div>
-          <div class="feat-item"><div class="feat-icon"><i class="fa fa-clock"></i></div><div class="feat-text">مواعيد مرنة ودقيقة</div></div>
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-microscope"></i></div><div class="feat-text" id="feat1">أجهزة تشخيص حديثة</div></div>
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-user-doctor"></i></div><div class="feat-text" id="feat2">أطباء معتمدون دولياً</div></div>
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-shield-virus"></i></div><div class="feat-text" id="feat3">بروتوكولات تعقيم متقدمة</div></div>
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-clock"></i></div><div class="feat-text" id="feat4">مواعيد مرنة ودقيقة</div></div>
         </div>
       </div>
     </div>
@@ -321,12 +321,7 @@
       <div class="footer-about">
         <div class="f-logo" id="footer-name">مركز لؤلؤة الابتسامة</div>
         <p id="footer-desc">مركز متكامل لطب الأسنان يجمع بين الخبرة العلمية والتقنيات الحديثة.</p>
-        <div class="footer-social">
-          <a class="soc-btn" href="#"><i class="fab fa-instagram"></i></a>
-          <a class="soc-btn" href="#"><i class="fab fa-twitter"></i></a>
-          <a class="soc-btn" href="#"><i class="fab fa-snapchat"></i></a>
-          <a class="soc-btn" id="wa-footer" href="#"><i class="fab fa-whatsapp"></i></a>
-        </div>
+        <div class="footer-social" id="social-links"></div>
       </div>
       <div class="footer-col"><h4>روابط سريعة</h4><ul><li><a href="#about">عن المركز</a></li><li><a href="#specialties">التخصصات</a></li><li><a href="#doctors">الكادر الطبي</a></li><li><a href="#hours">ساعات العمل</a></li><li><a href="#reviews">التقييمات</a></li></ul></div>
       <div class="footer-col"><h4>خدماتنا</h4><ul id="footer-services"></ul></div>
@@ -382,28 +377,63 @@ let BK = {doctorId:null,date:null,time:null,month:null};
 
 async function boot(){
   D = await DB.read();
-  applyInfo(); renderSpecs(); renderDocs(); renderHours(); renderRevs();
+  applyInfo(); applyHero(); applyAbout(); applySocial();
+  renderSpecs(); renderDocs(); renderHours(); renderRevs();
   document.getElementById('stat-docs').textContent = (D.doctors||[]).length;
-  // footer services from specialties
   document.getElementById('footer-services').innerHTML = (D.specialties||[]).slice(0,5).map(s=>`<li><a href="#">${s.title}</a></li>`).join('');
   hideLoader(); initReveal();
 }
 
 function hideLoader(){const l=document.getElementById('page-loader');l.classList.add('hidden');setTimeout(()=>l.remove(),600)}
 
+function set(id,v){const e=document.getElementById(id);if(e&&v!==undefined&&v!=='')e.textContent=v}
+
 function applyInfo(){
   const i=D.clinicInfo||{};
-  const s=(id,v)=>{const e=document.getElementById(id);if(e&&v)e.textContent=v};
-  s('clinic-name-nav',i.name);s('clinic-slogan-nav',i.slogan);
-  s('clinic-address',i.address);s('clinic-phone',i.phone);s('clinic-email',i.email);
-  s('about-p1',i.about1);s('about-p2',i.about2);
-  s('footer-name',i.name);s('footer-name2',i.name);s('footer-desc',i.footerDesc);
+  set('clinic-name-nav',i.name); set('clinic-slogan-nav',i.slogan);
+  set('clinic-address',i.address); set('clinic-phone',i.phone); set('clinic-email',i.email);
+  set('about-p1',i.about1); set('about-p2',i.about2);
+  set('footer-name',i.name); set('footer-name2',i.name); set('footer-desc',i.footerDesc);
   if(i.name)document.title=i.name+' - مركز طب الأسنان';
   const wa=(i.whatsapp||'966500000000').replace(/\D/g,'');
   document.getElementById('wa-float').href='https://wa.me/'+wa;
-  document.getElementById('wa-footer').href='https://wa.me/'+wa;
   if(i.mapEmbed)document.getElementById('clinic-map').src=i.mapEmbed;
   if(i.logoUrl){const w=document.getElementById('nav-logo-wrap');w.innerHTML=`<img src="${i.logoUrl}" alt="شعار">`}
+}
+
+function applyHero(){
+  const h=D.hero||{};
+  set('hero-badge',h.badge); set('hero-title1',h.title1); set('hero-title-gold',h.titleGold); set('hero-title2',h.title2);
+  set('hero-desc',h.desc); set('hero-btn1',h.btnPrimary); set('hero-btn2',h.btnSecondary);
+  set('stat1-num',h.stat1Num); set('stat1-label',h.stat1Label);
+  set('stat2-num',h.stat2Num); set('stat2-label',h.stat2Label);
+  set('stat4-num',h.stat4Num); set('stat4-label',h.stat4Label);
+  set('card1-title',h.card1Title); set('card1-sub',h.card1Sub);
+  set('card2-title',h.card2Title); set('card2-sub',h.card2Sub);
+  const frame=document.getElementById('hero-img-frame');
+  if(h.heroImg&&frame){frame.innerHTML=`<img src="${h.heroImg}" alt="صورة المركز" style="width:100%;height:100%;object-fit:cover">`}
+}
+
+function applyAbout(){
+  const a=D.about||{};
+  set('about-lead',a.lead); set('about-tag',a.tag);
+  set('feat1',a.feat1); set('feat2',a.feat2); set('feat3',a.feat3); set('feat4',a.feat4);
+  const wrap=document.getElementById('about-img-wrap');
+  if(a.img&&wrap){
+    const existing=wrap.querySelector('img');
+    if(!existing){const img=document.createElement('img');img.src=a.img;img.alt='عن المركز';wrap.appendChild(img)}
+    else existing.src=a.img;
+  }
+}
+
+function applySocial(){
+  const s=D.social||{};
+  const wa=(D.clinicInfo?.whatsapp||'966500000000').replace(/\D/g,'');
+  const icons={instagram:'fab fa-instagram',twitter:'fab fa-twitter',snapchat:'fab fa-snapchat',tiktok:'fab fa-tiktok',facebook:'fab fa-facebook-f',youtube:'fab fa-youtube'};
+  const links=Object.entries(icons).filter(([k])=>s[k]).map(([k,ic])=>`<a class="soc-btn" href="${s[k]}" target="_blank"><i class="${ic}"></i></a>`);
+  links.push(`<a class="soc-btn" href="https://wa.me/${wa}" target="_blank" id="wa-footer"><i class="fab fa-whatsapp"></i></a>`);
+  const el=document.getElementById('social-links');
+  if(el)el.innerHTML=links.join('');
 }
 
 function renderSpecs(){

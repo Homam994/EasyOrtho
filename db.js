@@ -1,112 +1,100 @@
-// =====================================================
-//  db.js  —  Shared cloud database via JSONBin.io
-//  يجب تعبئة BIN_ID و API_KEY من إعدادات JSONBin
-// =====================================================
-
 const DB = (() => {
-  // ⚠️  يُعبَّآن من صفحة الإدارة بعد إنشاء الـ Bin
   let BIN_ID  = localStorage.getItem('db_bin_id')  || '';
   let API_KEY = localStorage.getItem('db_api_key') || '';
-
-  const BASE = 'https://api.jsonbin.io/v3';
-
-  let _cache = null;
+  const BASE  = 'https://api.jsonbin.io/v3';
+  let _cache  = null;
   let _lastFetch = 0;
-  const CACHE_TTL = 30_000; // 30 ثانية
+  const TTL   = 30000;
 
-  // -------- DEFAULT DATA --------
   const DEFAULTS = {
     clinicInfo: {
-      name:       'مركز لؤلؤة الابتسامة',
-      slogan:     'لطب الأسنان المتخصص',
-      whatsapp:   '966500000000',
-      phone:      '920-000-000',
-      address:    'شارع الأمير محمد بن عبدالعزيز، حي العليا، الرياض',
-      email:      'info@pearl-dental.com',
-      mapEmbed:   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.3069641489!2d46.5390756!3d24.7136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f03890d489399%3A0xba974d1c98e79fd5!2sRiyadh%20Saudi%20Arabia!5e0!3m2!1sen!2s!4v1',
-      about1:     'يضم مركزنا نخبة من أمهر أطباء الأسنان المتخصصين في مختلف فروع طب الأسنان، مزوّدين بأحدث الأجهزة والتقنيات.',
-      about2:     'نؤمن بأن ابتسامتك هي انعكاس لصحتك وثقتك بنفسك، لذلك نحرص على تقديم تجربة علاجية راقية في بيئة مريحة وآمنة.',
-      footerDesc: 'مركز متكامل لطب الأسنان يجمع بين الخبرة العلمية والتقنيات الحديثة.',
-      logoUrl:    '',
+      name:'مركز لؤلؤة الابتسامة', slogan:'لطب الأسنان المتخصص',
+      whatsapp:'966500000000', phone:'920-000-000',
+      address:'شارع الأمير محمد بن عبدالعزيز، حي العليا، الرياض',
+      email:'info@pearl-dental.com',
+      mapEmbed:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.3069641489!2d46.5390756!3d24.7136!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f03890d489399%3A0xba974d1c98e79fd5!2sRiyadh!5e0!3m2!1sen!2s!4v1',
+      about1:'يضم مركزنا نخبة من أمهر أطباء الأسنان المتخصصين في مختلف فروع طب الأسنان، مزوّدين بأحدث الأجهزة والتقنيات.',
+      about2:'نؤمن بأن ابتسامتك هي انعكاس لصحتك وثقتك بنفسك، لذلك نحرص على تقديم تجربة علاجية راقية في بيئة مريحة وآمنة.',
+      footerDesc:'مركز متكامل لطب الأسنان يجمع بين الخبرة العلمية والتقنيات الحديثة.',
+      logoUrl:'',
+    },
+    hero: {
+      badge:'مركز متخصص في طب الأسنان',
+      title1:'ابتسامة', titleGold:'أكثر إشراقاً', title2:'في يد خبراء',
+      desc:'نقدّم لك رعاية أسنان عالية المستوى في بيئة راقية تجمع بين الخبرة الطبية الاحترافية وأحدث التقنيات.',
+      btnPrimary:'احجز موعدك الآن', btnSecondary:'تعرّف علينا',
+      stat1Num:'+5000', stat1Label:'مريض راضٍ',
+      stat2Num:'+15',   stat2Label:'سنة خبرة',
+      stat4Num:'4.9',   stat4Label:'تقييم المراجعين',
+      heroImg:'',
+      card1Title:'معتمد دولياً', card1Sub:'JCI Accredited',
+      card2Title:'معقّم بالكامل', card2Sub:'معايير عالمية',
+    },
+    about: {
+      img:'', tag:'منذ 2009',
+      lead:'رواد في تقديم الرعاية الأسنانية الشاملة منذ أكثر من خمسة عشر عاماً.',
+      feat1:'أجهزة تشخيص حديثة', feat2:'أطباء معتمدون دولياً',
+      feat3:'بروتوكولات تعقيم متقدمة', feat4:'مواعيد مرنة ودقيقة',
+    },
+    social: {
+      instagram:'', twitter:'', snapchat:'', tiktok:'', facebook:'', youtube:'',
     },
     doctors: [
-      { id:1, name:'د. أحمد المنصوري',  specialty:'تقويم وجراحة الفم',       img:'', workDays:[0,1,2,3,4], startTime:'9:00',  endTime:'17:00', slotDuration:30 },
-      { id:2, name:'د. سارة الزهراني',  specialty:'زراعة الأسنان',            img:'', workDays:[0,1,2,4,6], startTime:'10:00', endTime:'18:00', slotDuration:45 },
-      { id:3, name:'د. خالد العتيبي',   specialty:'طب الأسنان التجميلي',      img:'', workDays:[1,2,3,4,5], startTime:'8:00',  endTime:'16:00', slotDuration:30 },
-      { id:4, name:'د. نورة الشمري',    specialty:'طب أسنان الأطفال',         img:'', workDays:[0,1,2,3,4,5], startTime:'9:00', endTime:'17:00', slotDuration:30 },
+      {id:1,name:'د. أحمد المنصوري', specialty:'تقويم وجراحة الفم',    img:'',workDays:[0,1,2,3,4],  startTime:'9:00', endTime:'17:00',slotDuration:30},
+      {id:2,name:'د. سارة الزهراني', specialty:'زراعة الأسنان',         img:'',workDays:[0,1,2,4,6],  startTime:'10:00',endTime:'18:00',slotDuration:45},
+      {id:3,name:'د. خالد العتيبي',  specialty:'طب الأسنان التجميلي',   img:'',workDays:[1,2,3,4,5],  startTime:'8:00', endTime:'16:00',slotDuration:30},
+      {id:4,name:'د. نورة الشمري',   specialty:'طب أسنان الأطفال',      img:'',workDays:[0,1,2,3,4,5],startTime:'9:00', endTime:'17:00',slotDuration:30},
     ],
     specialties: [
-      { icon:'fa fa-teeth',      title:'تقويم الأسنان',        desc:'علاج اعوجاج الأسنان بأحدث تقنيات التقويم الشفاف والمعدني للحصول على ابتسامة مثالية.' },
-      { icon:'fa fa-tooth',      title:'زراعة الأسنان',         desc:'حلول دائمة لفقدان الأسنان باستخدام أفضل أنواع الغرسات المعتمدة عالمياً.' },
-      { icon:'fa fa-star',       title:'الأسنان التجميلية',    desc:'تحسين مظهر ابتسامتك عبر الفينيرز والقشور والتركيبات الخزفية الاحترافية.' },
-      { icon:'fa fa-syringe',    title:'علاج جذور الأسنان',    desc:'حل فعال ومريح لإنقاذ الأسنان المتضررة من العدوى والتلف الشديد.' },
-      { icon:'fa fa-face-smile', title:'تبييض الأسنان',        desc:'جلسات احترافية لتبييض الأسنان بأنظمة مرخصة وآمنة تمنحك بريقاً ساطعاً.' },
-      { icon:'fa fa-child',      title:'طب أسنان الأطفال',     desc:'رعاية متخصصة ولطيفة لأسنان أطفالك في بيئة ودية تقلل من القلق.' },
+      {icon:'fa fa-teeth',      title:'تقويم الأسنان',     desc:'علاج اعوجاج الأسنان بأحدث تقنيات التقويم الشفاف والمعدني.'},
+      {icon:'fa fa-tooth',      title:'زراعة الأسنان',      desc:'حلول دائمة لفقدان الأسنان باستخدام أفضل أنواع الغرسات.'},
+      {icon:'fa fa-star',       title:'الأسنان التجميلية', desc:'تحسين مظهر ابتسامتك عبر الفينيرز والقشور الخزفية.'},
+      {icon:'fa fa-syringe',    title:'علاج جذور الأسنان', desc:'حل فعال لإنقاذ الأسنان المتضررة من العدوى والتلف.'},
+      {icon:'fa fa-face-smile', title:'تبييض الأسنان',     desc:'جلسات احترافية بأنظمة مرخصة وآمنة تمنحك بريقاً ساطعاً.'},
+      {icon:'fa fa-child',      title:'طب أسنان الأطفال',  desc:'رعاية متخصصة ولطيفة في بيئة ودية تقلل من القلق.'},
     ],
     reviews: [
-      { name:'أم عبدالله',        initial:'أ', rating:5, text:'تجربة رائعة جداً! الطاقم الطبي محترف ومتفهم، والمكان نظيف وأنيق.',          date:'منذ أسبوع',    doctor:'د. أحمد المنصوري' },
-      { name:'محمد الغامدي',      initial:'م', rating:5, text:'أفضل مركز لطب الأسنان زرته. الدكتورة سارة خبيرة جداً في الزراعة.',        date:'منذ شهر',      doctor:'د. سارة الزهراني' },
-      { name:'نوف الحربي',        initial:'ن', rating:5, text:'جئت للتجميل وخرجت بابتسامة أحلم بها من سنوات!',                          date:'منذ 3 أسابيع', doctor:'د. خالد العتيبي' },
-      { name:'عبدالرحمن الدوسري', initial:'ع', rating:4, text:'المركز ممتاز والمواعيد دقيقة. استمتعت بتجربة التبييض والنتيجة فاقت توقعاتي.', date:'منذ شهرين',  doctor:'د. خالد العتيبي' },
-      { name:'هيفاء القحطاني',    initial:'ه', rating:5, text:'ابنتي كانت تخاف من طبيب الأسنان حتى جاءت هنا! الدكتورة نورة رائعة.',    date:'منذ أسبوعين', doctor:'د. نورة الشمري' },
-      { name:'فهد الشهراني',      initial:'ف', rating:5, text:'زرعة الأسنان اكتملت بنجاح تام. الفريق الطبي محترف ومطمئن جداً.',        date:'منذ شهر',      doctor:'د. سارة الزهراني' },
+      {name:'أم عبدالله',initial:'أ',rating:5,text:'تجربة رائعة جداً! الطاقم محترف ومتفهم.',date:'منذ أسبوع',doctor:'د. أحمد المنصوري'},
+      {name:'محمد الغامدي',initial:'م',rating:5,text:'أفضل مركز زرته. الدكتورة سارة خبيرة.',date:'منذ شهر',doctor:'د. سارة الزهراني'},
+      {name:'نوف الحربي',initial:'ن',rating:5,text:'جئت للتجميل وخرجت بابتسامة أحلم بها!',date:'منذ 3 أسابيع',doctor:'د. خالد العتيبي'},
+      {name:'عبدالرحمن الدوسري',initial:'ع',rating:4,text:'المركز ممتاز والمواعيد دقيقة.',date:'منذ شهرين',doctor:'د. خالد العتيبي'},
+      {name:'هيفاء القحطاني',initial:'ه',rating:5,text:'ابنتي كانت تخاف حتى جاءت هنا!',date:'منذ أسبوعين',doctor:'د. نورة الشمري'},
+      {name:'فهد الشهراني',initial:'ف',rating:5,text:'زرعة الأسنان اكتملت بنجاح. فريق محترف.',date:'منذ شهر',doctor:'د. سارة الزهراني'},
     ],
     hoursOverride: null,
   };
 
-  // -------- HELPERS --------
-  function headers() {
-    return {
-      'Content-Type':   'application/json',
-      'X-Master-Key':   API_KEY,
-      'X-Bin-Versioning': 'false',
-    };
-  }
+  function hdrs(){return{'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Versioning':'false'}}
+  function ok(){return BIN_ID&&API_KEY}
 
-  function isConfigured() { return BIN_ID && API_KEY; }
-
-  // -------- PUBLIC API --------
-  async function read() {
-    if (!isConfigured()) return JSON.parse(JSON.stringify(DEFAULTS));
-
-    const now = Date.now();
-    if (_cache && (now - _lastFetch) < CACHE_TTL) return _cache;
-
-    try {
-      const res = await fetch(`${BASE}/b/${BIN_ID}/latest`, { headers: headers() });
-      if (!res.ok) throw new Error('fetch failed');
-      const json = await res.json();
-      _cache = { ...DEFAULTS, ...json.record };
-      _lastFetch = now;
+  async function read(){
+    if(!ok())return JSON.parse(JSON.stringify(DEFAULTS));
+    const now=Date.now();
+    if(_cache&&now-_lastFetch<TTL)return _cache;
+    try{
+      const r=await fetch(`${BASE}/b/${BIN_ID}/latest`,{headers:hdrs()});
+      if(!r.ok)throw new Error(r.status);
+      const j=await r.json();
+      _cache={...DEFAULTS,...j.record};
+      if(!_cache.hero)_cache.hero=DEFAULTS.hero;
+      if(!_cache.about)_cache.about=DEFAULTS.about;
+      if(!_cache.social)_cache.social=DEFAULTS.social;
+      _lastFetch=now;
       return _cache;
-    } catch(e) {
-      console.warn('DB read failed, using cache/defaults', e);
-      return _cache || JSON.parse(JSON.stringify(DEFAULTS));
-    }
+    }catch(e){return _cache||JSON.parse(JSON.stringify(DEFAULTS))}
   }
 
-  async function write(data) {
-    if (!isConfigured()) throw new Error('DB not configured');
-    _cache = data;
-    const res = await fetch(`${BASE}/b/${BIN_ID}`, {
-      method:  'PUT',
-      headers: headers(),
-      body:    JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error('write failed: ' + res.status);
+  async function write(data){
+    if(!ok())throw new Error('DB not configured');
+    _cache=data;_lastFetch=0;
+    const r=await fetch(`${BASE}/b/${BIN_ID}`,{method:'PUT',headers:hdrs(),body:JSON.stringify(data)});
+    if(!r.ok)throw new Error('write failed: '+r.status);
     return true;
   }
 
-  function configure(binId, apiKey) {
-    BIN_ID  = binId;
-    API_KEY = apiKey;
-    localStorage.setItem('db_bin_id',  binId);
-    localStorage.setItem('db_api_key', apiKey);
-    _cache = null;
-  }
+  function configure(b,k){BIN_ID=b;API_KEY=k;localStorage.setItem('db_bin_id',b);localStorage.setItem('db_api_key',k);_cache=null}
+  function getConfig(){return{binId:BIN_ID,apiKey:API_KEY}}
+  function isReady(){return ok()}
 
-  function getConfig() { return { binId: BIN_ID, apiKey: API_KEY }; }
-  function isReady()   { return isConfigured(); }
-
-  return { read, write, configure, getConfig, isReady, DEFAULTS };
+  return{read,write,configure,getConfig,isReady,DEFAULTS};
 })();
