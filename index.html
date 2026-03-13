@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مركز لؤلؤة الابتسامة لطب الأسنان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dark:#9A7A2E;--gold-shine:#F5E6B2;--white:#FFF;--off-white:#FAF8F3;--cream:#F5EFE0;--dark:#1A1410;--text-dark:#2C2416;--text-mid:#5C4A2A;--border-gold:rgba(201,168,76,0.3)}
+  *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+  body{font-family:'Tajawal',sans-serif;background:var(--white);color:var(--text-dark);overflow-x:hidden}
+  #page-loader{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#FAF8F3,#F5EFE0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .5s}
+  #page-loader.hidden{opacity:0;pointer-events:none}
+  .loader-logo{font-family:'Playfair Display',serif;font-size:28px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .loader-spinner{width:44px;height:44px;border:3px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loader-text{font-size:14px;color:var(--text-mid)}
+  nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-gold);padding:0 5%}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:75px}
+  .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .logo-icon-wrap{height:50px;width:50px;border-radius:50%;border:2px solid var(--gold);overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;font-size:22px;flex-shrink:0}
+  .logo-icon-wrap img{width:100%;height:100%;object-fit:cover}
+  .logo-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;background:linear-gradient(135deg,var(--gold-dark),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+  .logo-sub{font-size:11px;color:var(--text-mid);font-weight:300;letter-spacing:1px;display:block}
+  .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+  .nav-links a{text-decoration:none;font-size:14px;font-weight:500;color:var(--text-dark);transition:color .3s;position:relative}
+  .nav-links a::after{content:'';position:absolute;bottom:-4px;right:0;width:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transition:width .3s}
+  .nav-links a:hover{color:var(--gold-dark)}.nav-links a:hover::after{width:100%}
+  .btn-book-nav{background:linear-gradient(135deg,var(--gold),var(--gold-dark))!important;color:white!important;padding:10px 24px;border-radius:30px;font-weight:700!important;box-shadow:0 4px 15px rgba(201,168,76,.4);transition:all .3s!important}
+  .btn-book-nav::after{display:none!important}.btn-book-nav:hover{transform:translateY(-2px)!important;box-shadow:0 8px 25px rgba(201,168,76,.5)!important}
+  .hero{min-height:100vh;background:linear-gradient(135deg,#FAF8F3,#F5EFE0 50%,#EDE3C8);display:flex;align-items:center;padding-top:75px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-50%;right:-20%;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);animation:pulse 6s ease-in-out infinite}
+  .hero::after{content:'';position:absolute;bottom:-30%;left:-10%;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);animation:pulse 8s ease-in-out infinite reverse}
+  @keyframes pulse{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(5deg)}}
+  .hero-inner{width:100%;max-width:1200px;margin:0 auto;padding:0 5%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.12);border:1px solid var(--border-gold);padding:6px 16px;border-radius:30px;font-size:13px;color:var(--gold-dark);font-weight:500;margin-bottom:20px}
+  .hero-title{font-family:'Playfair Display',serif;font-size:clamp(36px,5vw,58px);line-height:1.25;color:var(--text-dark);margin-bottom:20px}
+  .hero-title .gold-text{background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+  .hero-desc{font-size:16px;line-height:1.8;color:var(--text-mid);margin-bottom:36px;max-width:480px}
+  .hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:14px 32px;border-radius:50px;font-size:16px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:10px;box-shadow:0 6px 25px rgba(201,168,76,.45);transition:all .3s;border:none;cursor:pointer;font-family:'Tajawal',sans-serif}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(201,168,76,.55)}
+  .btn-secondary{color:var(--gold-dark);padding:14px 24px;border-radius:50px;font-size:15px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border:2px solid var(--gold);transition:all .3s;background:transparent;cursor:pointer;font-family:'Tajawal',sans-serif}
+  .btn-secondary:hover{background:var(--gold);color:white}
+  .hero-stats{display:flex;gap:30px;margin-top:44px;border-top:1px solid var(--border-gold);padding-top:30px}
+  .stat{text-align:center}
+  .stat-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--gold-dark),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .stat-label{font-size:12px;color:var(--text-mid);margin-top:2px}
+  .hero-image-wrap{position:relative;display:flex;justify-content:center}
+  .hero-img-frame{width:420px;height:520px;border-radius:200px 200px 150px 150px;overflow:hidden;border:3px solid var(--border-gold);box-shadow:0 30px 80px rgba(201,168,76,.2),0 0 0 12px rgba(201,168,76,.07);background:linear-gradient(135deg,var(--cream),var(--gold-shine));display:flex;align-items:center;justify-content:center}
+  .hero-img-placeholder{font-size:100px;color:rgba(201,168,76,.3);display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+  .hero-img-placeholder p{font-size:14px;color:var(--text-mid)}
+  .hero-img-frame img{width:100%;height:100%;object-fit:cover}
+  .floating-card{position:absolute;background:white;border-radius:16px;padding:14px 18px;box-shadow:0 10px 40px rgba(0,0,0,.1);border:1px solid var(--border-gold);display:flex;align-items:center;gap:12px;animation:float 4s ease-in-out infinite}
+  .float-card-1{bottom:60px;right:-30px}.float-card-2{top:80px;left:-30px;animation-delay:2s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .fc-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;color:white;font-size:18px}
+  .fc-title{font-size:13px;font-weight:700;color:var(--text-dark)}.fc-sub{font-size:11px;color:var(--text-mid)}
+  section{padding:90px 5%}
+  .container{max-width:1200px;margin:0 auto}
+  .section-header{text-align:center;margin-bottom:60px}
+  .section-badge{display:inline-flex;align-items:center;gap:8px;color:var(--gold-dark);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px}
+  .section-badge::before,.section-badge::after{content:'';flex:1;min-width:30px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .section-badge::after{background:linear-gradient(90deg,var(--gold),transparent)}
+  .section-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,42px);color:var(--text-dark);line-height:1.3}
+  .section-title span{background:linear-gradient(135deg,var(--gold-dark),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .section-line{width:60px;height:3px;margin:16px auto 0;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}
+  #about{background:var(--off-white)}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+  .about-image{height:500px;border-radius:20px;background:linear-gradient(135deg,var(--cream),var(--gold-shine));display:flex;align-items:center;justify-content:center;font-size:80px;color:rgba(201,168,76,.3);border:2px solid var(--border-gold);position:relative;overflow:hidden}
+  .about-image img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+  .about-tag{position:absolute;top:24px;right:24px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:8px 18px;border-radius:30px;font-size:13px;font-weight:600;z-index:1}
+  .about-content .lead{font-size:18px;font-weight:600;color:var(--gold-dark);margin-bottom:16px;line-height:1.6;font-family:'Playfair Display',serif}
+  .about-content p{font-size:15px;line-height:1.9;color:var(--text-mid);margin-bottom:14px}
+  .about-features{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
+  .feat-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:white;border-radius:12px;border:1px solid var(--border-gold)}
+  .feat-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;flex-shrink:0}
+  .feat-text{font-size:13px;font-weight:600;color:var(--text-dark)}
+  #specialties{background:white}
+  .spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px}
+  .spec-card{background:var(--off-white);border-radius:20px;padding:32px 28px;border:1px solid var(--border-gold);transition:all .4s;position:relative;overflow:hidden}
+  .spec-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:0 0 0 80px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05));transition:all .4s}
+  .spec-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(201,168,76,.2);background:white;border-color:var(--gold)}.spec-card:hover::before{width:120px;height:120px}
+  .spec-icon{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-size:28px;color:white;margin-bottom:20px;box-shadow:0 6px 20px rgba(201,168,76,.35)}
+  .spec-card h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--text-dark);margin-bottom:10px}
+  .spec-card p{font-size:14px;line-height:1.7;color:var(--text-mid)}
+  #doctors{background:var(--off-white)}
+  .doctors-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:30px}
+  .doctor-card{background:white;border-radius:24px;overflow:hidden;border:1px solid var(--border-gold);transition:all .4s;text-align:center}
+  .doctor-card:hover{transform:translateY(-8px);box-shadow:0 25px 70px rgba(201,168,76,.18);border-color:var(--gold)}
+  .doctor-img{height:240px;background:linear-gradient(135deg,var(--cream),var(--gold-shine));display:flex;align-items:center;justify-content:center;font-size:70px;color:rgba(201,168,76,.4);position:relative;overflow:hidden}
+  .doctor-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+  .doc-badge{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;z-index:1}
+  .doctor-info{padding:24px 20px}
+  .doctor-info h3{font-family:'Playfair Display',serif;font-size:19px;color:var(--text-dark);margin-bottom:6px}
+  .doctor-info .specialty{font-size:13px;color:var(--gold-dark);font-weight:600;margin-bottom:10px}
+  .doctor-schedule{font-size:12px;color:var(--text-mid);display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px}
+  .btn-book-doc{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:10px 24px;border-radius:30px;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .3s;font-family:'Tajawal',sans-serif;box-shadow:0 4px 15px rgba(201,168,76,.35);margin-top:10px}
+  .btn-book-doc:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(201,168,76,.5)}
+  #hours{background:white}
+  .hours-card{max-width:750px;margin:0 auto;background:var(--off-white);border-radius:24px;overflow:hidden;border:1px solid var(--border-gold);box-shadow:0 10px 50px rgba(201,168,76,.1)}
+  .hours-header{background:linear-gradient(135deg,var(--gold),var(--gold-dark));padding:28px 36px;text-align:center}
+  .hours-header h3{font-family:'Playfair Display',serif;font-size:24px;color:white}
+  .hours-header p{font-size:14px;color:rgba(255,255,255,.85);margin-top:6px}
+  .hours-row{display:flex;justify-content:space-between;align-items:center;padding:16px 36px;border-bottom:1px solid var(--border-gold);transition:background .2s}
+  .hours-row:hover{background:rgba(201,168,76,.05)}.hours-row:last-child{border-bottom:none}
+  .hours-row .day{font-weight:600;font-size:15px;color:var(--text-dark);display:flex;align-items:center;gap:10px}
+  .hours-row .day .dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+  .hours-row .time{font-size:14px;color:var(--text-mid);font-weight:500}
+  .hours-row .closed{color:#e53935;font-weight:600;font-size:13px}
+  .open-badge{background:rgba(76,175,80,.12);color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid rgba(76,175,80,.3)}
+  #reviews{background:var(--off-white)}
+  .reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+  .review-card{background:white;border-radius:20px;padding:28px;border:1px solid var(--border-gold);transition:all .3s;position:relative}
+  .review-card:hover{transform:translateY(-4px);box-shadow:0 15px 50px rgba(201,168,76,.15)}
+  .review-card .quote-icon{position:absolute;top:-12px;right:28px;width:32px;height:32px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:14px}
+  .stars{color:var(--gold);font-size:15px;margin-bottom:14px}
+  .review-text{font-size:14px;line-height:1.8;color:var(--text-mid);margin-bottom:20px}
+  .reviewer{display:flex;align-items:center;gap:12px}
+  .reviewer-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;color:white;font-size:16px;font-weight:700;flex-shrink:0;font-family:'Playfair Display',serif}
+  .reviewer-info h4{font-size:14px;font-weight:700;color:var(--text-dark)}
+  .reviewer-info p{font-size:12px;color:var(--text-mid)}
+  .review-date{font-size:11px;color:var(--gold-dark);margin-top:2px}
+  #location{background:white}
+  .map-wrap{border-radius:20px;overflow:hidden;border:2px solid var(--border-gold);box-shadow:0 10px 50px rgba(201,168,76,.1);height:420px}
+  .map-wrap iframe{width:100%;height:100%;border:none}
+  .location-info{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:36px}
+  .loc-item{display:flex;align-items:center;gap:14px;background:var(--off-white);padding:18px 24px;border-radius:16px;border:1px solid var(--border-gold)}
+  .loc-icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;color:white;font-size:20px;flex-shrink:0}
+  .loc-text h4{font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:4px}
+  .loc-text p{font-size:13px;color:var(--text-mid);line-height:1.5}
+  .modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,8,5,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.active{display:flex}
+  .modal{background:white;border-radius:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid var(--border-gold);box-shadow:0 40px 100px rgba(0,0,0,.3);animation:modalIn .4s cubic-bezier(.175,.885,.32,1.275)}
+  @keyframes modalIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal-header{background:linear-gradient(135deg,var(--gold),var(--gold-dark));padding:28px 32px;text-align:center;position:relative}
+  .modal-header h2{font-family:'Playfair Display',serif;font-size:22px;color:white}
+  .modal-header p{font-size:13px;color:rgba(255,255,255,.85);margin-top:6px}
+  .modal-close{position:absolute;top:18px;left:18px;background:rgba(255,255,255,.2);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+  .modal-close:hover{background:rgba(255,255,255,.35)}
+  .modal-body{padding:32px}
+  .step-indicator{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px}
+  .step-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border-gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-mid);transition:all .3s}
+  .step-dot.active{background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-color:var(--gold);color:white}
+  .step-dot.done{background:var(--gold-light);border-color:var(--gold);color:var(--gold-dark)}
+  .step-line{flex:1;max-width:50px;height:2px;background:var(--border-gold)}
+  .step-content{display:none}.step-content.active{display:block}
+  .form-label{font-size:14px;font-weight:700;color:var(--text-dark);margin-bottom:12px;display:block}
+  .doctor-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .doc-option{padding:14px;border:2px solid var(--border-gold);border-radius:14px;cursor:pointer;transition:all .3s;text-align:center;background:var(--off-white)}
+  .doc-option:hover{border-color:var(--gold);background:rgba(201,168,76,.06)}
+  .doc-option.selected{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05))}
+  .doc-name{font-size:13px;font-weight:700;color:var(--text-dark);margin-top:8px}
+  .doc-spec{font-size:11px;color:var(--gold-dark);margin-top:4px}
+  .cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .cal-month{font-family:'Playfair Display',serif;font-size:16px;color:var(--text-dark);font-weight:600}
+  .cal-nav{background:none;border:1px solid var(--border-gold);color:var(--gold-dark);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s}
+  .cal-nav:hover{background:var(--gold);color:white;border-color:var(--gold)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cal-day-header{text-align:center;font-size:11px;font-weight:700;color:var(--text-mid);padding:6px 0}
+  .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:8px;cursor:pointer;transition:all .2s;color:var(--text-dark)}
+  .cal-day:hover{background:rgba(201,168,76,.15)}.cal-day.today{border:2px solid var(--gold);color:var(--gold-dark);font-weight:700}
+  .cal-day.selected{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;font-weight:700}
+  .cal-day.other-month,.cal-day.disabled,.cal-day.closed-day{color:#ddd;cursor:not-allowed;pointer-events:none}
+  .time-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .time-slot{padding:10px;text-align:center;border:2px solid var(--border-gold);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-dark);transition:all .2s;background:var(--off-white)}
+  .time-slot:hover{border-color:var(--gold);color:var(--gold-dark)}.time-slot.selected{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;border-color:var(--gold)}
+  .booking-summary{background:var(--off-white);border-radius:16px;padding:20px;border:1px solid var(--border-gold);margin-bottom:20px}
+  .summary-row{display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px}
+  .summary-label{color:var(--text-mid);font-weight:500}.summary-value{color:var(--text-dark);font-weight:700}
+  .btn-next{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:14px;border-radius:50px;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s;box-shadow:0 6px 25px rgba(201,168,76,.4)}
+  .btn-next:hover{transform:translateY(-2px);box-shadow:0 10px 35px rgba(201,168,76,.5)}.btn-next:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-whatsapp{background:#25D366!important;box-shadow:0 6px 25px rgba(37,211,102,.4)!important}
+  footer{background:var(--dark);padding:60px 5% 30px}
+  .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:50px;margin-bottom:40px}
+  .footer-about .f-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px}
+  .footer-about p{font-size:14px;color:rgba(255,255,255,.55);line-height:1.8}
+  .footer-social{display:flex;gap:12px;margin-top:20px}
+  .soc-btn{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,.12);border:1px solid var(--border-gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;transition:all .3s;text-decoration:none}
+  .soc-btn:hover{background:var(--gold);color:white}
+  .footer-col h4{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.2)}
+  .footer-col ul{list-style:none}.footer-col ul li{margin-bottom:10px}
+  .footer-col ul li a{color:rgba(255,255,255,.55);text-decoration:none;font-size:14px;transition:color .2s}
+  .footer-col ul li a:hover{color:var(--gold-light)}
+  .footer-bottom{border-top:1px solid rgba(201,168,76,.15);padding-top:24px;text-align:center;font-size:13px;color:rgba(255,255,255,.35)}
+  .whatsapp-float{position:fixed;bottom:28px;left:28px;z-index:999;width:58px;height:58px;border-radius:50%;background:#25D366;color:white;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 25px rgba(37,211,102,.5);text-decoration:none;transition:all .3s;animation:waPulse 2s ease-in-out infinite}
+  @keyframes waPulse{0%,100%{box-shadow:0 6px 25px rgba(37,211,102,.5)}50%{box-shadow:0 6px 35px rgba(37,211,102,.8)}}
+  .whatsapp-float:hover{transform:scale(1.15)}
+  .reveal{opacity:0;transform:translateY(30px);transition:all .7s ease}.reveal.visible{opacity:1;transform:translateY(0)}
+  @media(max-width:900px){.hero-inner{grid-template-columns:1fr;text-align:center}.hero-actions{justify-content:center}.hero-stats{justify-content:center}.hero-image-wrap{display:none}.about-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr;gap:30px}.nav-links{display:none}.time-slots{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:480px){.time-slots{grid-template-columns:repeat(2,1fr)}.doctor-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-logo">لؤلؤة الابتسامة</div>
+  <div class="loader-spinner"></div>
+  <div class="loader-text">جاري تحميل بيانات المركز...</div>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="logo-icon-wrap" id="nav-logo-wrap"><i class="fa fa-tooth"></i></div>
+      <div><span class="logo-name" id="clinic-name-nav">مركز لؤلؤة الابتسامة</span><span class="logo-sub" id="clinic-slogan-nav">لطب الأسنان المتخصص</span></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">عن المركز</a></li>
+      <li><a href="#specialties">تخصصاتنا</a></li>
+      <li><a href="#doctors">الكادر الطبي</a></li>
+      <li><a href="#hours">ساعات العمل</a></li>
+      <li><a href="#reviews">آراء المراجعين</a></li>
+      <li><a href="#location">الموقع</a></li>
+      <li><a href="#" class="btn-book-nav" onclick="openBooking();return false">احجز موعدك</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge"><i class="fa fa-star"></i><span>مركز متخصص في طب الأسنان</span></div>
+      <h1 class="hero-title"><span>ابتسامة</span><span class="gold-text">أكثر إشراقاً</span><span>في يد خبراء</span></h1>
+      <p class="hero-desc" id="hero-desc">نقدّم لك رعاية أسنان عالية المستوى في بيئة راقية تجمع بين الخبرة الطبية الاحترافية وأحدث التقنيات.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="openBooking()"><i class="fa fa-calendar-check"></i>احجز موعدك الآن</button>
+        <a href="#about" class="btn-secondary"><i class="fa fa-play"></i>تعرّف علينا</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">+5000</div><div class="stat-label">مريض راضٍ</div></div>
+        <div class="stat"><div class="stat-num">+15</div><div class="stat-label">سنة خبرة</div></div>
+        <div class="stat"><div class="stat-num" id="stat-docs">—</div><div class="stat-label">أطباء متخصصون</div></div>
+        <div class="stat"><div class="stat-num">4.9</div><div class="stat-label">تقييم المراجعين</div></div>
+      </div>
+    </div>
+    <div class="hero-image-wrap">
+      <div class="hero-img-frame" id="hero-img-frame">
+        <div class="hero-img-placeholder"><i class="fa fa-tooth"></i><p>صورة المركز</p></div>
+      </div>
+      <div class="floating-card float-card-1">
+        <div class="fc-icon"><i class="fa fa-award"></i></div>
+        <div><div class="fc-title">معتمد دولياً</div><div class="fc-sub">JCI Accredited</div></div>
+      </div>
+      <div class="floating-card float-card-2">
+        <div class="fc-icon"><i class="fa fa-shield-halved"></i></div>
+        <div><div class="fc-title">معقّم بالكامل</div><div class="fc-sub">معايير عالمية</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-image" id="about-img-wrap"><i class="fa fa-hospital"></i><span class="about-tag">منذ 2009</span></div>
+      <div class="about-content reveal">
+        <div class="section-badge"><span>من نحن</span></div>
+        <h2 class="section-title" style="text-align:right;margin-bottom:20px">مركز طبي متكامل<br><span>بمعايير عالمية فائقة</span></h2>
+        <p class="lead">رواد في تقديم الرعاية الأسنانية الشاملة منذ أكثر من خمسة عشر عاماً.</p>
+        <p id="about-p1"></p><p id="about-p2"></p>
+        <div class="about-features">
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-microscope"></i></div><div class="feat-text">أجهزة تشخيص حديثة</div></div>
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-user-doctor"></i></div><div class="feat-text">أطباء معتمدون دولياً</div></div>
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-shield-virus"></i></div><div class="feat-text">بروتوكولات تعقيم متقدمة</div></div>
+          <div class="feat-item"><div class="feat-icon"><i class="fa fa-clock"></i></div><div class="feat-text">مواعيد مرنة ودقيقة</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="specialties">
+  <div class="container">
+    <div class="section-header reveal"><div class="section-badge"><span>خدماتنا</span></div><h2 class="section-title">تخصصاتنا <span>الطبية</span></h2><div class="section-line"></div></div>
+    <div class="spec-grid" id="specialties-grid"></div>
+  </div>
+</section>
+
+<section id="doctors">
+  <div class="container">
+    <div class="section-header reveal"><div class="section-badge"><span>فريقنا</span></div><h2 class="section-title">الكادر <span>الطبي</span></h2><div class="section-line"></div></div>
+    <div class="doctors-grid" id="doctors-grid"></div>
+  </div>
+</section>
+
+<section id="hours">
+  <div class="container">
+    <div class="section-header reveal"><div class="section-badge"><span>المواعيد</span></div><h2 class="section-title">ساعات <span>العمل</span></h2><div class="section-line"></div></div>
+    <div class="hours-card">
+      <div class="hours-header"><h3>جدول الدوام الأسبوعي</h3><p>المركز يعمل طوال أيام الأسبوع</p></div>
+      <div id="hours-list"></div>
+    </div>
+  </div>
+</section>
+
+<section id="reviews">
+  <div class="container">
+    <div class="section-header reveal"><div class="section-badge"><span>آراء مرضانا</span></div><h2 class="section-title">تقييمات <span>المراجعين</span></h2><div class="section-line"></div></div>
+    <div class="reviews-grid" id="reviews-grid"></div>
+  </div>
+</section>
+
+<section id="location">
+  <div class="container">
+    <div class="section-header reveal"><div class="section-badge"><span>زورونا</span></div><h2 class="section-title">موقع <span>المركز</span></h2><div class="section-line"></div></div>
+    <div class="map-wrap"><iframe id="clinic-map" src="about:blank" allowfullscreen loading="lazy"></iframe></div>
+    <div class="location-info">
+      <div class="loc-item"><div class="loc-icon"><i class="fa fa-location-dot"></i></div><div class="loc-text"><h4>العنوان</h4><p id="clinic-address">—</p></div></div>
+      <div class="loc-item"><div class="loc-icon"><i class="fa fa-phone"></i></div><div class="loc-text"><h4>هاتف</h4><p id="clinic-phone">—</p></div></div>
+      <div class="loc-item"><div class="loc-icon"><i class="fa fa-envelope"></i></div><div class="loc-text"><h4>البريد الإلكتروني</h4><p id="clinic-email">—</p></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <div class="f-logo" id="footer-name">مركز لؤلؤة الابتسامة</div>
+        <p id="footer-desc">مركز متكامل لطب الأسنان يجمع بين الخبرة العلمية والتقنيات الحديثة.</p>
+        <div class="footer-social">
+          <a class="soc-btn" href="#"><i class="fab fa-instagram"></i></a>
+          <a class="soc-btn" href="#"><i class="fab fa-twitter"></i></a>
+          <a class="soc-btn" href="#"><i class="fab fa-snapchat"></i></a>
+          <a class="soc-btn" id="wa-footer" href="#"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>روابط سريعة</h4><ul><li><a href="#about">عن المركز</a></li><li><a href="#specialties">التخصصات</a></li><li><a href="#doctors">الكادر الطبي</a></li><li><a href="#hours">ساعات العمل</a></li><li><a href="#reviews">التقييمات</a></li></ul></div>
+      <div class="footer-col"><h4>خدماتنا</h4><ul id="footer-services"></ul></div>
+    </div>
+    <div class="footer-bottom">© 2024 جميع الحقوق محفوظة — <span id="footer-name2">مركز لؤلؤة الابتسامة</span> | <a href="admin.html" style="color:rgba(201,168,76,.5);text-decoration:none">لوحة الإدارة</a></div>
+  </div>
+</footer>
+
+<a class="whatsapp-float" id="wa-float" href="#" target="_blank"><i class="fab fa-whatsapp"></i></a>
+
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeBooking()"><i class="fa fa-times"></i></button>
+      <h2><i class="fa fa-calendar-check" style="margin-left:10px"></i>حجز موعد</h2>
+      <p>اختر طبيبك والوقت المناسب</p>
+    </div>
+    <div class="modal-body">
+      <div class="step-indicator">
+        <div class="step-dot active" id="sd1">1</div><div class="step-line"></div>
+        <div class="step-dot" id="sd2">2</div><div class="step-line"></div>
+        <div class="step-dot" id="sd3">3</div>
+      </div>
+      <div class="step-content active" id="step-1">
+        <label class="form-label"><i class="fa fa-user-doctor" style="margin-left:8px;color:var(--gold)"></i>اختر الطبيب</label>
+        <div class="doctor-options" id="modal-doctors"></div><br>
+        <button class="btn-next" id="sn1" onclick="goStep(2)" disabled>التالي — اختر التاريخ <i class="fa fa-arrow-left" style="margin-right:8px"></i></button>
+      </div>
+      <div class="step-content" id="step-2">
+        <label class="form-label"><i class="fa fa-calendar" style="margin-left:8px;color:var(--gold)"></i>اختر التاريخ</label>
+        <div><div class="cal-header"><button class="cal-nav" onclick="changeMonth(-1)"><i class="fa fa-chevron-right"></i></button><div class="cal-month" id="cal-label"></div><button class="cal-nav" onclick="changeMonth(1)"><i class="fa fa-chevron-left"></i></button></div><div class="cal-grid" id="cal-grid"></div></div>
+        <label class="form-label" style="margin-top:20px"><i class="fa fa-clock" style="margin-left:8px;color:var(--gold)"></i>اختر الوقت</label>
+        <div class="time-slots" id="time-slots"></div><br>
+        <button class="btn-next" id="sn2" onclick="goStep(3)" disabled>التالي — تأكيد الحجز <i class="fa fa-arrow-left" style="margin-right:8px"></i></button>
+      </div>
+      <div class="step-content" id="step-3">
+        <label class="form-label"><i class="fa fa-check-circle" style="margin-left:8px;color:var(--gold)"></i>ملخص الحجز</label>
+        <div class="booking-summary" id="booking-summary"></div>
+        <button class="btn-next btn-whatsapp" onclick="confirmBooking()"><i class="fab fa-whatsapp" style="font-size:20px"></i>تأكيد الحجز عبر واتساب</button>
+        <br><br>
+        <button onclick="goStep(2)" style="background:none;border:none;color:var(--text-mid);font-family:'Tajawal';cursor:pointer;font-size:14px;width:100%;text-align:center"><i class="fa fa-arrow-right" style="margin-left:6px"></i>تغيير الموعد</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="db.js"></script>
+<script>
+const DAY   = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const MONTH = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+let D = null;
+let BK = {doctorId:null,date:null,time:null,month:null};
+
+async function boot(){
+  D = await DB.read();
+  applyInfo(); renderSpecs(); renderDocs(); renderHours(); renderRevs();
+  document.getElementById('stat-docs').textContent = (D.doctors||[]).length;
+  // footer services from specialties
+  document.getElementById('footer-services').innerHTML = (D.specialties||[]).slice(0,5).map(s=>`<li><a href="#">${s.title}</a></li>`).join('');
+  hideLoader(); initReveal();
+}
+
+function hideLoader(){const l=document.getElementById('page-loader');l.classList.add('hidden');setTimeout(()=>l.remove(),600)}
+
+function applyInfo(){
+  const i=D.clinicInfo||{};
+  const s=(id,v)=>{const e=document.getElementById(id);if(e&&v)e.textContent=v};
+  s('clinic-name-nav',i.name);s('clinic-slogan-nav',i.slogan);
+  s('clinic-address',i.address);s('clinic-phone',i.phone);s('clinic-email',i.email);
+  s('about-p1',i.about1);s('about-p2',i.about2);
+  s('footer-name',i.name);s('footer-name2',i.name);s('footer-desc',i.footerDesc);
+  if(i.name)document.title=i.name+' - مركز طب الأسنان';
+  const wa=(i.whatsapp||'966500000000').replace(/\D/g,'');
+  document.getElementById('wa-float').href='https://wa.me/'+wa;
+  document.getElementById('wa-footer').href='https://wa.me/'+wa;
+  if(i.mapEmbed)document.getElementById('clinic-map').src=i.mapEmbed;
+  if(i.logoUrl){const w=document.getElementById('nav-logo-wrap');w.innerHTML=`<img src="${i.logoUrl}" alt="شعار">`}
+}
+
+function renderSpecs(){
+  document.getElementById('specialties-grid').innerHTML=(D.specialties||[]).map(s=>`
+    <div class="spec-card reveal"><div class="spec-icon"><i class="${s.icon}"></i></div><h3>${s.title}</h3><p>${s.desc}</p></div>`).join('');
+}
+
+function renderDocs(){
+  document.getElementById('doctors-grid').innerHTML=(D.doctors||[]).map(d=>{
+    const days=(d.workDays||[0,1,2,3,4]).map(i=>DAY[i]).join('، ');
+    return `<div class="doctor-card reveal">
+      <div class="doctor-img">${d.img?`<img src="${d.img}" alt="${d.name}">`:'<i class="fa fa-user-doctor"></i>'}<span class="doc-badge">${d.specialty}</span></div>
+      <div class="doctor-info"><h3>${d.name}</h3><div class="specialty">${d.specialty}</div>
+        <div class="doctor-schedule"><i class="fa fa-calendar" style="color:var(--gold)"></i>${days}</div>
+        <div class="doctor-schedule"><i class="fa fa-clock" style="color:var(--gold)"></i>${d.startTime||'9:00'} — ${d.endTime||'17:00'}</div>
+        <button class="btn-book-doc" onclick="openBookingFor(${d.id})">احجز مع الطبيب</button>
+      </div></div>`;
+  }).join('');
+}
+
+function renderHours(){
+  const ov=D.hoursOverride; const docs=D.doctors||[];
+  document.getElementById('hours-list').innerHTML=ov&&ov.length
+    ? ov.map(r=>`<div class="hours-row"><div class="day"><div class="dot" style="${r.closed?'background:#e53935':''}"></div>${r.day}</div><div>${r.closed?'<span class="closed">مغلق</span>':`<span class="time">${r.time}</span>`}</div>${!r.closed?'<span class="open-badge">متاح</span>':''}</div>`).join('')
+    : DAY.map((name,idx)=>{
+        const act=docs.filter(d=>(d.workDays||[0,1,2,3,4]).includes(idx));
+        const cl=act.length===0; const t=cl?'':act[0].startTime+' - '+act[0].endTime;
+        return `<div class="hours-row"><div class="day"><div class="dot" style="${cl?'background:#e53935':''}"></div>${name}</div><div>${cl?'<span class="closed">مغلق</span>':`<span class="time">${t}</span>`}</div>${!cl?'<span class="open-badge">متاح</span>':''}</div>`;
+      }).join('');
+}
+
+function renderRevs(){
+  document.getElementById('reviews-grid').innerHTML=(D.reviews||[]).map(r=>`
+    <div class="review-card reveal"><div class="quote-icon"><i class="fa fa-quote-right"></i></div>
+      <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      <p class="review-text">${r.text}</p>
+      <div class="reviewer"><div class="reviewer-avatar">${r.initial}</div>
+        <div class="reviewer-info"><h4>${r.name}</h4><p>${r.doctor}</p><p class="review-date">${r.date}</p></div>
+      </div></div>`).join('');
+}
+
+/* ---- BOOKING ---- */
+function openBooking(){BK={doctorId:null,date:null,time:null,month:new Date()};BK.month.setDate(1);document.getElementById('booking-modal').classList.add('active');goStep(1);renderMDocs()}
+function openBookingFor(id){openBooking();selDoc(id)}
+function closeBooking(){document.getElementById('booking-modal').classList.remove('active')}
+
+function renderMDocs(){
+  document.getElementById('modal-doctors').innerHTML=(D.doctors||[]).map(d=>`
+    <div class="doc-option" id="do-${d.id}" onclick="selDoc(${d.id})">
+      <div style="font-size:28px;color:rgba(201,168,76,.5)"><i class="fa fa-user-doctor"></i></div>
+      <div class="doc-name">${d.name}</div><div class="doc-spec">${d.specialty}</div>
+    </div>`).join('');
+}
+
+function selDoc(id){BK.doctorId=id;document.querySelectorAll('.doc-option').forEach(e=>e.classList.remove('selected'));const o=document.getElementById('do-'+id);if(o)o.classList.add('selected');document.getElementById('sn1').disabled=false}
+
+function goStep(n){
+  for(let i=1;i<=3;i++){document.getElementById('step-'+i).classList.toggle('active',i===n);const d=document.getElementById('sd'+i);d.classList.toggle('active',i===n);d.classList.toggle('done',i<n)}
+  if(n===2&&BK.doctorId)renderCal();
+  if(n===3)renderSum();
+}
+
+function renderCal(){
+  const d=BK.month,y=d.getFullYear(),m=d.getMonth();
+  const doc=(D.doctors||[]).find(x=>x.id===BK.doctorId);
+  const closed=[0,1,2,3,4,5,6].filter(i=>!(doc?.workDays||[0,1,2,3,4]).includes(i));
+  const today=new Date();today.setHours(0,0,0,0);
+  document.getElementById('cal-label').textContent=MONTH[m]+' '+y;
+  let h=DAY.map(n=>`<div class="cal-day-header">${n[0]}</div>`).join('');
+  for(let i=0;i<new Date(y,m,1).getDay();i++)h+=`<div class="cal-day other-month"></div>`;
+  for(let day=1;day<=new Date(y,m+1,0).getDate();day++){
+    const dt=new Date(y,m,day),dow=dt.getDay();
+    const str=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const past=dt<today,cl2=closed.includes(dow),sel=BK.date===str,tod=dt.getTime()===today.getTime();
+    let c='cal-day';if(past)c+=' disabled';else if(cl2)c+=' closed-day';else if(sel)c+=' selected';else if(tod)c+=' today';
+    h+=`<div class="${c}" ${(!past&&!cl2)?`onclick="selDate('${str}')"`:''}>${day}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=h;renderSlots();
+}
+function changeMonth(d){BK.month.setMonth(BK.month.getMonth()+d);renderCal()}
+function selDate(s){BK.date=s;BK.time=null;renderCal();renderSlots();document.getElementById('sn2').disabled=true}
+
+function renderSlots(){
+  const doc=(D.doctors||[]).find(x=>x.id===BK.doctorId);
+  if(!doc||!BK.date){document.getElementById('time-slots').innerHTML='<p style="color:var(--text-mid);font-size:13px;grid-column:1/-1;text-align:center">اختر تاريخاً أولاً</p>';return}
+  const[sh,sm]=(doc.startTime||'9:00').split(':').map(Number);
+  const[eh,em]=(doc.endTime||'17:00').split(':').map(Number);
+  const dur=doc.slotDuration||30;let cur=sh*60+sm,end=eh*60+em;const sl=[];
+  while(cur+dur<=end){sl.push(`${String(Math.floor(cur/60)).padStart(2,'0')}:${String(cur%60).padStart(2,'0')}`);cur+=dur}
+  document.getElementById('time-slots').innerHTML=sl.map(t=>`<div class="time-slot${BK.time===t?' selected':''}" onclick="selTime('${t}')">${t}</div>`).join('');
+}
+function selTime(t){BK.time=t;renderSlots();document.getElementById('sn2').disabled=false}
+
+function renderSum(){
+  const doc=(D.doctors||[]).find(x=>x.id===BK.doctorId);
+  const dt=new Date(BK.date+'T12:00:00');
+  document.getElementById('booking-summary').innerHTML=`
+    <div class="summary-row"><span class="summary-label">الطبيب</span><span class="summary-value">${doc?.name}</span></div>
+    <div class="summary-row"><span class="summary-label">التخصص</span><span class="summary-value">${doc?.specialty}</span></div>
+    <div class="summary-row"><span class="summary-label">التاريخ</span><span class="summary-value">${DAY[dt.getDay()]} ${dt.getDate()} ${MONTH[dt.getMonth()]} ${dt.getFullYear()}</span></div>
+    <div class="summary-row" style="margin-bottom:0"><span class="summary-label">الوقت</span><span class="summary-value">${BK.time}</span></div>`;
+}
+
+function confirmBooking(){
+  const doc=(D.doctors||[]).find(x=>x.id===BK.doctorId);
+  const dt=new Date(BK.date+'T12:00:00');
+  const date=`${DAY[dt.getDay()]} ${dt.getDate()} ${MONTH[dt.getMonth()]} ${dt.getFullYear()}`;
+  const msg=encodeURIComponent(`السلام عليكم،\nأرغب في حجز موعد:\n👨‍⚕️ الطبيب: ${doc?.name}\n🦷 التخصص: ${doc?.specialty}\n📅 التاريخ: ${date}\n🕐 الوقت: ${BK.time}\n\nأرجو التأكيد، شكراً.`);
+  const phone=((D.clinicInfo||{}).whatsapp||'966500000000').replace(/\D/g,'');
+  window.open(`https://wa.me/${phone}?text=${msg}`,'_blank');
+  closeBooking();
+}
+
+function initReveal(){
+  const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+document.getElementById('booking-modal').addEventListener('click',function(e){if(e.target===this)closeBooking()});
+boot();
+</script>
+</body>
+</html>
