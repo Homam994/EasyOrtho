@@ -102,6 +102,10 @@
   input:checked+.tslider{background:var(--danger)}input:checked+.tslider:before{transform:translateX(-20px)}
   .img-upload-box{border:2px dashed var(--border);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;background:var(--off-white);min-height:100px;display:flex;align-items:center;justify-content:center}
   .img-upload-box:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
+  .media-tabs{display:flex;gap:8px;margin-bottom:12px}
+  .media-tab{padding:8px 18px;border-radius:20px;border:2px solid var(--border);background:transparent;color:var(--text-mid);font-size:13px;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px}
+  .media-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;border-color:var(--gold)}
+  .media-tab:hover:not(.active){border-color:var(--gold);color:var(--gold-dark)}
   .logo-drop{border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:all .3s;background:var(--off-white)}
   .logo-drop:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
   .logo-drop input{display:none}
@@ -321,14 +325,27 @@
       <div class="card-header"><div><div class="card-title"><i class="fa fa-wand-magic-sparkles"></i>قسم Hero — الصفحة الرئيسية</div><div class="card-sub">العنوان الكبير والإحصائيات والصورة</div></div><button class="btn btn-gold" onclick="saveHero()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
       <div class="form-grid">
         <div class="form-group full">
-          <label class="form-label">صورة Hero (الصورة الكبيرة على اليمين)</label>
-          <div class="img-upload-box" onclick="document.getElementById('hero-img-file').click()" id="hero-img-drop">
-            <input type="file" id="hero-img-file" accept="image/*" style="display:none" onchange="previewImg(this,'hero-img-prev','hero-img-drop')">
-            <img id="hero-img-prev" src="" style="max-height:120px;max-width:300px;display:none;margin:0 auto;border-radius:8px;object-fit:cover">
-            <div id="hero-img-ph" style="text-align:center;padding:20px"><i class="fa fa-image" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i><p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة الـ Hero</p></div>
+          <label class="form-label">صورة أو فيديو Hero <span style="font-weight:400;color:var(--text-mid)">(الجانب الأيمن)</span></label>
+          <div class="media-tabs">
+            <button class="media-tab active" onclick="switchTab('hero','file',this)"><i class="fa fa-upload"></i> رفع صورة</button>
+            <button class="media-tab" onclick="switchTab('hero','url',this)"><i class="fa fa-link"></i> رابط صورة / فيديو</button>
           </div>
-          <p style="font-size:12px;color:#bbb;margin-top:8px">أو أدخل رابطاً مباشراً:</p>
-          <input type="url" class="form-input" id="hero-img-url" placeholder="https://..." dir="ltr" style="margin-top:8px" oninput="syncImgUrl('hero-img-url','hero-img-prev','hero-img-ph')">
+          <div id="hero-tab-file">
+            <div class="img-upload-box" onclick="document.getElementById('hero-img-file').click()" id="hero-img-drop">
+              <input type="file" id="hero-img-file" accept="image/*,video/*" style="display:none" onchange="previewMedia(this,'hero-media-prev','hero-img-drop')">
+              <div id="hero-media-prev" style="display:none;text-align:center"></div>
+              <div id="hero-img-ph" style="text-align:center;padding:20px">
+                <i class="fa fa-photo-film" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i>
+                <p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة أو فيديو</p>
+                <p style="font-size:11px;color:#bbb;margin-top:4px">JPG, PNG, MP4, MOV, WebM</p>
+              </div>
+            </div>
+          </div>
+          <div id="hero-tab-url" style="display:none">
+            <input type="url" class="form-input" id="hero-img-url" placeholder="رابط صورة أو YouTube أو Vimeo أو ملف فيديو..." dir="ltr" style="margin-top:8px" oninput="previewUrlMedia('hero-img-url','hero-url-prev')">
+            <div id="hero-url-prev" style="margin-top:10px;border-radius:10px;overflow:hidden;display:none;max-height:200px;"></div>
+            <p style="font-size:11px;color:#bbb;margin-top:6px">يدعم: روابط Cloudinary · YouTube · Vimeo · ملفات MP4/WebM مباشرة</p>
+          </div>
         </div>
         <div class="form-group full"><label class="form-label">نص الشارة (Badge)</label><input type="text" class="form-input" id="h-badge" placeholder="مركز متخصص في طب الأسنان"></div>
         <div class="form-group"><label class="form-label">سطر العنوان الأول</label><input type="text" class="form-input" id="h-t1" placeholder="ابتسامة"></div>
@@ -367,14 +384,27 @@
       <div class="card-header"><div><div class="card-title"><i class="fa fa-circle-info"></i>قسم "عن المركز"</div><div class="card-sub">الصورة والنصوص والمميزات الأربعة</div></div><button class="btn btn-gold" onclick="saveAbout()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
       <div class="form-grid">
         <div class="form-group full">
-          <label class="form-label">صورة القسم</label>
-          <div class="img-upload-box" onclick="document.getElementById('about-img-file').click()" id="about-img-drop">
-            <input type="file" id="about-img-file" accept="image/*" style="display:none" onchange="previewImg(this,'about-img-prev','about-img-drop')">
-            <img id="about-img-prev" src="" style="max-height:120px;max-width:300px;display:none;margin:0 auto;border-radius:8px;object-fit:cover">
-            <div id="about-img-ph" style="text-align:center;padding:20px"><i class="fa fa-image" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i><p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة القسم</p></div>
+          <label class="form-label">صورة أو فيديو القسم</label>
+          <div class="media-tabs">
+            <button class="media-tab active" onclick="switchTab('about','file',this)"><i class="fa fa-upload"></i> رفع صورة</button>
+            <button class="media-tab" onclick="switchTab('about','url',this)"><i class="fa fa-link"></i> رابط صورة / فيديو</button>
           </div>
-          <p style="font-size:12px;color:#bbb;margin-top:8px">أو أدخل رابطاً مباشراً:</p>
-          <input type="url" class="form-input" id="about-img-url" placeholder="https://..." dir="ltr" style="margin-top:8px" oninput="syncImgUrl('about-img-url','about-img-prev','about-img-ph')">
+          <div id="about-tab-file">
+            <div class="img-upload-box" onclick="document.getElementById('about-img-file').click()" id="about-img-drop">
+              <input type="file" id="about-img-file" accept="image/*,video/*" style="display:none" onchange="previewMedia(this,'about-media-prev','about-img-drop')">
+              <div id="about-media-prev" style="display:none;text-align:center"></div>
+              <div id="about-img-ph" style="text-align:center;padding:20px">
+                <i class="fa fa-photo-film" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i>
+                <p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة أو فيديو</p>
+                <p style="font-size:11px;color:#bbb;margin-top:4px">JPG, PNG, MP4, MOV, WebM</p>
+              </div>
+            </div>
+          </div>
+          <div id="about-tab-url" style="display:none">
+            <input type="url" class="form-input" id="about-img-url" placeholder="رابط صورة أو YouTube أو Vimeo أو ملف فيديو..." dir="ltr" style="margin-top:8px" oninput="previewUrlMedia('about-img-url','about-url-prev')">
+            <div id="about-url-prev" style="margin-top:10px;border-radius:10px;overflow:hidden;display:none;max-height:200px;"></div>
+            <p style="font-size:11px;color:#bbb;margin-top:6px">يدعم: روابط Cloudinary · YouTube · Vimeo · ملفات MP4/WebM مباشرة</p>
+          </div>
         </div>
         <div class="form-group"><label class="form-label">وسم الصورة (Tag)</label><input type="text" class="form-input" id="ab-tag" placeholder="منذ 2009"></div>
         <div class="form-group full"><label class="form-label">جملة Lead</label><input type="text" class="form-input" id="ab-lead"></div>
@@ -769,51 +799,105 @@ async function saveRev(){
 }
 async function deleteRev(idx){if(!confirm('حذف؟'))return;DATA.reviews.splice(idx,1);await save(DATA);renderRevs()}
 
-/* ---- IMAGE UPLOAD HELPERS ---- */
-// يقرأ الصورة كـ base64 ويعرضها في العنصر المحدد
-function previewImg(input, previewId, dropId){
+/* ---- MEDIA UPLOAD HELPERS ---- */
+
+// تبديل تاب رفع / رابط
+function switchTab(section, tab, btn){
+  const fileDiv = document.getElementById(section+'-tab-file');
+  const urlDiv  = document.getElementById(section+'-tab-url');
+  document.querySelectorAll('#page-'+section+' .media-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='file'){ fileDiv.style.display=''; urlDiv.style.display='none'; }
+  else            { fileDiv.style.display='none'; urlDiv.style.display=''; }
+}
+
+// معاينة ملف مرفوع (صورة أو فيديو)
+function previewMedia(input, prevId, dropId){
   const f=input.files[0]; if(!f) return;
-  // ضغط الصورة قبل الحفظ
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-      const MAX=800;
-      let w=img.width, h=img.height;
-      if(w>MAX){h=Math.round(h*MAX/w);w=MAX}
-      const canvas=document.createElement('canvas');
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      const b64=canvas.toDataURL('image/jpeg',0.82);
-      const prev=document.getElementById(previewId);
-      const ph=document.getElementById(dropId.replace('-drop','-ph')||dropId+'_ph');
-      if(prev){prev.src=b64;prev.style.display='block'}
-      // نخزن في data attribute مؤقتاً
-      document.getElementById(dropId).dataset.b64=b64;
-      // إخفاء placeholder
-      const phEl=document.querySelector('#'+dropId+' div[id$="-ph"],#'+dropId+' div[id$="_ph"]');
-      if(phEl)phEl.style.display='none';
+  const drop=document.getElementById(dropId);
+  const prev=document.getElementById(prevId);
+  const ph=drop.querySelector('[id$="-ph"]');
+  if(f.type.startsWith('video/')){
+    // فيديو: نقرأه كـ object URL (لا نحوّله base64 — الفيديو كبير)
+    const url=URL.createObjectURL(f);
+    drop.dataset.b64='';
+    drop.dataset.videoFile='pending'; // علامة أن فيديو محلي
+    if(prev){ prev.innerHTML=`<video src="${url}" style="max-height:160px;border-radius:8px;max-width:100%" controls muted></video>`; prev.style.display='block'; }
+    if(ph) ph.style.display='none';
+    // تحذير للمستخدم
+    drop.dataset.videoWarning='1';
+  } else {
+    // صورة: نضغطها ونحوّلها base64
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=900;
+        let w=img.width,h=img.height;
+        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const b64=canvas.toDataURL('image/jpeg',0.85);
+        drop.dataset.b64=b64;
+        drop.dataset.videoFile='';
+        if(prev){ prev.innerHTML=`<img src="${b64}" style="max-height:140px;border-radius:8px;object-fit:cover;max-width:100%">`; prev.style.display='block'; }
+        if(ph) ph.style.display='none';
+      };
+      img.src=e.target.result;
     };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(f);
+    reader.readAsDataURL(f);
+  }
 }
 
-// مزامنة رابط URL مع عنصر المعاينة
-function syncImgUrl(inputId, previewId, phId){
+// معاينة رابط URL (صورة أو يوتيوب أو فيميو أو mp4)
+function previewUrlMedia(inputId, prevId){
   const url=document.getElementById(inputId).value.trim();
-  const prev=document.getElementById(previewId);
+  const prev=document.getElementById(prevId);
   if(!prev) return;
-  if(url){prev.src=url;prev.style.display='block';const ph=document.getElementById(phId);if(ph)ph.style.display='none';}
-  else{prev.style.display='none'}
+  if(!url){ prev.style.display='none'; prev.innerHTML=''; return; }
+  prev.style.display='block';
+  const ytM=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+  const vmM=url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if(ytM){
+    prev.innerHTML=`<iframe src="https://www.youtube.com/embed/${ytM[1]}" style="width:100%;height:180px;border:none;border-radius:8px" allowfullscreen></iframe>`;
+  } else if(vmM){
+    prev.innerHTML=`<iframe src="https://player.vimeo.com/video/${vmM[1]}" style="width:100%;height:180px;border:none;border-radius:8px" allowfullscreen></iframe>`;
+  } else if(/\.(mp4|webm|ogg|mov)([?#]|$)/i.test(url)){
+    prev.innerHTML=`<video src="${url}" style="max-height:160px;width:100%;border-radius:8px" controls muted></video>`;
+  } else {
+    prev.innerHTML=`<img src="${url}" style="max-height:160px;border-radius:8px;object-fit:cover;max-width:100%" onerror="this.parentElement.innerHTML='<p style=color:red;font-size:12px>تعذّر تحميل الصورة</p>'">`;
+  }
 }
 
-// تحصيل قيمة الصورة: base64 من الرفع، أو URL من الحقل
+// تحصيل قيمة الميديا النهائية للحفظ
+function getMediaVal(section){
+  // تحقق من الـ tab النشط
+  const urlDiv=document.getElementById(section+'-tab-url');
+  const isUrl = urlDiv && urlDiv.style.display !== 'none';
+  if(isUrl){
+    const urlEl=document.getElementById(section+'-img-url');
+    return urlEl ? urlEl.value.trim() : '';
+  }
+  // tab الرفع
+  const drop=document.getElementById(section+'-img-drop');
+  if(drop && drop.dataset.videoFile==='pending'){
+    // فيديو محلي — لا يمكن حفظه في JSONBin، نُحذّر
+    toast('⚠️ لرفع فيديو استخدم رابط URL (Cloudinary / YouTube)');
+    return '';
+  }
+  return drop ? (drop.dataset.b64||'') : '';
+}
+
+// للحفاظ على التوافق مع أجزاء أخرى (الشعار والطبيب)
+function previewImg(input, previewId, dropId){
+  previewMedia(input, previewId, dropId);
+}
 function getImgVal(dropId, urlInputId){
   const drop=document.getElementById(dropId);
-  if(drop&&drop.dataset.b64) return drop.dataset.b64;
+  if(drop && drop.dataset.b64) return drop.dataset.b64;
   const urlEl=document.getElementById(urlInputId);
-  return urlEl?urlEl.value.trim():'';
+  return urlEl ? urlEl.value.trim() : '';
 }
 
 /* ---- HERO ---- */
@@ -827,12 +911,22 @@ function loadHeroForm(){
   f('h-s4n').value=h.stat4Num||''; f('h-s4l').value=h.stat4Label||'';
   f('h-c1t').value=h.card1Title||''; f('h-c1s').value=h.card1Sub||'';
   f('h-c2t').value=h.card2Title||''; f('h-c2s').value=h.card2Sub||'';
-  if(h.heroImg){const p=f('hero-img-prev');if(p){p.src=h.heroImg;p.style.display='block';}; f('hero-img-url').value=h.heroImg;}
+  if(h.heroImg){
+    // إذا كان الرابط موجوداً، افتح tab URL وعرّض المعاينة
+    f('hero-img-url').value=h.heroImg;
+    const urlDiv=document.getElementById('hero-tab-url');
+    const fileDiv=document.getElementById('hero-tab-file');
+    if(urlDiv&&fileDiv){
+      fileDiv.style.display='none'; urlDiv.style.display='';
+      document.querySelectorAll('#page-hero .media-tab').forEach((b,i)=>{b.classList.toggle('active',i===1);});
+      previewUrlMedia('hero-img-url','hero-url-prev');
+    }
+  }
 }
 
 async function saveHero(){
   const f=id=>document.getElementById(id).value;
-  const img=getImgVal('hero-img-drop','hero-img-url')||DATA?.hero?.heroImg||'';
+  const img=getMediaVal('hero')||DATA?.hero?.heroImg||'';
   const hero={
     badge:f('h-badge'), title1:f('h-t1'), titleGold:f('h-tg'), title2:f('h-t2'),
     desc:f('h-desc'), btnPrimary:f('h-btn1'), btnSecondary:f('h-btn2'),
@@ -853,12 +947,21 @@ function loadAboutForm(){
   const f=id=>document.getElementById(id);
   f('ab-tag').value=a.tag||''; f('ab-lead').value=a.lead||'';
   f('ab-f1').value=a.feat1||''; f('ab-f2').value=a.feat2||''; f('ab-f3').value=a.feat3||''; f('ab-f4').value=a.feat4||'';
-  if(a.img){const p=f('about-img-prev');if(p){p.src=a.img;p.style.display='block';}; f('about-img-url').value=a.img;}
+  if(a.img){
+    f('about-img-url').value=a.img;
+    const urlDiv=document.getElementById('about-tab-url');
+    const fileDiv=document.getElementById('about-tab-file');
+    if(urlDiv&&fileDiv){
+      fileDiv.style.display='none'; urlDiv.style.display='';
+      document.querySelectorAll('#page-about .media-tab').forEach((b,i)=>{b.classList.toggle('active',i===1);});
+      previewUrlMedia('about-img-url','about-url-prev');
+    }
+  }
 }
 
 async function saveAbout(){
   const f=id=>document.getElementById(id).value;
-  const img=getImgVal('about-img-drop','about-img-url')||DATA?.about?.img||'';
+  const img=getMediaVal('about')||DATA?.about?.img||'';
   const about={img, tag:f('ab-tag'), lead:f('ab-lead'), feat1:f('ab-f1'), feat2:f('ab-f2'), feat3:f('ab-f3'), feat4:f('ab-f4')};
   const newData={...DATA, about};
   await save(newData);
