@@ -312,6 +312,37 @@
     display: flex; gap: 8px; justify-content: flex-end;
   }
 
+  /* ── Author credit ── */
+  .author-credit {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 11px; border-radius: 20px;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.25);
+  }
+  .author-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .author-name { font-size: 0.75rem; color: var(--gold); font-weight: 500; letter-spacing: 0.02em; }
+  .author-role { font-size: 0.58rem; color: rgba(201,168,76,0.55); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* ── Footer ── */
+  .page-footer {
+    background: var(--navy-mid); border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 14px 28px; display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    margin-top: auto;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 9px; }
+  .footer-icon { width: 24px; height: 24px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+  .footer-text { color: rgba(255,255,255,0.3); font-size: 0.75rem; }
+  .footer-author {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 12px; border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.08);
+  }
+  .footer-author-name { font-family: 'DM Serif Display', serif; font-size: 0.82rem; color: var(--gold); display: block; }
+  .footer-author-label { font-size: 0.58rem; color: rgba(255,255,255,0.25); letter-spacing: 0.07em; text-transform: uppercase; }
+  .footer-copy { font-size: 0.65rem; color: rgba(255,255,255,0.18); }
+
   /* ── Mobile ── */
   @media (max-width: 768px) {
     .sidebar { display: none; }
@@ -332,6 +363,13 @@
     </div>
   </div>
   <div class="header-actions">
+    <div class="author-credit">
+      <div class="author-dot"></div>
+      <div>
+        <div class="author-name">Dr. Mohammed Homam Alsamman</div>
+        <div class="author-role">Designer &amp; Developer</div>
+      </div>
+    </div>
     <a href="index.html" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);">← Back to Forms</a>
     <button class="btn btn-outline btn-sm" onclick="exportSettings()">📤 Export</button>
     <button class="btn btn-gold btn-sm" onclick="document.getElementById('file-import').click()">📥 Import</button>
@@ -609,9 +647,22 @@
   </div><!-- /main -->
 </div><!-- /layout -->
 
+<footer class="page-footer">
+  <div class="footer-brand">
+    <div class="footer-icon">⚙️</div>
+    <span class="footer-text">Orthodontic Records — Admin Panel</span>
+  </div>
+  <div class="footer-author">
+    <span style="font-size:14px;">🩺</span>
+    <div>
+      <span class="footer-author-name">Dr. Mohammed Homam Alsamman</span>
+      <span class="footer-author-label">Concept, Design &amp; Development</span>
+    </div>
+  </div>
+  <span class="footer-copy">© 2025 All Rights Reserved</span>
+</footer>
+
 <script>
-// ══════════════════════════════════════════════════════════════
-// DEFAULT SCHEMA
 // ══════════════════════════════════════════════════════════════
 const DEFAULT_SCHEMA = {
   wireSizes: ['0.012','0.014','0.016','0.018','0.020','0.016×0.016','0.016×0.022','0.017×0.025','0.018×0.025','0.019×0.025','0.021×0.025'],

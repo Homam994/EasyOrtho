@@ -47,6 +47,43 @@
   .header-date { color: var(--grey-400); font-size: 0.76rem; text-align: right; }
   .header-date strong { display: block; color: var(--teal-mid); font-size: 0.9rem; font-weight: 600; }
 
+  /* ── Author credit ── */
+  .author-credit {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 12px; border-radius: 20px;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.25);
+  }
+  .author-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .author-name { font-family: 'DM Serif Display', serif; font-size: 0.78rem; color: var(--gold); letter-spacing: 0.02em; }
+  .author-role { font-size: 0.62rem; color: rgba(201,168,76,0.6); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* ── Footer ── */
+  .page-footer {
+    background: var(--navy); border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 18px 32px; display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 10px; }
+  .footer-icon { width: 28px; height: 28px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .footer-text { font-family: 'DM Serif Display', serif; color: rgba(255,255,255,0.5); font-size: 0.82rem; }
+  .footer-author {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.08);
+  }
+  .footer-author-icon { font-size: 14px; }
+  .footer-author-info {}
+  .footer-author-name { font-family: 'DM Serif Display', serif; font-size: 0.86rem; color: var(--gold); display: block; }
+  .footer-author-label { font-size: 0.62rem; color: rgba(255,255,255,0.3); letter-spacing: 0.07em; text-transform: uppercase; }
+  .footer-copy { font-size: 0.68rem; color: rgba(255,255,255,0.2); }
+
+  @media (max-width: 768px) {
+    .author-credit { display: none; }
+    .page-footer { padding: 14px 12px; justify-content: center; text-align: center; }
+  }
+
   /* ── Tab Navigation ── */
   .tab-nav-wrap {
     background: var(--navy);
@@ -380,6 +417,13 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
+    <div class="author-credit">
+      <div class="author-dot"></div>
+      <div>
+        <div class="author-name">Dr. Mohammed Homam Alsamman</div>
+        <div class="author-role">Designer &amp; Developer</div>
+      </div>
+    </div>
     <div class="header-date">
       <div id="live-date"></div>
       <strong id="live-time"></strong>
@@ -2456,6 +2500,21 @@
   <button class="btn btn-print"   onclick="window.print()">🖨 Print</button>
   <button class="btn btn-primary" onclick="copyCurrentSummary()">📋 Copy Summary</button>
 </div>
+
+<footer class="page-footer">
+  <div class="footer-brand">
+    <div class="footer-icon">🦷</div>
+    <span class="footer-text">Orthodontic Clinical Records System</span>
+  </div>
+  <div class="footer-author">
+    <span class="footer-author-icon">🩺</span>
+    <div class="footer-author-info">
+      <span class="footer-author-name">Dr. Mohammed Homam Alsamman</span>
+      <span class="footer-author-label">Concept, Design &amp; Development</span>
+    </div>
+  </div>
+  <span class="footer-copy">© 2025 All Rights Reserved</span>
+</footer>
 
 <script>
 // ── Clock ──────────────────────────────────────────────────────────────
