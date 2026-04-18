@@ -1,1024 +1,1187 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة إدارة المركز</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>Ortho Records — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dark:#9A7A2E;--white:#FFF;--off-white:#FAF8F3;--dark:#1A1410;--sidebar:#13100B;--text-dark:#2C2416;--text-mid:#5C4A2A;--border:rgba(201,168,76,.25);--danger:#e53935;--success:#4CAF50}
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Tajawal',sans-serif;background:#F5F0E8;display:flex;min-height:100vh}
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #152336;
+    --navy-light: #1e3448;
+    --teal: #1a7a7a;
+    --teal-light: #e8f5f5;
+    --teal-mid: #c2e8e8;
+    --gold: #c9a84c;
+    --gold-light: #fdf6e3;
+    --white: #ffffff;
+    --grey-50: #f8fafb;
+    --grey-100: #f0f4f7;
+    --grey-200: #dce4ea;
+    --grey-300: #c5d1da;
+    --grey-400: #93a7b5;
+    --grey-500: #6e8fa0;
+    --grey-600: #5a7080;
+    --grey-800: #2d3f4a;
+    --text: #1a2a35;
+    --red: #a02820;
+    --red-light: #fdecea;
+    --green: #1a5c3a;
+    --green-light: #e8f5e9;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(13,27,42,0.08);
+    --sidebar-w: 240px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: var(--text); min-height: 100vh; }
 
-  /* LOGIN */
-  .login-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,var(--dark),#2C2010);display:flex;align-items:center;justify-content:center}
-  .login-box{background:white;border-radius:24px;padding:48px 42px;width:420px;max-width:95vw;border:1px solid var(--border);text-align:center;box-shadow:0 40px 100px rgba(0,0,0,.5)}
-  .login-icon{width:72px;height:72px;border-radius:20px;margin:0 auto 20px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-size:32px;color:white}
-  .login-box h2{font-family:'Playfair Display',serif;font-size:24px;color:var(--text-dark);margin-bottom:6px}
-  .login-box>p{font-size:14px;color:var(--text-mid);margin-bottom:24px}
-  .login-input{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:12px;font-size:15px;font-family:'Tajawal',sans-serif;outline:none;margin-bottom:14px;transition:border-color .2s;color:var(--text-dark);background:var(--off-white)}
-  .login-input:focus{border-color:var(--gold)}
-  .login-btn{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;padding:14px;border-radius:50px;border:none;font-size:16px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .3s;box-shadow:0 6px 25px rgba(201,168,76,.4)}
-  .login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(201,168,76,.5)}
-  .login-err{color:var(--danger);font-size:13px;margin-bottom:10px;display:none}
+  /* ── Header ── */
+  .page-header {
+    background: var(--navy); padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 300;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+    height: 60px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-icon { width: 34px; height: 34px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .header-title { font-family: 'DM Serif Display', serif; color: var(--white); font-size: 1.1rem; }
+  .header-sub { color: var(--gold); font-size: 0.63rem; letter-spacing: 0.09em; text-transform: uppercase; margin-top: 1px; }
+  .header-actions { display: flex; gap: 6px; align-items: center; }
 
-  /* ---- SETUP BANNER ---- */
-  .setup-banner{background:linear-gradient(135deg,#1A1410,#2C2010);color:white;padding:20px 28px;border-radius:16px;margin-bottom:28px;border:1px solid rgba(201,168,76,.3)}
-  .setup-banner h3{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold-light);margin-bottom:10px}
-  .setup-banner p{font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;margin-bottom:4px}
-  .setup-banner ol{padding-right:20px;font-size:13px;color:rgba(255,255,255,.7);line-height:2}
-  .setup-banner a{color:var(--gold-light);font-weight:700}
-  .setup-banner code{background:rgba(201,168,76,.2);padding:2px 7px;border-radius:5px;font-family:monospace;font-size:12px;color:var(--gold-light)}
-  .setup-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;margin-top:14px}
+  /* ── Layout ── */
+  .layout { display: flex; min-height: calc(100vh - 60px); }
 
-  /* SIDEBAR */
-  .sidebar{width:260px;background:var(--sidebar);color:white;padding:28px 0;position:fixed;top:0;right:0;bottom:0;z-index:100;overflow-y:auto;border-left:1px solid rgba(201,168,76,.15)}
-  .sidebar-logo{padding:0 24px 28px;border-bottom:1px solid rgba(201,168,76,.15);margin-bottom:20px;text-align:center}
-  .sl-icon{width:56px;height:56px;border-radius:16px;margin:0 auto 12px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-size:24px;color:white}
-  .sidebar-logo h2{font-family:'Playfair Display',serif;font-size:15px;background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .sidebar-logo p{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px}
-  .nav-sec{padding:0 14px 8px}
-  .nav-sec-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.3);padding:8px 12px 6px}
-  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;cursor:pointer;color:rgba(255,255,255,.6);font-size:14px;font-weight:500;transition:all .2s;margin-bottom:2px}
-  .nav-item:hover{background:rgba(201,168,76,.1);color:var(--gold-light)}.nav-item.active{background:linear-gradient(135deg,rgba(201,168,76,.25),rgba(201,168,76,.1));color:var(--gold-light)}
-  .nav-item i{width:20px;text-align:center;font-size:16px}
-  .nav-div{height:1px;background:rgba(201,168,76,.1);margin:12px 14px}
-  .sidebar-footer{padding:20px 24px 10px;border-top:1px solid rgba(201,168,76,.15);margin-top:20px}
-  .logout-btn{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;padding:8px 12px;border-radius:10px;transition:all .2s;background:none;border:none;font-family:'Tajawal',sans-serif;width:100%;text-decoration:none}
-  .logout-btn:hover{color:var(--danger);background:rgba(229,57,53,.1)}
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    background: var(--navy-mid); border-right: 1px solid rgba(255,255,255,0.06);
+    position: sticky; top: 60px; height: calc(100vh - 60px);
+    overflow-y: auto; padding: 12px 0;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
-  /* MAIN */
-  .main{margin-right:260px;flex:1;min-height:100vh}
-  .topbar{background:white;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(201,168,76,.2);box-shadow:0 2px 10px rgba(0,0,0,.05)}
-  .topbar h1{font-family:'Playfair Display',serif;font-size:22px;color:var(--text-dark)}
-  .topbar p{font-size:13px;color:var(--text-mid);margin-top:2px}
-  .tb-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Tajawal',sans-serif;text-decoration:none}
-  .tb-prev{background:var(--off-white);color:var(--text-dark);border:1px solid var(--border)}.tb-prev:hover{border-color:var(--gold);color:var(--gold-dark)}
-  .page{padding:32px;display:none}.page.active{display:block}
+  .sidebar-group { margin-bottom: 4px; }
+  .sidebar-group-label {
+    font-size: 0.59rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: rgba(255,255,255,0.28);
+    padding: 10px 16px 4px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 16px; cursor: pointer; transition: all 0.15s;
+    font-size: 0.82rem; color: rgba(255,255,255,0.55);
+    border-left: 2px solid transparent; position: relative;
+  }
+  .sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+  .sidebar-item.active {
+    background: rgba(26,122,122,0.18); color: var(--teal-mid);
+    border-left-color: var(--teal); font-weight: 600;
+  }
+  .sidebar-icon { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; }
+  .sidebar-count {
+    margin-left: auto; font-size: 0.6rem; font-weight: 700;
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
+    border-radius: 10px; padding: 1px 6px; min-width: 18px; text-align: center;
+  }
+  .sidebar-item.active .sidebar-count { background: rgba(26,122,122,0.3); color: var(--teal-mid); }
 
-  /* DB STATUS INDICATOR */
-  .db-status{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid;margin-left:12px}
-  .db-status.ok{background:rgba(76,175,80,.1);color:#2e7d32;border-color:rgba(76,175,80,.3)}
-  .db-status.err{background:rgba(229,57,53,.1);color:var(--danger);border-color:rgba(229,57,53,.3)}
-  .db-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  /* ── Main ── */
+  .main { flex: 1; min-width: 0; }
 
-  /* CARDS */
-  .card{background:white;border-radius:18px;padding:28px;border:1px solid rgba(201,168,76,.18);margin-bottom:24px;box-shadow:0 2px 15px rgba(0,0,0,.04)}
-  .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-  .card-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--text-dark);display:flex;align-items:center;gap:10px}
-  .card-title i{color:var(--gold)}
-  .card-sub{font-size:13px;color:var(--text-mid);margin-top:2px}
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  .form-group.full{grid-column:1/-1}
-  .form-label{font-size:13px;font-weight:700;color:var(--text-dark);margin-bottom:8px;display:block}
-  .form-input,.form-select,.form-textarea{width:100%;padding:11px 14px;border:2px solid rgba(201,168,76,.2);border-radius:12px;font-size:14px;font-family:'Tajawal',sans-serif;outline:none;transition:border-color .2s;color:var(--text-dark);background:var(--off-white)}
-  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold);background:white}
-  .form-textarea{resize:vertical;min-height:80px}
-  .btn{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Tajawal',sans-serif;display:inline-flex;align-items:center;gap:8px;border:none}
-  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;box-shadow:0 4px 15px rgba(201,168,76,.35)}.btn-gold:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,168,76,.45)}
-  .btn-outline{background:transparent;border:2px solid var(--border);color:var(--text-dark)}.btn-outline:hover{border-color:var(--gold);color:var(--gold-dark)}
-  .btn-danger{background:rgba(229,57,53,.1);color:var(--danger);border:1px solid rgba(229,57,53,.2)}.btn-danger:hover{background:var(--danger);color:white}
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:28px}
-  .stat-card{background:white;border-radius:16px;padding:22px 20px;border:1px solid rgba(201,168,76,.18);display:flex;align-items:center;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
-  .stat-icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:22px;flex-shrink:0}
-  .stat-info h3{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--text-dark)}.stat-info p{font-size:12px;color:var(--text-mid);margin-top:2px}
-  .list-row{display:flex;align-items:center;gap:16px;padding:14px 16px;background:var(--off-white);border-radius:14px;border:1px solid rgba(201,168,76,.15);transition:all .2s;margin-bottom:12px}
-  .list-row:hover{border-color:var(--gold);background:white}
-  .row-avatar{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;color:white;font-size:20px;flex-shrink:0;overflow:hidden}
-  .row-avatar img{width:100%;height:100%;object-fit:cover}
-  .row-info{flex:1}.row-info h4{font-size:15px;font-weight:700;color:var(--text-dark)}.row-info p{font-size:12px;color:var(--gold-dark);font-weight:600;margin-top:2px}.row-info small{font-size:12px;color:var(--text-mid);display:block;margin-top:3px}
-  .row-actions{display:flex;gap:8px}
-  .days-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-  .day-cb{display:none}.day-lbl{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid var(--border);color:var(--text-mid);transition:all .2s;user-select:none}
-  .day-cb:checked+.day-lbl{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;border-color:var(--gold)}
-  .hour-row{display:grid;grid-template-columns:120px 1fr 1fr 60px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
-  .hour-row:last-child{border-bottom:none}
-  .hour-day{font-size:14px;font-weight:700;color:var(--text-dark)}
-  .toggle{position:relative;width:44px;height:24px}.toggle input{opacity:0;width:0;height:0}
-  .tslider{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:.3s}
-  .tslider:before{content:'';position:absolute;height:18px;width:18px;right:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
-  input:checked+.tslider{background:var(--danger)}input:checked+.tslider:before{transform:translateX(-20px)}
-  .img-upload-box{border:2px dashed var(--border);border-radius:16px;padding:24px;cursor:pointer;transition:all .3s;background:var(--off-white);min-height:100px;display:flex;align-items:center;justify-content:center}
-  .img-upload-box:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
-  .media-tabs{display:flex;gap:8px;margin-bottom:12px}
-  .media-tab{padding:8px 18px;border-radius:20px;border:2px solid var(--border);background:transparent;color:var(--text-mid);font-size:13px;font-weight:600;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px}
-  .media-tab.active{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:white;border-color:var(--gold)}
-  .media-tab:hover:not(.active){border-color:var(--gold);color:var(--gold-dark)}
-  .logo-drop{border:2px dashed var(--border);border-radius:16px;padding:40px;text-align:center;cursor:pointer;transition:all .3s;background:var(--off-white)}
-  .logo-drop:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
-  .logo-drop input{display:none}
-  .overlay-wrap{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
-  .overlay-wrap.open{display:flex}
-  .overlay-box{background:white;border-radius:24px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;border:1px solid var(--border);box-shadow:0 40px 100px rgba(0,0,0,.3)}
-  .overlay-head{background:linear-gradient(135deg,var(--gold),var(--gold-dark));padding:24px 28px;display:flex;justify-content:space-between;align-items:center;border-radius:24px 24px 0 0}
-  .overlay-head h3{font-family:'Playfair Display',serif;font-size:18px;color:white}
-  .overlay-close{background:rgba(255,255,255,.2);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px}
-  .overlay-body{padding:28px}
-  .toast{position:fixed;bottom:30px;left:30px;z-index:99999;background:var(--sidebar);color:var(--gold-light);padding:14px 22px;border-radius:12px;font-size:14px;border:1px solid var(--border);display:flex;align-items:center;gap:10px;transform:translateX(-200%);transition:transform .4s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 10px 40px rgba(0,0,0,.3)}
-  .toast.show{transform:translateX(0)}
-  .saving-overlay{display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.4);backdrop-filter:blur(3px);align-items:center;justify-content:center}
-  .saving-overlay.show{display:flex}
-  .saving-box{background:white;border-radius:16px;padding:32px 40px;text-align:center;border:1px solid var(--border)}
-  .saving-box .saving-spin{width:48px;height:48px;border:3px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .saving-box p{font-size:15px;color:var(--text-dark);font-weight:600}
-  @media(max-width:900px){.sidebar{transform:translateX(260px)}.main{margin-right:0}.stats-row{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}}
+  /* ── Panel header ── */
+  .panel-topbar {
+    background: var(--white); border-bottom: 1px solid var(--grey-200);
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 60px; z-index: 100;
+  }
+  .panel-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
+  .panel-desc { font-size: 0.79rem; color: var(--grey-500); margin-top: 2px; }
+
+  /* ── Content area ── */
+  .content-area { padding: 20px 28px 80px; }
+
+  /* ── Panels ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Info box ── */
+  .info-box {
+    background: var(--teal-light); border: 1px solid var(--teal-mid);
+    border-radius: 8px; padding: 11px 14px; font-size: 0.81rem;
+    color: var(--teal); display: flex; gap: 10px; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--white); border: 1px solid var(--grey-200);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    margin-bottom: 14px; overflow: hidden;
+  }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 16px; background: var(--grey-50);
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .card-title { font-size: 0.82rem; font-weight: 700; color: var(--navy); flex: 1; }
+  .card-body { padding: 14px 16px; }
+  .card-footer {
+    padding: 10px 16px; background: var(--grey-50);
+    border-top: 1px solid var(--grey-200);
+    display: flex; gap: 8px; align-items: center;
+  }
+
+  /* ── Badge ── */
+  .badge {
+    font-size: 0.6rem; font-weight: 700; border-radius: 5px;
+    padding: 2px 7px; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .badge-radio   { background: #e8f0ff; color: #3355cc; }
+  .badge-check   { background: #fff0e0; color: #a05010; }
+  .badge-text    { background: var(--teal-light); color: var(--teal); }
+  .badge-select  { background: #f5eaff; color: #6a1f9e; }
+  .badge-pills   { background: var(--red-light); color: var(--red); }
+
+  /* ── Options list ── */
+  .options-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .option-row {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--grey-50); border: 1.5px solid var(--grey-200);
+    border-radius: 7px; padding: 6px 10px; transition: all 0.15s;
+  }
+  .option-row:hover { border-color: var(--grey-300); }
+  .option-row.drag-over { border-color: var(--teal); background: var(--teal-light); }
+  .drag-handle {
+    color: var(--grey-400); cursor: grab; font-size: 13px;
+    padding: 2px; user-select: none; flex-shrink: 0;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .option-input {
+    flex: 1; font-size: 0.84rem; color: var(--text);
+    border: none; background: transparent; outline: none;
+    font-family: 'DM Sans', sans-serif; min-width: 0;
+  }
+  .option-input:focus { color: var(--teal); }
+  .btn-del {
+    width: 22px; height: 22px; border-radius: 5px; border: none;
+    background: transparent; color: var(--grey-400); cursor: pointer;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .btn-del:hover { background: var(--red-light); color: var(--red); }
+
+  /* ── Add row ── */
+  .add-row { display: flex; gap: 7px; }
+  .add-input {
+    flex: 1; border: 1.5px dashed var(--grey-300); border-radius: 7px;
+    padding: 6px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
+    color: var(--text); background: var(--white); outline: none; transition: all 0.18s;
+  }
+  .add-input:focus { border-color: var(--teal); border-style: solid; }
+  .add-input::placeholder { color: var(--grey-400); }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 13px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.18s; border: none;
+  }
+  .btn-sm { padding: 5px 10px; font-size: 0.76rem; border-radius: 7px; }
+  .btn-xs { padding: 4px 8px; font-size: 0.72rem; border-radius: 6px; }
+  .btn-primary { background: var(--teal); color: white; }
+  .btn-primary:hover { background: #155f5f; }
+  .btn-outline { background: var(--white); border: 1.5px solid var(--grey-200); color: var(--grey-800); }
+  .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #a8872f; }
+  .btn-danger { background: var(--white); border: 1.5px solid var(--grey-200); color: var(--red); }
+  .btn-danger:hover { border-color: var(--red); background: var(--red-light); }
+  .btn-ghost { background: transparent; color: var(--grey-600); border: none; }
+  .btn-ghost:hover { background: var(--grey-100); color: var(--navy); }
+
+  /* ── Settings rows ── */
+  .settings-card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 14px; }
+  .settings-card-title { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--navy); padding: 12px 16px; border-bottom: 1px solid var(--grey-200); background: var(--grey-50); border-radius: var(--radius) var(--radius) 0 0; }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--grey-200);
+    gap: 16px;
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-label { font-size: 0.84rem; font-weight: 500; color: var(--text); }
+  .setting-desc { font-size: 0.74rem; color: var(--grey-500); margin-top: 2px; }
+  .setting-control { flex-shrink: 0; }
+  .inline-input {
+    border: 1.5px solid var(--grey-200); border-radius: 7px;
+    padding: 6px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
+    color: var(--text); outline: none; transition: border-color 0.18s;
+  }
+  .inline-input:focus { border-color: var(--teal); }
+
+  /* ── Toggle switch ── */
+  .toggle { position: relative; width: 38px; height: 22px; cursor: pointer; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0; background: var(--grey-200);
+    border-radius: 22px; transition: 0.2s;
+  }
+  .toggle-thumb {
+    position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
+    background: white; border-radius: 50%; transition: 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle input:checked ~ .toggle-track { background: var(--teal); }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+
+  /* ── Notation picker ── */
+  .notation-picker { display: flex; gap: 7px; }
+  .notation-opt {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1.5px solid var(--grey-200); border-radius: 8px;
+    cursor: pointer; font-size: 0.83rem; font-weight: 500; transition: all 0.15s;
+  }
+  .notation-opt input { display: none; }
+  .notation-opt.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
+
+  /* ── Wire grid ── */
+  .wire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* ── Form tabs (for form field sections) ── */
+  .form-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 16px; }
+  .form-tab {
+    padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--grey-200);
+    font-size: 0.78rem; font-weight: 600; color: var(--grey-600);
+    cursor: pointer; transition: all 0.15s; background: var(--white);
+  }
+  .form-tab:hover { border-color: var(--teal); color: var(--teal); }
+  .form-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+  .form-section { display: none; }
+  .form-section.active { display: block; }
+
+  /* ── Preview strip ── */
+  .preview-strip {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    padding: 8px 10px; background: var(--grey-50);
+    border: 1px solid var(--grey-200); border-radius: 7px; margin-top: 8px;
+  }
+  .preview-chip {
+    padding: 3px 8px; border: 1.5px solid var(--grey-200);
+    border-radius: 6px; font-size: 0.74rem; color: var(--grey-700);
+    background: var(--white);
+  }
+  .preview-label { font-size: 0.62rem; color: var(--grey-400); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 5px; width: 100%; }
+
+  /* ── Clinician list ── */
+  .clinician-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .clinician-input {
+    flex: 1; border: 1.5px solid var(--grey-200); border-radius: 7px;
+    padding: 7px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
+    color: var(--text); outline: none; transition: border-color 0.15s;
+  }
+  .clinician-input:focus { border-color: var(--teal); }
+
+  /* ── IO panel ── */
+  .io-card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow); }
+  .io-card h3 { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--navy); margin-bottom: 6px; }
+  .io-card p { font-size: 0.8rem; color: var(--grey-600); margin-bottom: 12px; line-height: 1.5; }
+  .io-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(14px);
+    background: var(--navy); color: white; padding: 9px 20px; border-radius: 9px;
+    font-size: 0.84rem; font-weight: 500; z-index: 9999;
+    opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--green); }
+  .toast.error   { background: var(--red); }
+
+  /* ── Sticky save bar ── */
+  .save-bar {
+    position: sticky; bottom: 0; z-index: 100;
+    background: rgba(248,250,251,0.95); backdrop-filter: blur(8px);
+    border-top: 1px solid var(--grey-200); padding: 10px 28px;
+    display: flex; gap: 8px; justify-content: flex-end;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .panel-topbar { padding: 12px 14px; }
+    .content-area { padding: 14px 14px 80px; }
+    .wire-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-screen" id="login-screen">
-  <div class="login-box">
-    <div class="login-icon"><i class="fa fa-shield-halved"></i></div>
-    <h2>لوحة إدارة المركز</h2>
-    <p>أدخل بيانات الدخول للمتابعة</p>
-    <p class="login-err" id="login-err">كلمة المرور غير صحيحة</p>
-    <input type="text"     class="login-input" id="lu" placeholder="اسم المستخدم" value="admin">
-    <input type="password" class="login-input" id="lp" placeholder="كلمة المرور">
-    <button class="login-btn" onclick="doLogin()"><i class="fa fa-sign-in-alt" style="margin-left:8px"></i>دخول</button>
-    <p style="font-size:12px;color:#bbb;margin-top:16px">كلمة المرور الافتراضية: <strong>admin123</strong></p>
+<div class="page-header">
+  <div class="header-brand">
+    <div class="header-icon">⚙️</div>
+    <div>
+      <div class="header-title">Admin Panel</div>
+      <div class="header-sub">Orthodontic Records System</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <a href="index.html" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);">← Back to Forms</a>
+    <button class="btn btn-outline btn-sm" onclick="exportSettings()">📤 Export</button>
+    <button class="btn btn-gold btn-sm" onclick="document.getElementById('file-import').click()">📥 Import</button>
+    <input type="file" id="file-import" accept=".json" style="display:none" onchange="importSettings(this)">
+    <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Save All</button>
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="sl-icon"><i class="fa fa-tooth"></i></div>
-    <h2>لوحة التحكم</h2>
-    <p>إدارة مركز طب الأسنان</p>
-  </div>
-  <div class="nav-sec">
-    <div class="nav-sec-title">الرئيسية</div>
-    <div class="nav-item active" onclick="showPage('dashboard',this)"><i class="fa fa-gauge"></i>لوحة المعلومات</div>
-    <div class="nav-item" onclick="showPage('setup',this)"><i class="fa fa-database"></i>إعداد قاعدة البيانات</div>
-    <div class="nav-item" onclick="showPage('clinic',this)"><i class="fa fa-building-circle-check"></i>معلومات المركز</div>
-  </div>
-  <div class="nav-div"></div>
-  <div class="nav-sec">
-    <div class="nav-sec-title">إدارة المحتوى</div>
-    <div class="nav-item" onclick="showPage('hero',this)"><i class="fa fa-wand-magic-sparkles"></i>قسم Hero</div>
-    <div class="nav-item" onclick="showPage('about',this)"><i class="fa fa-circle-info"></i>قسم عن المركز</div>
-    <div class="nav-item" onclick="showPage('doctors',this)"><i class="fa fa-user-doctor"></i>الأطباء</div>
-    <div class="nav-item" onclick="showPage('specialties',this)"><i class="fa fa-stethoscope"></i>التخصصات</div>
-    <div class="nav-item" onclick="showPage('hours',this)"><i class="fa fa-clock"></i>ساعات العمل</div>
-    <div class="nav-item" onclick="showPage('reviews',this)"><i class="fa fa-star"></i>التقييمات</div>
-    <div class="nav-item" onclick="showPage('social',this)"><i class="fa fa-share-nodes"></i>التواصل الاجتماعي</div>
-    <div class="nav-item" onclick="showPage('logo',this)"><i class="fa fa-image"></i>الشعار والهوية</div>
-  </div>
-  <div class="nav-div"></div>
-  <div class="sidebar-footer">
-    <a href="index.html" target="_blank" class="logout-btn" style="color:rgba(201,168,76,.7)"><i class="fa fa-eye"></i>معاينة الموقع</a>
-    <button class="logout-btn" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i>تسجيل الخروج</button>
-  </div>
-</aside>
+<div class="toast" id="toast"></div>
 
-<!-- MAIN -->
-<main class="main">
-  <div class="topbar">
-    <div><h1 id="page-title">لوحة المعلومات</h1><p id="page-sub">مرحباً بك في لوحة إدارة المركز</p></div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="db-status err" id="db-status"><div class="db-dot"></div><span id="db-status-text">غير متصل بالسحابة</span></div>
-      <a href="index.html" target="_blank" class="tb-btn tb-prev"><i class="fa fa-eye"></i>معاينة الموقع</a>
-    </div>
-  </div>
+<div class="layout">
 
-  <!-- DASHBOARD -->
-  <div class="page active" id="page-dashboard">
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-icon"><i class="fa fa-user-doctor"></i></div><div class="stat-info"><h3 id="s-docs">—</h3><p>طبيب نشط</p></div></div>
-      <div class="stat-card"><div class="stat-icon"><i class="fa fa-stethoscope"></i></div><div class="stat-info"><h3 id="s-specs">—</h3><p>تخصص طبي</p></div></div>
-      <div class="stat-card"><div class="stat-icon"><i class="fa fa-star"></i></div><div class="stat-info"><h3 id="s-revs">—</h3><p>تقييم منشور</p></div></div>
-      <div class="stat-card"><div class="stat-icon"><i class="fa fa-cloud"></i></div><div class="stat-info"><h3 id="s-cloud">—</h3><p>حالة البيانات</p></div></div>
+  <!-- ══ SIDEBAR ══ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">General</div>
+      <div class="sidebar-item active" onclick="showPanel('clinic')" id="nav-clinic">
+        <span class="sidebar-icon">🏥</span> Clinic Settings
+      </div>
+      <div class="sidebar-item" onclick="showPanel('clinicians')" id="nav-clinicians">
+        <span class="sidebar-icon">👨‍⚕️</span> Clinicians
+        <span class="sidebar-count" id="cnt-clinicians">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showPanel('wires')" id="nav-wires">
+        <span class="sidebar-icon">🔩</span> Wire Options
+      </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
-      <div class="card">
-        <div class="card-header"><div><div class="card-title"><i class="fa fa-bolt"></i>إجراءات سريعة</div></div></div>
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <button class="btn btn-gold" onclick="showPage('doctors')" style="width:100%;justify-content:center"><i class="fa fa-plus"></i>إضافة طبيب جديد</button>
-          <button class="btn btn-outline" onclick="showPage('reviews')" style="width:100%;justify-content:center"><i class="fa fa-star"></i>إضافة تقييم جديد</button>
-          <button class="btn btn-outline" onclick="showPage('hours')" style="width:100%;justify-content:center"><i class="fa fa-clock"></i>تعديل ساعات العمل</button>
-          <button class="btn btn-outline" onclick="showPage('logo')" style="width:100%;justify-content:center"><i class="fa fa-image"></i>تحديث شعار المركز</button>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">Form Fields</div>
+      <div class="sidebar-item" onclick="showPanel('form-exam')" id="nav-form-exam">
+        <span class="sidebar-icon">🔍</span> Examination
+        <span class="sidebar-count" id="cnt-exam">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showPanel('form-plan')" id="nav-form-plan">
+        <span class="sidebar-icon">📝</span> Treatment Plan
+        <span class="sidebar-count" id="cnt-plan">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showPanel('form-bond')" id="nav-form-bond">
+        <span class="sidebar-icon">🔗</span> Bond-Up
+        <span class="sidebar-count" id="cnt-bond">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showPanel('form-fu-fixed')" id="nav-form-fu-fixed">
+        <span class="sidebar-icon">🔧</span> Fixed Follow-Up
+        <span class="sidebar-count" id="cnt-fu-fixed">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showPanel('form-fu-aligner')" id="nav-form-fu-aligner">
+        <span class="sidebar-icon">💎</span> Aligner Follow-Up
+        <span class="sidebar-count" id="cnt-fu-aligner">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showPanel('form-emergency')" id="nav-form-emergency">
+        <span class="sidebar-icon">🚨</span> Emergency
+        <span class="sidebar-count" id="cnt-emergency">0</span>
+      </div>
+      <div class="sidebar-item" onclick="showPanel('form-debond')" id="nav-form-debond">
+        <span class="sidebar-icon">✂️</span> Debond & Retainer
+        <span class="sidebar-count" id="cnt-debond">0</span>
+      </div>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">System</div>
+      <div class="sidebar-item" onclick="showPanel('reset')" id="nav-reset">
+        <span class="sidebar-icon">🔄</span> Reset & Export
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+
+    <!-- panel topbar changes with active panel -->
+    <div class="panel-topbar" id="panel-topbar">
+      <div>
+        <div class="panel-title" id="topbar-title">Clinic Settings</div>
+        <div class="panel-desc" id="topbar-desc">General information displayed across all forms</div>
+      </div>
+      <div id="topbar-actions"></div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ══════════════════════════
+           PANEL: CLINIC SETTINGS
+      ══════════════════════════ -->
+      <div class="panel active" id="panel-clinic">
+        <div class="info-box">
+          <span>🔒</span>
+          <div><strong>Settings are local & private.</strong> All changes are saved only in <em>this browser</em> on <em>this device</em> via localStorage. Use Export/Import to transfer between devices.</div>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title"><i class="fa fa-database"></i>حالة قاعدة البيانات</div></div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="padding:12px 16px;background:var(--off-white);border-radius:12px;border:1px solid var(--border)">
-            <div style="font-size:12px;color:var(--text-mid);margin-bottom:4px">Bin ID</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text-dark);word-break:break-all" id="dash-binid">غير مُعيَّن</div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Clinic Information</div>
+          <div class="setting-row">
+            <div><div class="setting-label">Clinic / Practice Name</div><div class="setting-desc">Displayed in the form header subtitle</div></div>
+            <div class="setting-control"><input type="text" class="inline-input" id="clinic-name" placeholder="e.g. Dr. Ahmed Orthodontics" style="width:240px;"></div>
           </div>
-          <div style="padding:12px 16px;background:var(--off-white);border-radius:12px;border:1px solid var(--border)">
-            <div style="font-size:12px;color:var(--text-mid);margin-bottom:4px">آخر حفظ</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text-dark)" id="last-save">—</div>
+          <div class="setting-row">
+            <div><div class="setting-label">Currency</div><div class="setting-desc">Used in all cost fields</div></div>
+            <div class="setting-control">
+              <select class="inline-input" id="clinic-currency" style="width:140px;">
+                <option value="SAR">SAR ﷼</option>
+                <option value="USD">USD $</option>
+                <option value="EUR">EUR €</option>
+                <option value="GBP">GBP £</option>
+                <option value="AED">AED د.إ</option>
+                <option value="KWD">KWD د.ك</option>
+                <option value="QAR">QAR ر.ق</option>
+              </select>
+            </div>
           </div>
-          <div id="dash-notconf" style="padding:12px 16px;background:rgba(229,57,53,.08);border-radius:12px;border:1px solid rgba(229,57,53,.2)">
-            <p style="font-size:13px;color:var(--danger);font-weight:600"><i class="fa fa-exclamation-triangle" style="margin-left:6px"></i>قاعدة البيانات غير مُعدَّة</p>
-            <p style="font-size:12px;color:var(--text-mid);margin-top:4px">اذهب إلى "إعداد قاعدة البيانات" لربط JSONBin</p>
+          <div class="setting-row">
+            <div><div class="setting-label">Default Appointment Interval</div><div class="setting-desc">Pre-fills the Next Visit field</div></div>
+            <div class="setting-control"><input type="text" class="inline-input" id="default-interval" placeholder="e.g. 4–6 weeks" style="width:180px;"></div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SETUP PAGE -->
-  <div class="page" id="page-setup">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-database"></i>إعداد قاعدة البيانات السحابية</div><div class="card-sub">يجب إعداد هذا مرة واحدة فقط</div></div></div>
-
-      <div class="setup-banner">
-        <h3>⚡ كيفية إعداد JSONBin.io (مجاني تماماً)</h3>
-        <ol>
-          <li>افتح <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> وأنشئ حساباً مجانياً</li>
-          <li>من لوحة التحكم اضغط <strong>"+ Create Bin"</strong> وضع أي محتوى مثل <code>{}</code> ثم احفظ</li>
-          <li>انسخ <strong>BIN ID</strong> من عنوان URL أو من صفحة الـ Bin (سلسلة مثل <code>64a1b2c3d4e5f6...</code>)</li>
-          <li>من القائمة الجانبية اذهب إلى <strong>API Keys</strong> ثم أنشئ مفتاحاً جديداً وانسخه</li>
-          <li>أدخل المعلومات أدناه واضغط <strong>اختبار وحفظ</strong></li>
-        </ol>
-        <p style="margin-top:10px;color:rgba(255,255,255,.5);font-size:11px">⚠️ هذه المعلومات تُحفظ في المتصفح فقط — يجب إدخالها في كل متصفح/جهاز تدير منه الموقع.</p>
-      </div>
-
-      <div style="margin-bottom:20px">
-        <label class="form-label">Bin ID</label>
-        <input type="text" class="form-input" id="cfg-bin" placeholder="64a1b2c3d4e5f6a7b8c9d0e1" dir="ltr">
-      </div>
-      <div style="margin-bottom:24px">
-        <label class="form-label">API Key (Master Key)</label>
-        <input type="password" class="form-input" id="cfg-key" placeholder="$2a$10$..." dir="ltr">
-      </div>
-      <div style="display:flex;gap:12px">
-        <button class="btn btn-gold" onclick="testAndSaveConfig()"><i class="fa fa-plug"></i>اختبار وحفظ الإعداد</button>
-        <button class="btn btn-outline" onclick="pushDefaults()"><i class="fa fa-upload"></i>رفع البيانات الافتراضية</button>
-      </div>
-      <div id="cfg-result" style="margin-top:16px;display:none"></div>
-    </div>
-  </div>
-
-  <!-- CLINIC INFO -->
-  <div class="page" id="page-clinic">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-building"></i>معلومات المركز</div><div class="card-sub">تعديل البيانات الأساسية للمركز</div></div><button class="btn btn-gold" onclick="saveSection('clinicInfo')"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
-      <div class="form-grid">
-        <div class="form-group"><label class="form-label">اسم المركز</label><input type="text" class="form-input" id="c-name"></div>
-        <div class="form-group"><label class="form-label">السطر الثاني (الشعار)</label><input type="text" class="form-input" id="c-slogan"></div>
-        <div class="form-group"><label class="form-label">رقم واتساب (للحجز)</label><input type="text" class="form-input" id="c-wa" dir="ltr" placeholder="966500000000"></div>
-        <div class="form-group"><label class="form-label">هاتف العرض</label><input type="text" class="form-input" id="c-phone"></div>
-        <div class="form-group full"><label class="form-label">العنوان</label><input type="text" class="form-input" id="c-addr"></div>
-        <div class="form-group"><label class="form-label">البريد الإلكتروني</label><input type="text" class="form-input" id="c-email" dir="ltr"></div>
-        <div class="form-group full"><label class="form-label">Google Maps Embed URL</label><input type="text" class="form-input" id="c-map" dir="ltr"></div>
-        <div class="form-group full"><label class="form-label">عن المركز — الفقرة الأولى</label><textarea class="form-textarea" id="c-a1" rows="3"></textarea></div>
-        <div class="form-group full"><label class="form-label">عن المركز — الفقرة الثانية</label><textarea class="form-textarea" id="c-a2" rows="3"></textarea></div>
-        <div class="form-group full"><label class="form-label">وصف الفوتر</label><textarea class="form-textarea" id="c-fd" rows="2"></textarea></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DOCTORS -->
-  <div class="page" id="page-doctors">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-user-doctor"></i>الكادر الطبي</div></div><button class="btn btn-gold" onclick="openDocModal()"><i class="fa fa-plus"></i>إضافة طبيب</button></div>
-      <div id="docs-list"></div>
-    </div>
-  </div>
-
-  <!-- SPECIALTIES -->
-  <div class="page" id="page-specialties">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-stethoscope"></i>التخصصات</div></div><button class="btn btn-gold" onclick="openSpecModal()"><i class="fa fa-plus"></i>إضافة تخصص</button></div>
-      <div id="specs-list"></div>
-    </div>
-  </div>
-
-  <!-- HOURS -->
-  <div class="page" id="page-hours">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-clock"></i>ساعات العمل</div><div class="card-sub">تجاوز جداول الأطباء الفردية بجدول عام للمركز</div></div><button class="btn btn-gold" onclick="saveHours()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
-      <div id="hours-admin"></div>
-    </div>
-  </div>
-
-  <!-- REVIEWS -->
-  <div class="page" id="page-reviews">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-star"></i>التقييمات</div></div><button class="btn btn-gold" onclick="openRevModal()"><i class="fa fa-plus"></i>إضافة تقييم</button></div>
-      <div id="revs-list"></div>
-    </div>
-  </div>
-
-  <!-- LOGO -->
-  <div class="page" id="page-logo">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-image"></i>شعار المركز</div></div><button class="btn btn-gold" onclick="saveLogo()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
-      <div class="logo-drop" onclick="document.getElementById('logo-file').click()">
-        <input type="file" id="logo-file" accept="image/*" onchange="previewLogo(this)">
-        <img id="logo-preview" src="" style="max-height:80px;max-width:200px;display:none;margin:0 auto 12px;border-radius:8px">
-        <div id="logo-ph"><i class="fa fa-cloud-arrow-up" style="font-size:48px;color:var(--gold);opacity:.6;margin-bottom:12px"></i><p style="font-size:14px;color:var(--text-mid)">انقر لاختيار صورة الشعار</p><p style="font-size:12px;color:#bbb;margin-top:6px">PNG, JPG, SVG — خلفية شفافة مُفضَّلة</p></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HERO PAGE -->
-  <div class="page" id="page-hero">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-wand-magic-sparkles"></i>قسم Hero — الصفحة الرئيسية</div><div class="card-sub">العنوان الكبير والإحصائيات والصورة</div></div><button class="btn btn-gold" onclick="saveHero()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
-      <div class="form-grid">
-        <div class="form-group full">
-          <label class="form-label">صورة أو فيديو Hero <span style="font-weight:400;color:var(--text-mid)">(الجانب الأيمن)</span></label>
-          <div class="media-tabs">
-            <button class="media-tab active" onclick="switchTab('hero','file',this)"><i class="fa fa-upload"></i> رفع صورة</button>
-            <button class="media-tab" onclick="switchTab('hero','url',this)"><i class="fa fa-link"></i> رابط صورة / فيديو</button>
-          </div>
-          <div id="hero-tab-file">
-            <div class="img-upload-box" onclick="document.getElementById('hero-img-file').click()" id="hero-img-drop">
-              <input type="file" id="hero-img-file" accept="image/*,video/*" style="display:none" onchange="previewMedia(this,'hero-media-prev','hero-img-drop')">
-              <div id="hero-media-prev" style="display:none;text-align:center"></div>
-              <div id="hero-img-ph" style="text-align:center;padding:20px">
-                <i class="fa fa-photo-film" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i>
-                <p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة أو فيديو</p>
-                <p style="font-size:11px;color:#bbb;margin-top:4px">JPG, PNG, MP4, MOV, WebM</p>
+        <div class="settings-card">
+          <div class="settings-card-title">Tooth Notation System</div>
+          <div class="setting-row">
+            <div>
+              <div class="setting-label">Notation used across all dental charts and summaries</div>
+              <div class="setting-desc">Affects how tooth numbers are displayed and exported</div>
+            </div>
+            <div class="setting-control">
+              <div class="notation-picker">
+                <label class="notation-opt" id="notation-fdi-lbl">
+                  <input type="radio" name="notation" value="FDI" id="notation-fdi" onchange="updateNotationStyle()">
+                  FDI <span style="color:var(--grey-400);font-weight:400;">(11–48)</span>
+                </label>
+                <label class="notation-opt" id="notation-palmer-lbl">
+                  <input type="radio" name="notation" value="Palmer" id="notation-palmer" onchange="updateNotationStyle()">
+                  Palmer <span style="color:var(--grey-400);font-weight:400;">(UR1–LL8)</span>
+                </label>
               </div>
             </div>
           </div>
-          <div id="hero-tab-url" style="display:none">
-            <input type="url" class="form-input" id="hero-img-url" placeholder="رابط صورة أو YouTube أو Vimeo أو ملف فيديو..." dir="ltr" style="margin-top:8px" oninput="previewUrlMedia('hero-img-url','hero-url-prev')">
-            <div id="hero-url-prev" style="margin-top:10px;border-radius:10px;overflow:hidden;display:none;max-height:200px;"></div>
-            <p style="font-size:11px;color:#bbb;margin-top:6px">يدعم: روابط Cloudinary · YouTube · Vimeo · ملفات MP4/WebM مباشرة</p>
-          </div>
         </div>
-        <div class="form-group full"><label class="form-label">نص الشارة (Badge)</label><input type="text" class="form-input" id="h-badge" placeholder="مركز متخصص في طب الأسنان"></div>
-        <div class="form-group"><label class="form-label">سطر العنوان الأول</label><input type="text" class="form-input" id="h-t1" placeholder="ابتسامة"></div>
-        <div class="form-group"><label class="form-label">سطر العنوان الذهبي</label><input type="text" class="form-input" id="h-tg" placeholder="أكثر إشراقاً"></div>
-        <div class="form-group full"><label class="form-label">سطر العنوان الثالث</label><input type="text" class="form-input" id="h-t2" placeholder="في يد خبراء"></div>
-        <div class="form-group full"><label class="form-label">النص التوضيحي</label><textarea class="form-textarea" id="h-desc" rows="3"></textarea></div>
-        <div class="form-group"><label class="form-label">نص الزر الرئيسي</label><input type="text" class="form-input" id="h-btn1" placeholder="احجز موعدك الآن"></div>
-        <div class="form-group"><label class="form-label">نص الزر الثانوي</label><input type="text" class="form-input" id="h-btn2" placeholder="تعرّف علينا"></div>
-      </div>
-      <div style="border-top:1px solid var(--border);margin:20px 0;padding-top:20px">
-        <p class="form-label" style="margin-bottom:16px">الإحصائيات الأربعة</p>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">إحصائية 1 — الرقم</label><input type="text" class="form-input" id="h-s1n" placeholder="+5000"></div>
-          <div class="form-group"><label class="form-label">إحصائية 1 — النص</label><input type="text" class="form-input" id="h-s1l" placeholder="مريض راضٍ"></div>
-          <div class="form-group"><label class="form-label">إحصائية 2 — الرقم</label><input type="text" class="form-input" id="h-s2n" placeholder="+15"></div>
-          <div class="form-group"><label class="form-label">إحصائية 2 — النص</label><input type="text" class="form-input" id="h-s2l" placeholder="سنة خبرة"></div>
-          <div class="form-group"><label class="form-label">إحصائية 4 — الرقم</label><input type="text" class="form-input" id="h-s4n" placeholder="4.9"></div>
-          <div class="form-group"><label class="form-label">إحصائية 4 — النص</label><input type="text" class="form-input" id="h-s4l" placeholder="تقييم المراجعين"></div>
-        </div>
-      </div>
-      <div style="border-top:1px solid var(--border);margin:20px 0;padding-top:20px">
-        <p class="form-label" style="margin-bottom:16px">البطاقتان العائمتان</p>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">بطاقة 1 — العنوان</label><input type="text" class="form-input" id="h-c1t" placeholder="معتمد دولياً"></div>
-          <div class="form-group"><label class="form-label">بطاقة 1 — النص الفرعي</label><input type="text" class="form-input" id="h-c1s" placeholder="JCI Accredited"></div>
-          <div class="form-group"><label class="form-label">بطاقة 2 — العنوان</label><input type="text" class="form-input" id="h-c2t" placeholder="معقّم بالكامل"></div>
-          <div class="form-group"><label class="form-label">بطاقة 2 — النص الفرعي</label><input type="text" class="form-input" id="h-c2s" placeholder="معايير عالمية"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ABOUT PAGE -->
-  <div class="page" id="page-about">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-circle-info"></i>قسم "عن المركز"</div><div class="card-sub">الصورة والنصوص والمميزات الأربعة</div></div><button class="btn btn-gold" onclick="saveAbout()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
-      <div class="form-grid">
-        <div class="form-group full">
-          <label class="form-label">صورة أو فيديو القسم</label>
-          <div class="media-tabs">
-            <button class="media-tab active" onclick="switchTab('about','file',this)"><i class="fa fa-upload"></i> رفع صورة</button>
-            <button class="media-tab" onclick="switchTab('about','url',this)"><i class="fa fa-link"></i> رابط صورة / فيديو</button>
+        <div class="settings-card">
+          <div class="settings-card-title">Aseptic Statement</div>
+          <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+            <div>
+              <div class="setting-label">Text shown in the aseptic confirmation row on all visit forms</div>
+              <div class="setting-desc">This statement appears at the bottom of Bond-Up, Follow-Up, Emergency and Debond forms</div>
+            </div>
+            <textarea id="aseptic-statement" style="width:100%;border:1.5px solid var(--grey-200);border-radius:8px;padding:9px 11px;font-family:DM Sans,sans-serif;font-size:0.84rem;outline:none;resize:vertical;min-height:64px;" placeholder="Aseptic technique statement..."></textarea>
           </div>
-          <div id="about-tab-file">
-            <div class="img-upload-box" onclick="document.getElementById('about-img-file').click()" id="about-img-drop">
-              <input type="file" id="about-img-file" accept="image/*,video/*" style="display:none" onchange="previewMedia(this,'about-media-prev','about-img-drop')">
-              <div id="about-media-prev" style="display:none;text-align:center"></div>
-              <div id="about-img-ph" style="text-align:center;padding:20px">
-                <i class="fa fa-photo-film" style="font-size:36px;color:var(--gold);opacity:.6;margin-bottom:8px;display:block"></i>
-                <p style="font-size:13px;color:var(--text-mid)">انقر لرفع صورة أو فيديو</p>
-                <p style="font-size:11px;color:#bbb;margin-top:4px">JPG, PNG, MP4, MOV, WebM</p>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════
+           PANEL: CLINICIANS
+      ══════════════════════════ -->
+      <div class="panel" id="panel-clinicians">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👨‍⚕️ Clinician List</div>
+            <span class="badge badge-text">AUTOCOMPLETE</span>
+          </div>
+          <div class="card-body">
+            <p style="font-size:0.8rem;color:var(--grey-500);margin-bottom:12px;">These names appear as suggestions in the Clinician field on every visit form.</p>
+            <div id="clinician-list"></div>
+            <div class="add-row" style="margin-top:6px;">
+              <input type="text" class="add-input" id="new-clinician" placeholder="Dr. New Name — press Enter to add">
+              <button class="btn btn-primary btn-sm" onclick="addClinician()">+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════
+           PANEL: WIRE OPTIONS
+      ══════════════════════════ -->
+      <div class="panel" id="panel-wires">
+        <div class="info-box">
+          <span>ℹ️</span>
+          <div>Wire sizes and materials populate the chip selectors on <strong>Bond-Up</strong>, <strong>Fixed Follow-Up</strong>, and <strong>Emergency</strong> forms. Drag to reorder.</div>
+        </div>
+        <div class="wire-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📏 Wire Sizes</div>
+              <span class="badge badge-radio">CHIPS</span>
+            </div>
+            <div class="card-body">
+              <div class="options-list" id="wire-sizes-list"></div>
+              <div class="add-row">
+                <input type="text" class="add-input" id="new-wire-size" placeholder="e.g. 0.016×0.022">
+                <button class="btn btn-primary btn-sm" onclick="addWireOption('size')">+ Add</button>
               </div>
             </div>
           </div>
-          <div id="about-tab-url" style="display:none">
-            <input type="url" class="form-input" id="about-img-url" placeholder="رابط صورة أو YouTube أو Vimeo أو ملف فيديو..." dir="ltr" style="margin-top:8px" oninput="previewUrlMedia('about-img-url','about-url-prev')">
-            <div id="about-url-prev" style="margin-top:10px;border-radius:10px;overflow:hidden;display:none;max-height:200px;"></div>
-            <p style="font-size:11px;color:#bbb;margin-top:6px">يدعم: روابط Cloudinary · YouTube · Vimeo · ملفات MP4/WebM مباشرة</p>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🧪 Wire Materials</div>
+              <span class="badge badge-radio">CHIPS</span>
+            </div>
+            <div class="card-body">
+              <div class="options-list" id="wire-mats-list"></div>
+              <div class="add-row">
+                <input type="text" class="add-input" id="new-wire-mat" placeholder="e.g. Cu NiTi">
+                <button class="btn btn-primary btn-sm" onclick="addWireOption('mat')">+ Add</button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="form-group"><label class="form-label">وسم الصورة (Tag)</label><input type="text" class="form-input" id="ab-tag" placeholder="منذ 2009"></div>
-        <div class="form-group full"><label class="form-label">جملة Lead</label><input type="text" class="form-input" id="ab-lead"></div>
-        <div class="form-group"><label class="form-label">ميزة 1</label><input type="text" class="form-input" id="ab-f1"></div>
-        <div class="form-group"><label class="form-label">ميزة 2</label><input type="text" class="form-input" id="ab-f2"></div>
-        <div class="form-group"><label class="form-label">ميزة 3</label><input type="text" class="form-input" id="ab-f3"></div>
-        <div class="form-group"><label class="form-label">ميزة 4</label><input type="text" class="form-input" id="ab-f4"></div>
       </div>
-    </div>
-  </div>
 
-  <!-- SOCIAL PAGE -->
-  <div class="page" id="page-social">
-    <div class="card">
-      <div class="card-header"><div><div class="card-title"><i class="fa fa-share-nodes"></i>روابط التواصل الاجتماعي</div><div class="card-sub">تظهر في الفوتر — اتركها فارغة لإخفائها</div></div><button class="btn btn-gold" onclick="saveSocial()"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button></div>
-      <div class="form-grid">
-        <div class="form-group"><label class="form-label"><i class="fab fa-instagram" style="color:#E1306C;margin-left:8px"></i>Instagram</label><input type="url" class="form-input" id="soc-instagram" placeholder="https://instagram.com/..." dir="ltr"></div>
-        <div class="form-group"><label class="form-label"><i class="fab fa-twitter" style="color:#1DA1F2;margin-left:8px"></i>Twitter / X</label><input type="url" class="form-input" id="soc-twitter" placeholder="https://twitter.com/..." dir="ltr"></div>
-        <div class="form-group"><label class="form-label"><i class="fab fa-snapchat" style="color:#FFFC00;margin-left:8px;text-shadow:0 0 1px #aaa"></i>Snapchat</label><input type="url" class="form-input" id="soc-snapchat" placeholder="https://snapchat.com/add/..." dir="ltr"></div>
-        <div class="form-group"><label class="form-label"><i class="fab fa-tiktok" style="color:#010101;margin-left:8px"></i>TikTok</label><input type="url" class="form-input" id="soc-tiktok" placeholder="https://tiktok.com/@..." dir="ltr"></div>
-        <div class="form-group"><label class="form-label"><i class="fab fa-facebook-f" style="color:#1877F2;margin-left:8px"></i>Facebook</label><input type="url" class="form-input" id="soc-facebook" placeholder="https://facebook.com/..." dir="ltr"></div>
-        <div class="form-group"><label class="form-label"><i class="fab fa-youtube" style="color:#FF0000;margin-left:8px"></i>YouTube</label><input type="url" class="form-input" id="soc-youtube" placeholder="https://youtube.com/@..." dir="ltr"></div>
+      <!-- ══════════════════════════
+           PANEL: FORM FIELDS (all forms share this template)
+      ══════════════════════════ -->
+      <div class="panel" id="panel-form-exam">
+        <div id="fields-exam"></div>
       </div>
-      <p style="font-size:12px;color:#bbb;margin-top:8px">رقم واتساب يُدار من صفحة "معلومات المركز"</p>
-    </div>
-  </div>
+      <div class="panel" id="panel-form-plan">
+        <div id="fields-plan"></div>
+      </div>
+      <div class="panel" id="panel-form-bond">
+        <div id="fields-bond"></div>
+      </div>
+      <div class="panel" id="panel-form-fu-fixed">
+        <div id="fields-fu-fixed"></div>
+      </div>
+      <div class="panel" id="panel-form-fu-aligner">
+        <div id="fields-fu-aligner"></div>
+      </div>
+      <div class="panel" id="panel-form-emergency">
+        <div id="fields-emergency"></div>
+      </div>
+      <div class="panel" id="panel-form-debond">
+        <div id="fields-debond"></div>
+      </div>
 
-</main>
-
-<!-- MODAL: DOCTOR -->
-<div class="overlay-wrap" id="doc-modal">
-  <div class="overlay-box">
-    <div class="overlay-head"><h3 id="doc-modal-t">إضافة طبيب</h3><button class="overlay-close" onclick="closeDocModal()"><i class="fa fa-times"></i></button></div>
-    <div class="overlay-body">
-      <div class="form-grid">
-        <input type="hidden" id="d-idx">
-        <div class="form-group"><label class="form-label">اسم الطبيب</label><input type="text" class="form-input" id="d-name" placeholder="د. اسم الطبيب"></div>
-        <div class="form-group"><label class="form-label">التخصص</label><input type="text" class="form-input" id="d-spec"></div>
-        <div class="form-group full">
-          <label class="form-label">صورة الطبيب</label>
-          <div class="img-upload-box" onclick="document.getElementById('d-img-file').click()" id="d-img-drop" style="min-height:80px">
-            <input type="file" id="d-img-file" accept="image/*" style="display:none" onchange="previewImg(this,'d-img-prev','d-img-drop')">
-            <img id="d-img-prev" src="" style="max-height:80px;max-width:160px;display:none;margin:0 auto;border-radius:8px;object-fit:cover">
-            <div id="d-img-ph" style="text-align:center"><i class="fa fa-camera" style="font-size:24px;color:var(--gold);opacity:.6;margin-bottom:6px;display:block"></i><p style="font-size:12px;color:var(--text-mid)">انقر لرفع صورة</p></div>
+      <!-- ══════════════════════════
+           PANEL: RESET & EXPORT
+      ══════════════════════════ -->
+      <div class="panel" id="panel-reset">
+        <div class="io-card">
+          <h3>📤 Export Current Settings</h3>
+          <p>Download all customizations as a JSON file. Use this as a backup or to copy settings to another device or browser.</p>
+          <div class="io-row">
+            <button class="btn btn-primary" onclick="exportSettings()">📤 Download Settings JSON</button>
           </div>
-          <input type="url" class="form-input" id="d-img" placeholder="أو أدخل رابطاً مباشراً https://..." dir="ltr" style="margin-top:8px" oninput="syncImgUrl('d-img','d-img-prev','d-img-ph')">
         </div>
-        <div class="form-group full"><label class="form-label">أيام العمل</label><div class="days-wrap" id="days-cbs"></div></div>
-        <div class="form-group"><label class="form-label">وقت البداية</label><input type="time" class="form-input" id="d-start" value="09:00"></div>
-        <div class="form-group"><label class="form-label">وقت الانتهاء</label><input type="time" class="form-input" id="d-end" value="17:00"></div>
-        <div class="form-group"><label class="form-label">مدة الموعد</label><select class="form-select" id="d-dur"><option value="15">15 دقيقة</option><option value="30" selected>30 دقيقة</option><option value="45">45 دقيقة</option><option value="60">ساعة كاملة</option></select></div>
+        <div class="io-card">
+          <h3>📥 Import Settings</h3>
+          <p>Load a previously exported settings file. This will replace <strong>all</strong> current customizations.</p>
+          <div class="io-row">
+            <button class="btn btn-gold" onclick="document.getElementById('file-import-2').click()">📥 Choose JSON File</button>
+            <input type="file" id="file-import-2" accept=".json" style="display:none" onchange="importSettings(this)">
+          </div>
+        </div>
+        <div class="io-card">
+          <h3>🔄 Reset to Factory Defaults</h3>
+          <p>Restore all field options to their original values. <strong>Your saved form drafts (patient data) will not be affected.</strong></p>
+          <div class="io-row">
+            <button class="btn btn-danger" onclick="resetToDefaults()">🔄 Reset All Options to Defaults</button>
+          </div>
+        </div>
+        <div class="io-card" style="border-color:#f5a0a0;">
+          <h3>🗑 Clear All Saved Form Drafts</h3>
+          <p style="color:var(--red);">⚠️ This will permanently erase all patient data saved in this browser (clinical record drafts). This <strong>cannot be undone</strong>.</p>
+          <div class="io-row">
+            <button class="btn btn-danger" onclick="clearAllDrafts()">🗑 Clear All Patient Form Data</button>
+          </div>
+        </div>
       </div>
-      <div style="display:flex;gap:12px;margin-top:24px">
-        <button class="btn btn-gold" onclick="saveDoc()" style="flex:1;justify-content:center"><i class="fa fa-cloud-arrow-up"></i>حفظ وتحديث</button>
-        <button class="btn btn-outline" onclick="closeDocModal()">إلغاء</button>
-      </div>
+
+    </div><!-- /content-area -->
+
+    <div class="save-bar">
+      <button class="btn btn-outline btn-sm" onclick="exportSettings()">📤 Export</button>
+      <button class="btn btn-primary" onclick="saveAll()">💾 Save All Changes</button>
     </div>
-  </div>
-</div>
 
-<!-- MODAL: SPECIALTY -->
-<div class="overlay-wrap" id="spec-modal">
-  <div class="overlay-box" style="max-width:460px">
-    <div class="overlay-head"><h3 id="spec-modal-t">إضافة تخصص</h3><button class="overlay-close" onclick="closeSpecModal()"><i class="fa fa-times"></i></button></div>
-    <div class="overlay-body">
-      <div style="margin-bottom:16px"><label class="form-label">أيقونة (Font Awesome class)</label><input type="text" class="form-input" id="s-icon" placeholder="fa fa-tooth" dir="ltr"><p style="font-size:11px;color:#bbb;margin-top:6px">أمثلة: fa fa-tooth | fa fa-stethoscope | fa fa-heart-pulse</p></div>
-      <div style="margin-bottom:16px"><label class="form-label">الاسم</label><input type="text" class="form-input" id="s-title"></div>
-      <div style="margin-bottom:20px"><label class="form-label">الوصف</label><textarea class="form-textarea" id="s-desc" rows="3"></textarea></div>
-      <input type="hidden" id="s-idx">
-      <div style="display:flex;gap:12px">
-        <button class="btn btn-gold" onclick="saveSpec()" style="flex:1;justify-content:center"><i class="fa fa-cloud-arrow-up"></i>حفظ</button>
-        <button class="btn btn-outline" onclick="closeSpecModal()">إلغاء</button>
-      </div>
-    </div>
-  </div>
-</div>
+  </div><!-- /main -->
+</div><!-- /layout -->
 
-<!-- MODAL: REVIEW -->
-<div class="overlay-wrap" id="rev-modal">
-  <div class="overlay-box" style="max-width:500px">
-    <div class="overlay-head"><h3 id="rev-modal-t">إضافة تقييم</h3><button class="overlay-close" onclick="closeRevModal()"><i class="fa fa-times"></i></button></div>
-    <div class="overlay-body">
-      <div class="form-grid">
-        <input type="hidden" id="r-idx">
-        <div class="form-group"><label class="form-label">الاسم</label><input type="text" class="form-input" id="r-name"></div>
-        <div class="form-group"><label class="form-label">الحرف الأول (للأفاتار)</label><input type="text" class="form-input" id="r-init" maxlength="2"></div>
-        <div class="form-group"><label class="form-label">التقييم</label><select class="form-select" id="r-rate"><option value="5">⭐⭐⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option><option value="3">⭐⭐⭐</option></select></div>
-        <div class="form-group"><label class="form-label">التاريخ</label><input type="text" class="form-input" id="r-date" placeholder="منذ أسبوع"></div>
-        <div class="form-group full"><label class="form-label">الطبيب</label><select class="form-select" id="r-doc"></select></div>
-        <div class="form-group full"><label class="form-label">نص التقييم</label><textarea class="form-textarea" id="r-text" rows="4"></textarea></div>
-      </div>
-      <div style="display:flex;gap:12px;margin-top:20px">
-        <button class="btn btn-gold" onclick="saveRev()" style="flex:1;justify-content:center"><i class="fa fa-cloud-arrow-up"></i>حفظ</button>
-        <button class="btn btn-outline" onclick="closeRevModal()">إلغاء</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"><i class="fa fa-check-circle" style="color:var(--gold)"></i><span id="toast-msg">تم</span></div>
-<div class="saving-overlay" id="saving-overlay"><div class="saving-box"><div class="saving-spin"></div><p>جاري الحفظ والمزامنة...</p></div></div>
-
-<script src="db.js"></script>
 <script>
-const DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-const PASS = 'admin123';
-let DATA = null;
+// ══════════════════════════════════════════════════════════════
+// DEFAULT SCHEMA
+// ══════════════════════════════════════════════════════════════
+const DEFAULT_SCHEMA = {
+  wireSizes: ['0.012','0.014','0.016','0.018','0.020','0.016×0.016','0.016×0.022','0.017×0.025','0.018×0.025','0.019×0.025','0.021×0.025'],
+  wireMats:  ['NiTi','SS','RCS NiTi','TMA'],
+  clinicians: ['Dr. Ahmed','Dr. Sara'],
+  notation: 'FDI',
+  clinicName: '',
+  currency: 'SAR',
+  defaultInterval: '4–6 weeks',
+  asepticStatement: 'Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.',
 
-/* ---- AUTH ---- */
-function doLogin(){
-  if(document.getElementById('lp').value === (localStorage.getItem('adminPass')||PASS)){
-    localStorage.setItem('adminAuth','1');
-    document.getElementById('login-screen').style.display='none';
-    init();
-  } else {document.getElementById('login-err').style.display='block'}
-}
-function doLogout(){localStorage.removeItem('adminAuth');location.reload()}
-document.getElementById('lp').addEventListener('keypress',e=>{if(e.key==='Enter')doLogin()});
-
-/* ---- PAGES ---- */
-const titles = {dashboard:'لوحة المعلومات',setup:'إعداد قاعدة البيانات',clinic:'معلومات المركز',hero:'قسم Hero',about:'قسم عن المركز',social:'التواصل الاجتماعي',doctors:'الكادر الطبي',specialties:'التخصصات',hours:'ساعات العمل',reviews:'التقييمات',logo:'الشعار والهوية'};
-const subs   = {dashboard:'نظرة عامة',setup:'ربط JSONBin.io كقاعدة بيانات سحابية',clinic:'تعديل البيانات الأساسية',hero:'العنوان والصورة والإحصائيات',about:'الصورة والنصوص والمميزات',social:'روابط منصات التواصل الاجتماعي',doctors:'إضافة وتعديل وحذف الأطباء',specialties:'إدارة التخصصات',hours:'ضبط ساعات الدوام',reviews:'إدارة التقييمات',logo:'تحديث الشعار'};
-function showPage(name, el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.getElementById('page-title').textContent = titles[name]||name;
-  document.getElementById('page-sub').textContent   = subs[name]||'';
-  if(el) el.classList.add('active');
-  if(name==='dashboard')  renderDash();
-  if(name==='setup')      loadSetupForm();
-  if(name==='clinic')     loadClinicForm();
-  if(name==='hero')       loadHeroForm();
-  if(name==='about')      loadAboutForm();
-  if(name==='social')     loadSocialForm();
-  if(name==='doctors')    renderDocs();
-  if(name==='specialties')renderSpecs();
-  if(name==='hours')      renderHoursAdmin();
-  if(name==='reviews')    renderRevs();
-}
-
-/* ---- DB HELPERS ---- */
-async function save(newData){
-  showSaving(true);
-  try{
-    await DB.write(newData);
-    DATA=newData;
-    localStorage.setItem('lastSave',new Date().toISOString());
-    toast('✅ تم الحفظ والمزامنة مع السحابة');
-    updateDbStatus(true);
-  }catch(e){
-    toast('❌ فشل الحفظ: '+e.message);
-  }finally{showSaving(false)}
-}
-
-function showSaving(v){document.getElementById('saving-overlay').classList.toggle('show',v)}
-
-/* ---- DB STATUS ---- */
-function updateDbStatus(ok){
-  const el=document.getElementById('db-status');
-  const tx=document.getElementById('db-status-text');
-  el.className='db-status '+(ok?'ok':'err');
-  tx.textContent=ok?'متصل بالسحابة ✓':'غير متصل بالسحابة';
-}
-
-/* ---- SETUP ---- */
-function loadSetupForm(){
-  const cfg=DB.getConfig();
-  document.getElementById('cfg-bin').value=cfg.binId||'';
-  document.getElementById('cfg-key').value=cfg.apiKey||'';
-}
-
-async function testAndSaveConfig(){
-  const bin=document.getElementById('cfg-bin').value.trim();
-  const key=document.getElementById('cfg-key').value.trim();
-  const res=document.getElementById('cfg-result');
-  if(!bin||!key){showResult(res,'يرجى إدخال كلا الحقلين','err');return}
-  DB.configure(bin,key);
-  res.style.display='block';
-  res.innerHTML=`<div style="padding:12px 16px;background:rgba(201,168,76,.1);border-radius:12px;color:var(--text-mid);font-size:13px"><i class="fa fa-spinner fa-spin" style="margin-left:8px;color:var(--gold)"></i>جاري الاختبار...</div>`;
-  try{
-    const d=await DB.read();
-    DATA=d;
-    showResult(res,'✅ تم الاتصال بنجاح! قاعدة البيانات جاهزة.','ok');
-    updateDbStatus(true);
-    renderDash();
-  }catch(e){
-    showResult(res,'❌ فشل الاتصال: '+e.message+' — تحقق من الـ Bin ID والـ API Key','err');
-    updateDbStatus(false);
+  fields: {
+    exam: [
+      { id:'profile',       label:'Profile Class',            type:'radio',  options:['Class I','Class II','Class III'] },
+      { id:'vertPattern',   label:'Vertical Pattern',         type:'radio',  options:['normodivergent','hyperdivergent','hypodivergent'] },
+      { id:'facialSym',     label:'Facial Symmetry',          type:'radio',  options:['Symmetrical','Mild asymmetry','Marked asymmetry'] },
+      { id:'smileArc',      label:'Smile Arc',                type:'radio',  options:['Consonant','Flat','Reverse'] },
+      { id:'gingiDisplay',  label:'Gingival Display',         type:'radio',  options:['Normal','Gummy smile','Reduced'] },
+      { id:'buccalCorridor',label:'Buccal Corridors',         type:'radio',  options:['Normal','Wide','Narrow'] },
+      { id:'lipComp',       label:'Lip Competence',           type:'radio',  options:['Competent','Incompetent','Potentially competent'] },
+      { id:'lipUpper',      label:'Lip Position — Upper',     type:'radio',  options:['Normal','Protruded','Retruded'] },
+      { id:'lipLower',      label:'Lip Position — Lower',     type:'radio',  options:['Normal','Protruded','Retruded'] },
+      { id:'nasoAngle',     label:'Nasolabial Angle',         type:'radio',  options:['Normal (90–110°)','Acute','Obtuse'] },
+      { id:'incisorClass',  label:'Incisors Class',           type:'radio',  options:['Class I','Class II Div 1','Class II Div 2','Class III'] },
+      { id:'buccalRight',   label:'Buccal Relation — Right',  type:'radio',  options:['Class I','Class II','Class III','½ Class II','½ Class III'] },
+      { id:'buccalLeft',    label:'Buccal Relation — Left',   type:'radio',  options:['Class I','Class II','Class III','½ Class II','½ Class III'] },
+      { id:'crowding-upper',label:'Crowding — Upper',         type:'radio',  options:['None','Mild','Moderate','Severe'] },
+      { id:'crowding-lower',label:'Crowding — Lower',         type:'radio',  options:['None','Mild','Moderate','Severe'] },
+      { id:'spacing-upper', label:'Spacing — Upper',          type:'radio',  options:['None','Mild','Moderate','Severe'] },
+      { id:'spacing-lower', label:'Spacing — Lower',          type:'radio',  options:['None','Mild','Moderate','Severe'] },
+      { id:'oj',            label:'Overjet (OJ)',              type:'radio',  options:['Normal','Increased','Decreased'] },
+      { id:'ob',            label:'Overbite (OB)',             type:'radio',  options:['Normal','Deep','Reduced','Open bite'] },
+      { id:'cos',           label:'Curve of Spee',             type:'radio',  options:['Flat','Accentuated','Reversed'] },
+      { id:'transverse',    label:'Transverse',                type:'select', options:['Normal','Upper arch narrow','Posterior crossbite — Right','Posterior crossbite — Left','Bilateral crossbite','Localized crossbite','Scissor bite'] },
+      { id:'upperMid',      label:'Upper Midline',             type:'radio',  options:['Coincident','Deviated to right','Deviated to left'] },
+      { id:'lowerMid',      label:'Lower Midline',             type:'radio',  options:['Coincident','Deviated to right','Deviated to left'] },
+      { id:'ginBiotype',    label:'Gingival Biotype',          type:'radio',  options:['Thin-scalloped','Thick-flat','Intermediate'] },
+      { id:'oralHygiene',   label:'Oral Hygiene',              type:'radio',  options:['Good','Fair','Poor'] },
+      { id:'ginHealth',     label:'Gingival Health',           type:'radio',  options:['Healthy','Mild gingivitis','Moderate gingivitis','Periodontitis'] },
+      { id:'tongueSize',    label:'Tongue Size',               type:'radio',  options:['Normal','Macroglossia','Microglossia'] },
+      { id:'tongueScallop', label:'Tongue Indentations',       type:'radio',  options:['No indentations','Indentations present','Marked indentations'] },
+      { id:'boneLevel',     label:'OPG — Bone Level',          type:'radio',  options:['Normal','Mild loss','Moderate loss','Severe loss'] },
+      { id:'condylar',      label:'OPG — Condylar Morphology', type:'radio',  options:['Normal','Asymmetric','Resorption signs'] },
+      { id:'rootMorph',     label:'OPG — Root Morphology',     type:'radio',  options:['Normal','Dilaceration','Short roots','Resorption'] },
+      { id:'motivation',    label:'Motivation Level',          type:'radio',  options:['High','Moderate','Low','Parental'] },
+      { id:'prevOrtho',     label:'Previous Ortho Treatment',  type:'select', options:['None','Fixed braces','Functional appliance','Retainer only','Clear aligners','Orthognathic surgery'] },
+      { id:'cc',            label:'Chief Complaints',          type:'check',  options:['Crowding','Spacing','Protrusion','Deep bite','Open bite','Crossbite','Smile aesthetics','Facial profile','Functional issue','Missing teeth','TMJ / Pain','Referral'] },
+    ],
+    plan: [
+      { id:'plan-tx-type',       label:'Treatment Type',         type:'select', options:['Non-extraction camouflage','Extraction treatment','Non-extraction expansion','Surgical-orthodontic','Limited / Interceptive','Phase I (Growth modification)','Phase II (Comprehensive)'] },
+      { id:'plan-slot',          label:'Slot Size',              type:'radio',  options:['0.022×0.028','0.018×0.025'] },
+      { id:'plan-rx',            label:'Prescription',           type:'radio',  options:['MBT','Roth','SWA','Damon'] },
+      { id:'plan-brand',         label:'Bracket Brand',          type:'radio',  options:['OrthoTech','Pinnacle','3M','Dentsply','Other'] },
+      { id:'plan-arch-cov',      label:'Arch Coverage',          type:'radio',  options:['Upper 6-6 & Lower 6-6','Upper 7-7 & Lower 7-7','Upper only','Lower only'] },
+      { id:'plan-anch',          label:'Anchorage Req.',         type:'radio',  options:['Maximum','Moderate','Minimum'] },
+      { id:'plan-ext',           label:'Extractions',            type:'radio',  options:['None','Upper 4s','Upper 5s','Lower 4s','Lower 5s','Upper & Lower 4s','Other'] },
+      { id:'plan-aligner-brand', label:'Aligner Brand',          type:'select', options:['Invisalign','ClearCorrect','OrthoSnap','Spark','Angel Aligner','Other'] },
+      { id:'plan-aligner-scope', label:'Aligner Scope',          type:'radio',  options:['Comprehensive','Limited','Lite'] },
+      { id:'plan-midline',       label:'Midline Displacement',   type:'radio',  options:['Coincident','Upper deviated','Lower deviated','Both deviated'] },
+      { id:'plan-lip-prom',      label:'Lip Prominence',         type:'radio',  options:['Not a concern','Reduce','Maintain','Increase'] },
+      { id:'plan-sym',           label:'Facial Symmetry Goal',   type:'radio',  options:['Maintain','Improve','Accept asymmetry'] },
+      { id:'plan-smile',         label:'Smile Line',             type:'radio',  options:['Maintain','Improve - consonant arc','Reduce gummy smile'] },
+      { id:'plan-appliance-type',label:'Appliance Type',         type:'radio',  options:['fixed','aligner'] },
+    ],
+    bond: [
+      { id:'bond-arch',        label:'Arch Coverage (Fixed)',  type:'radio',  options:['Upper 6-6 & Lower 6-6','Upper 7-7 & Lower 7-7','Upper arch only','Lower arch only'] },
+      { id:'bond-rx',          label:'Prescription',          type:'radio',  options:['MBT','Roth','SWA'] },
+      { id:'bond-brand',       label:'Brand',                 type:'radio',  options:['OrthoTech','Pinnacle','3M','Other'] },
+      { id:'bond-aligner-wear',label:'Aligner Wear Protocol', type:'radio',  options:['22hrs/day','20hrs/day','Every 1 week','Every 2 weeks'] },
+      { id:'bond-ipr',         label:'IPR Status',            type:'radio',  options:['None at this visit','Done — Stage 1','Planned — future visit'] },
+      { id:'bond-oh',          label:'Oral Hygiene',          type:'radio',  options:['Good','Fair','Poor'] },
+      { id:'bond-elastic-config',label:'Elastic Configuration',type:'radio',  options:['symmetric','asymmetric'] },
+      { id:'bond-elastic',     label:'Elastic Type',          type:'radio',  options:['None','Class II','Class III','Vertical','Box','Cross'] },
+      { id:'bond-el-size',     label:'Elastic Size',          type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
+      { id:'bond-el-force',    label:'Elastic Force',         type:'radio',  options:['Light','Medium','Heavy'] },
+      { id:'bond-type',        label:'Bond-Up Type',          type:'radio',  options:['fixed','aligner'] },
+    ],
+    'fu-fixed': [
+      { id:'fuf-rebond-reason',label:'Rebond Reason',         type:'radio',  options:['Debond — traumatic','Debond — poor OH','Debond — bond failure','Broken — appliance','Repositioned'] },
+      { id:'fuf-lig-upper',   label:'Ligature — Upper',       type:'radio',  options:['Elastic modules','Elastic chain','Self-ligating'] },
+      { id:'fuf-lig-lower',   label:'Ligature — Lower',       type:'radio',  options:['Elastic modules','Elastic chain','Self-ligating'] },
+      { id:'fuf-stage',       label:'Treatment Stage',        type:'radio',  options:['Alignment & leveling','Space closure','OJ correction','Finishing'] },
+      { id:'fuf-elastic',     label:'Elastic Type',           type:'radio',  options:['None','Class II','Class III','Vertical','Box','Triangle','Cross'] },
+      { id:'fuf-el-size',     label:'Elastic Size',           type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
+      { id:'fuf-el-force',    label:'Elastic Force',          type:'radio',  options:['Light','Medium','Heavy'] },
+      { id:'fuf-align-prog',  label:'Alignment Progress',     type:'radio',  options:['Progressing well','Satisfactory','Slow — monitor','Plateau — intervention needed'] },
+      { id:'fuf-compliance',  label:'Patient Compliance',     type:'radio',  options:['Excellent','Good','Fair','Poor'] },
+      { id:'fuf-oh',          label:'Oral Hygiene',           type:'radio',  options:['Good','Fair','Poor'] },
+    ],
+    'fu-aligner': [
+      { id:'fua-tracking',    label:'Tracking Assessment',    type:'radio',  options:['Full tracking — excellent','Mostly tracking — minor gaps','Poor tracking — refinement needed','Refinement planned'] },
+      { id:'fua-ipr',         label:'IPR Status',             type:'radio',  options:['None','Done this visit','Partially done'] },
+      { id:'fua-elastic',     label:'Elastic Type',           type:'radio',  options:['None','Class II','Class III','Vertical','Box','Cross'] },
+      { id:'fua-el-size',     label:'Elastic Size',           type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
+      { id:'fua-el-force',    label:'Elastic Force',          type:'radio',  options:['Light','Medium','Heavy'] },
+      { id:'fua-oh',          label:'Oral Hygiene',           type:'radio',  options:['Good','Fair','Poor'] },
+      { id:'fua-wear-comply', label:'Wear Compliance',        type:'radio',  options:['22+ hrs/day','18–22 hrs/day','Under 18 hrs'] },
+    ],
+    emergency: [
+      { id:'em-pills',        label:'Emergency Type Pills',   type:'pills',  options:['De-bonded bracket','De-bonded molar tube','De-bonded retainer','Loose band','Excess / poking wire','Broken archwire','Lost aligner','Broken attachment','Lost elastic chain','TAD / mini-screw issue','Pain / discomfort','Trauma','Soft tissue irritation','Other'] },
+      { id:'em-duration',     label:'Duration of Problem',    type:'radio',  options:['Today','1–2 days','Few days','Week+'] },
+      { id:'em-return',       label:'Return to Visits',       type:'radio',  options:['Resume normal schedule','Expedited follow-up needed'] },
+      { id:'em-wire-arch',    label:'Wire Arch (Emergency)',  type:'radio',  options:['Upper only','Lower only','Both arches','N/A'] },
+    ],
+    debond: [
+      { id:'db-enamel',       label:'Enamel Surface',               type:'radio',  options:['Smooth — no irregularities','Minor composite remnants — polished','WSL noted — monitor','Enamel crack — documented'] },
+      { id:'db-fr-upper',     label:'Fixed Retainer Upper',         type:'radio',  options:['None','3-3 multi-stranded 4×0.009"','3-3 braided 0.010×0.028"','6-6 bonded'] },
+      { id:'db-fr-lower',     label:'Fixed Retainer Lower',         type:'radio',  options:['None','3-3 multi-stranded 4×0.009"','3-3 braided 0.010×0.028"','6-6 bonded'] },
+      { id:'db-rr-wear',      label:'Removable Retainer Wear',      type:'radio',  options:['Full-time (22 hrs/day) — 3 months then nights','Nights only — indefinitely','Fixed retainer only — no removable'] },
+      { id:'db-rr-arch',      label:'Removable Retainer Arch',      type:'radio',  options:['Upper & Lower','Upper only','Lower only','N/A'] },
+      { id:'db-outcome',      label:'Treatment Objectives',         type:'radio',  options:['Fully achieved','Mostly achieved','Partially achieved — compromise'] },
+      { id:'db-oh',           label:'Oral Hygiene',                  type:'radio',  options:['Good','Fair','Poor'] },
+    ],
   }
-}
+};
 
-async function pushDefaults(){
-  if(!DB.isReady()){toast('أكمل الإعداد أولاً');return}
-  if(!confirm('سيتم رفع البيانات الافتراضية (أطباء وتخصصات وتقييمات تجريبية). هل تريد المتابعة؟'))return;
-  await save(JSON.parse(JSON.stringify(DB.DEFAULTS)));
-  renderDash();
-}
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let schema = deepClone(DEFAULT_SCHEMA);
 
-function showResult(el,msg,type){
-  const bg=type==='ok'?'rgba(76,175,80,.1)':'rgba(229,57,53,.1)';
-  const color=type==='ok'?'#2e7d32':'var(--danger)';
-  el.style.display='block';
-  el.innerHTML=`<div style="padding:12px 16px;background:${bg};border-radius:12px;color:${color};font-size:13px;font-weight:600">${msg}</div>`;
-}
+function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
-/* ---- INIT ---- */
-async function init(){
-  // Load setup form values
-  document.getElementById('cfg-bin').value=DB.getConfig().binId||'';
-  document.getElementById('cfg-key').value=DB.getConfig().apiKey||'';
-  if(DB.isReady()){
-    try{DATA=await DB.read();updateDbStatus(true)}
-    catch(e){DATA=JSON.parse(JSON.stringify(DB.DEFAULTS));updateDbStatus(false)}
-  } else {DATA=JSON.parse(JSON.stringify(DB.DEFAULTS));updateDbStatus(false)}
-  renderDash();
-}
-
-/* ---- DASHBOARD ---- */
-function renderDash(){
-  if(!DATA)return;
-  document.getElementById('s-docs').textContent=(DATA.doctors||[]).length;
-  document.getElementById('s-specs').textContent=(DATA.specialties||[]).length;
-  document.getElementById('s-revs').textContent=(DATA.reviews||[]).length;
-  document.getElementById('s-cloud').textContent=DB.isReady()?'متصل':'محلي';
-  document.getElementById('dash-binid').textContent=DB.getConfig().binId||'غير مُعيَّن';
-  const ls=localStorage.getItem('lastSave');
-  document.getElementById('last-save').textContent=ls?new Date(ls).toLocaleString('ar-SA'):'—';
-  document.getElementById('dash-notconf').style.display=DB.isReady()?'none':'block';
-}
-
-/* ---- CLINIC ---- */
-function loadClinicForm(){
-  const i=DATA?.clinicInfo||{};
-  const f=id=>document.getElementById(id);
-  f('c-name').value=i.name||'';f('c-slogan').value=i.slogan||'';
-  f('c-wa').value=i.whatsapp||'';f('c-phone').value=i.phone||'';
-  f('c-addr').value=i.address||'';f('c-email').value=i.email||'';
-  f('c-map').value=i.mapEmbed||'';
-  f('c-a1').value=i.about1||'';f('c-a2').value=i.about2||'';f('c-fd').value=i.footerDesc||'';
-}
-async function saveSection(sec){
-  if(!DATA)return;
-  if(sec==='clinicInfo'){
-    DATA.clinicInfo={
-      name:document.getElementById('c-name').value, slogan:document.getElementById('c-slogan').value,
-      whatsapp:document.getElementById('c-wa').value, phone:document.getElementById('c-phone').value,
-      address:document.getElementById('c-addr').value, email:document.getElementById('c-email').value,
-      mapEmbed:document.getElementById('c-map').value,
-      about1:document.getElementById('c-a1').value, about2:document.getElementById('c-a2').value,
-      footerDesc:document.getElementById('c-fd').value,
-      logoUrl:DATA.clinicInfo?.logoUrl||''
-    };
-  }
-  await save(DATA);
-}
-
-/* ---- DOCTORS ---- */
-function renderDocs(){
-  const list=document.getElementById('docs-list');
-  const docs=DATA?.doctors||[];
-  if(!docs.length){list.innerHTML='<p style="text-align:center;padding:30px;color:var(--text-mid)">لا يوجد أطباء بعد.</p>';return}
-  list.innerHTML=docs.map((d,i)=>`
-    <div class="list-row">
-      <div class="row-avatar">${d.img?`<img src="${d.img}">`:'<i class="fa fa-user-doctor"></i>'}</div>
-      <div class="row-info"><h4>${d.name}</h4><p>${d.specialty}</p><small>${(d.workDays||[]).map(x=>DAYS[x]).join('، ')} | ${d.startTime||'9:00'} — ${d.endTime||'17:00'}</small></div>
-      <div class="row-actions">
-        <button class="btn btn-outline" style="padding:8px 14px" onclick="openDocModal(${i})"><i class="fa fa-pen"></i>تعديل</button>
-        <button class="btn btn-danger"  style="padding:8px 14px" onclick="deleteDoc(${i})"><i class="fa fa-trash"></i></button>
-      </div>
-    </div>`).join('');
-}
-function openDocModal(idx){
-  const m=document.getElementById('doc-modal');m.classList.add('open');
-  const cbs=document.getElementById('days-cbs');
-  cbs.innerHTML=DAYS.map((n,i)=>`<input type="checkbox" class="day-cb" id="dc-${i}" value="${i}"><label class="day-lbl" for="dc-${i}">${n}</label>`).join('');
-  if(idx!==undefined){
-    const d=DATA.doctors[idx];
-    document.getElementById('doc-modal-t').textContent='تعديل بيانات الطبيب';
-    document.getElementById('d-idx').value=idx;
-    document.getElementById('d-name').value=d.name;document.getElementById('d-spec').value=d.specialty;
-    document.getElementById('d-img').value=d.img||'';
-    // عرض الصورة الحالية
-    const prev=document.getElementById('d-img-prev');
-    const drop=document.getElementById('d-img-drop');
-    if(d.img&&prev){prev.src=d.img;prev.style.display='block';if(drop)drop.dataset.b64=''}
-    else if(prev){prev.style.display='none'}
-    document.getElementById('d-start').value=d.startTime||'09:00';
-    document.getElementById('d-end').value=d.endTime||'17:00';document.getElementById('d-dur').value=d.slotDuration||30;
-    (d.workDays||[]).forEach(i=>{const c=document.getElementById('dc-'+i);if(c)c.checked=true});
-  } else {
-    document.getElementById('doc-modal-t').textContent='إضافة طبيب جديد';
-    document.getElementById('d-idx').value='';
-    ['d-name','d-spec','d-img'].forEach(id=>document.getElementById(id).value='');
-    const prev=document.getElementById('d-img-prev'); if(prev)prev.style.display='none';
-    const drop=document.getElementById('d-img-drop'); if(drop)drop.dataset.b64='';
-    document.getElementById('d-start').value='09:00';document.getElementById('d-end').value='17:00';document.getElementById('d-dur').value=30;
-    [0,1,2,3,4].forEach(i=>{const c=document.getElementById('dc-'+i);if(c)c.checked=true});
-  }
-}
-function closeDocModal(){document.getElementById('doc-modal').classList.remove('open')}
-async function saveDoc(){
-  const idx=document.getElementById('d-idx').value;
-  const days=[];for(let i=0;i<7;i++){const c=document.getElementById('dc-'+i);if(c?.checked)days.push(i)}
-  const imgVal=getImgVal('d-img-drop','d-img')||(idx!==''?DATA.doctors[parseInt(idx)]?.img:'')||'';
-  const doc={id:idx!==''?DATA.doctors[parseInt(idx)].id:Date.now(),name:document.getElementById('d-name').value,specialty:document.getElementById('d-spec').value,img:imgVal,workDays:days,startTime:document.getElementById('d-start').value,endTime:document.getElementById('d-end').value,slotDuration:parseInt(document.getElementById('d-dur').value)};
-  const docs=[...DATA.doctors||[]];
-  if(idx!=='')docs[parseInt(idx)]=doc;else docs.push(doc);
-  DATA.doctors=docs;await save(DATA);closeDocModal();renderDocs();
-}
-async function deleteDoc(idx){
-  if(!confirm('حذف هذا الطبيب؟'))return;
-  DATA.doctors.splice(idx,1);await save(DATA);renderDocs();
-}
-
-/* ---- SPECIALTIES ---- */
-function renderSpecs(){
-  const list=document.getElementById('specs-list');
-  const specs=DATA?.specialties||[];
-  if(!specs.length){list.innerHTML='<p style="text-align:center;padding:30px;color:var(--text-mid)">لا يوجد تخصصات.</p>';return}
-  list.innerHTML=specs.map((s,i)=>`
-    <div class="list-row">
-      <div class="row-avatar" style="font-size:20px"><i class="${s.icon}"></i></div>
-      <div class="row-info"><h4>${s.title}</h4><small>${s.desc}</small></div>
-      <div class="row-actions">
-        <button class="btn btn-outline" style="padding:8px 14px" onclick="openSpecModal(${i})"><i class="fa fa-pen"></i>تعديل</button>
-        <button class="btn btn-danger"  style="padding:8px 14px" onclick="deleteSpec(${i})"><i class="fa fa-trash"></i></button>
-      </div>
-    </div>`).join('');
-}
-function openSpecModal(idx){
-  document.getElementById('spec-modal').classList.add('open');
-  if(idx!==undefined){const s=DATA.specialties[idx];document.getElementById('spec-modal-t').textContent='تعديل التخصص';document.getElementById('s-idx').value=idx;document.getElementById('s-icon').value=s.icon;document.getElementById('s-title').value=s.title;document.getElementById('s-desc').value=s.desc;}
-  else{document.getElementById('spec-modal-t').textContent='إضافة تخصص';document.getElementById('s-idx').value='';document.getElementById('s-icon').value='fa fa-tooth';document.getElementById('s-title').value='';document.getElementById('s-desc').value='';}
-}
-function closeSpecModal(){document.getElementById('spec-modal').classList.remove('open')}
-async function saveSpec(){
-  const idx=document.getElementById('s-idx').value;
-  const spec={icon:document.getElementById('s-icon').value,title:document.getElementById('s-title').value,desc:document.getElementById('s-desc').value};
-  const specs=[...DATA.specialties||[]];if(idx!=='')specs[parseInt(idx)]=spec;else specs.push(spec);
-  DATA.specialties=specs;await save(DATA);closeSpecModal();renderSpecs();
-}
-async function deleteSpec(idx){if(!confirm('حذف؟'))return;DATA.specialties.splice(idx,1);await save(DATA);renderSpecs()}
-
-/* ---- HOURS ---- */
-function renderHoursAdmin(){
-  const ov=DATA?.hoursOverride||null;
-  document.getElementById('hours-admin').innerHTML=DAYS.map((name,i)=>{
-    const row=ov?ov[i]:null;const cl=row?row.closed:(i===5);
-    const from=(row&&!cl)?row.time.split(' - ')[0]:'09:00';
-    const to=(row&&!cl)?row.time.split(' - ')[1]:'17:00';
-    return `<div class="hour-row"><div class="hour-day">${name}</div>
-      <input type="time" class="form-input" id="hf-${i}" value="${from}" ${cl?'disabled':''} style="font-size:13px;padding:8px 12px">
-      <input type="time" class="form-input" id="ht-${i}" value="${to}"   ${cl?'disabled':''} style="font-size:13px;padding:8px 12px">
-      <label class="toggle"><input type="checkbox" id="hc-${i}" ${cl?'checked':''} onchange="toggleDay(${i})"><span class="tslider"></span></label>
-    </div>`;
-  }).join('');
-}
-function toggleDay(i){const cl=document.getElementById('hc-'+i).checked;document.getElementById('hf-'+i).disabled=cl;document.getElementById('ht-'+i).disabled=cl}
-async function saveHours(){
-  DATA.hoursOverride=DAYS.map((name,i)=>{const cl=document.getElementById('hc-'+i).checked;return{day:name,closed:cl,time:document.getElementById('hf-'+i).value+' - '+document.getElementById('ht-'+i).value}});
-  await save(DATA);
-}
-
-/* ---- REVIEWS ---- */
-function renderRevs(){
-  const list=document.getElementById('revs-list');
-  const revs=DATA?.reviews||[];
-  if(!revs.length){list.innerHTML='<p style="text-align:center;padding:30px;color:var(--text-mid)">لا يوجد تقييمات.</p>';return}
-  list.innerHTML=revs.map((r,i)=>`
-    <div class="list-row" style="flex-wrap:wrap;gap:12px">
-      <div class="row-avatar" style="background:linear-gradient(135deg,var(--gold),var(--gold-dark))">${r.initial}</div>
-      <div class="row-info" style="min-width:200px"><h4>${r.name} — ${'★'.repeat(r.rating)}</h4><small>${r.text}</small><small style="color:var(--gold-dark);margin-top:4px">${r.doctor} | ${r.date}</small></div>
-      <div class="row-actions">
-        <button class="btn btn-outline" style="padding:8px 14px" onclick="openRevModal(${i})"><i class="fa fa-pen"></i></button>
-        <button class="btn btn-danger"  style="padding:8px 14px" onclick="deleteRev(${i})"><i class="fa fa-trash"></i></button>
-      </div>
-    </div>`).join('');
-}
-function openRevModal(idx){
-  document.getElementById('rev-modal').classList.add('open');
-  document.getElementById('r-doc').innerHTML=(DATA?.doctors||[]).map(d=>`<option value="${d.name}">${d.name}</option>`).join('');
-  if(idx!==undefined){const r=DATA.reviews[idx];document.getElementById('rev-modal-t').textContent='تعديل التقييم';document.getElementById('r-idx').value=idx;document.getElementById('r-name').value=r.name;document.getElementById('r-init').value=r.initial;document.getElementById('r-rate').value=r.rating;document.getElementById('r-date').value=r.date;document.getElementById('r-text').value=r.text;document.getElementById('r-doc').value=r.doctor;}
-  else{document.getElementById('rev-modal-t').textContent='إضافة تقييم';document.getElementById('r-idx').value='';['r-name','r-init','r-date','r-text'].forEach(id=>document.getElementById(id).value='');document.getElementById('r-rate').value=5;}
-}
-function closeRevModal(){document.getElementById('rev-modal').classList.remove('open')}
-async function saveRev(){
-  const idx=document.getElementById('r-idx').value;
-  const rev={name:document.getElementById('r-name').value,initial:document.getElementById('r-init').value||document.getElementById('r-name').value[0],rating:parseInt(document.getElementById('r-rate').value),date:document.getElementById('r-date').value,text:document.getElementById('r-text').value,doctor:document.getElementById('r-doc').value};
-  const revs=[...DATA.reviews||[]];if(idx!=='')revs[parseInt(idx)]=rev;else revs.push(rev);
-  DATA.reviews=revs;await save(DATA);closeRevModal();renderRevs();
-}
-async function deleteRev(idx){if(!confirm('حذف؟'))return;DATA.reviews.splice(idx,1);await save(DATA);renderRevs()}
-
-/* ---- MEDIA UPLOAD HELPERS ---- */
-
-// تبديل تاب رفع / رابط
-function switchTab(section, tab, btn){
-  const fileDiv = document.getElementById(section+'-tab-file');
-  const urlDiv  = document.getElementById(section+'-tab-url');
-  document.querySelectorAll('#page-'+section+' .media-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(tab==='file'){ fileDiv.style.display=''; urlDiv.style.display='none'; }
-  else            { fileDiv.style.display='none'; urlDiv.style.display=''; }
-}
-
-// معاينة ملف مرفوع (صورة أو فيديو)
-function previewMedia(input, prevId, dropId){
-  const f=input.files[0]; if(!f) return;
-  const drop=document.getElementById(dropId);
-  const prev=document.getElementById(prevId);
-  const ph=drop.querySelector('[id$="-ph"]');
-  if(f.type.startsWith('video/')){
-    // فيديو: نقرأه كـ object URL (لا نحوّله base64 — الفيديو كبير)
-    const url=URL.createObjectURL(f);
-    drop.dataset.b64='';
-    drop.dataset.videoFile='pending'; // علامة أن فيديو محلي
-    if(prev){ prev.innerHTML=`<video src="${url}" style="max-height:160px;border-radius:8px;max-width:100%" controls muted></video>`; prev.style.display='block'; }
-    if(ph) ph.style.display='none';
-    // تحذير للمستخدم
-    drop.dataset.videoWarning='1';
-  } else {
-    // صورة: نضغطها ونحوّلها base64
-    const reader=new FileReader();
-    reader.onload=e=>{
-      const img=new Image();
-      img.onload=()=>{
-        const MAX=900;
-        let w=img.width,h=img.height;
-        if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
-        const canvas=document.createElement('canvas');
-        canvas.width=w;canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        const b64=canvas.toDataURL('image/jpeg',0.85);
-        drop.dataset.b64=b64;
-        drop.dataset.videoFile='';
-        if(prev){ prev.innerHTML=`<img src="${b64}" style="max-height:140px;border-radius:8px;object-fit:cover;max-width:100%">`; prev.style.display='block'; }
-        if(ph) ph.style.display='none';
-      };
-      img.src=e.target.result;
-    };
-    reader.readAsDataURL(f);
-  }
-}
-
-// معاينة رابط URL (صورة أو يوتيوب أو فيميو أو mp4)
-function previewUrlMedia(inputId, prevId){
-  const url=document.getElementById(inputId).value.trim();
-  const prev=document.getElementById(prevId);
-  if(!prev) return;
-  if(!url){ prev.style.display='none'; prev.innerHTML=''; return; }
-  prev.style.display='block';
-  const ytM=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
-  const vmM=url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  if(ytM){
-    prev.innerHTML=`<iframe src="https://www.youtube.com/embed/${ytM[1]}" style="width:100%;height:180px;border:none;border-radius:8px" allowfullscreen></iframe>`;
-  } else if(vmM){
-    prev.innerHTML=`<iframe src="https://player.vimeo.com/video/${vmM[1]}" style="width:100%;height:180px;border:none;border-radius:8px" allowfullscreen></iframe>`;
-  } else if(/\.(mp4|webm|ogg|mov)([?#]|$)/i.test(url)){
-    prev.innerHTML=`<video src="${url}" style="max-height:160px;width:100%;border-radius:8px" controls muted></video>`;
-  } else {
-    prev.innerHTML=`<img src="${url}" style="max-height:160px;border-radius:8px;object-fit:cover;max-width:100%" onerror="this.parentElement.innerHTML='<p style=color:red;font-size:12px>تعذّر تحميل الصورة</p>'">`;
-  }
-}
-
-// تحصيل قيمة الميديا النهائية للحفظ
-function getMediaVal(section){
-  // تحقق من الـ tab النشط
-  const urlDiv=document.getElementById(section+'-tab-url');
-  const isUrl = urlDiv && urlDiv.style.display !== 'none';
-  if(isUrl){
-    const urlEl=document.getElementById(section+'-img-url');
-    return urlEl ? urlEl.value.trim() : '';
-  }
-  // tab الرفع
-  const drop=document.getElementById(section+'-img-drop');
-  if(drop && drop.dataset.videoFile==='pending'){
-    // فيديو محلي — لا يمكن حفظه في JSONBin، نُحذّر
-    toast('⚠️ لرفع فيديو استخدم رابط URL (Cloudinary / YouTube)');
-    return '';
-  }
-  return drop ? (drop.dataset.b64||'') : '';
-}
-
-// للحفاظ على التوافق مع أجزاء أخرى (الشعار والطبيب)
-function previewImg(input, previewId, dropId){
-  previewMedia(input, previewId, dropId);
-}
-function getImgVal(dropId, urlInputId){
-  const drop=document.getElementById(dropId);
-  if(drop && drop.dataset.b64) return drop.dataset.b64;
-  const urlEl=document.getElementById(urlInputId);
-  return urlEl ? urlEl.value.trim() : '';
-}
-
-/* ---- HERO ---- */
-function loadHeroForm(){
-  const h=DATA?.hero||{};
-  const f=id=>document.getElementById(id);
-  f('h-badge').value=h.badge||''; f('h-t1').value=h.title1||''; f('h-tg').value=h.titleGold||''; f('h-t2').value=h.title2||'';
-  f('h-desc').value=h.desc||''; f('h-btn1').value=h.btnPrimary||''; f('h-btn2').value=h.btnSecondary||'';
-  f('h-s1n').value=h.stat1Num||''; f('h-s1l').value=h.stat1Label||'';
-  f('h-s2n').value=h.stat2Num||''; f('h-s2l').value=h.stat2Label||'';
-  f('h-s4n').value=h.stat4Num||''; f('h-s4l').value=h.stat4Label||'';
-  f('h-c1t').value=h.card1Title||''; f('h-c1s').value=h.card1Sub||'';
-  f('h-c2t').value=h.card2Title||''; f('h-c2s').value=h.card2Sub||'';
-  if(h.heroImg){
-    // إذا كان الرابط موجوداً، افتح tab URL وعرّض المعاينة
-    f('hero-img-url').value=h.heroImg;
-    const urlDiv=document.getElementById('hero-tab-url');
-    const fileDiv=document.getElementById('hero-tab-file');
-    if(urlDiv&&fileDiv){
-      fileDiv.style.display='none'; urlDiv.style.display='';
-      document.querySelectorAll('#page-hero .media-tab').forEach((b,i)=>{b.classList.toggle('active',i===1);});
-      previewUrlMedia('hero-img-url','hero-url-prev');
+function deepMerge(target, source) {
+  if (!source) return target;
+  Object.keys(source).forEach(k => {
+    if (typeof source[k] === 'object' && !Array.isArray(source[k]) && source[k] !== null) {
+      if (!target[k]) target[k] = {};
+      deepMerge(target[k], source[k]);
+    } else {
+      target[k] = source[k];
     }
+  });
+  return target;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PANEL METADATA
+// ══════════════════════════════════════════════════════════════
+const PANEL_META = {
+  'clinic':         { title: 'Clinic Settings',          desc: 'General information displayed across all forms' },
+  'clinicians':     { title: 'Clinicians',               desc: 'Names used as autocomplete suggestions in the Clinician field' },
+  'wires':          { title: 'Wire Options',             desc: 'Archwire sizes and materials shown in wire chip selectors' },
+  'form-exam':      { title: 'Examination Form',        desc: 'Edit all radio groups, dropdowns and checkbox lists in the Examination tab' },
+  'form-plan':      { title: 'Treatment Plan Form',     desc: 'Edit option lists for the Treatment Plan tab' },
+  'form-bond':      { title: 'Bond-Up Form',            desc: 'Edit options for the bonding session tab' },
+  'form-fu-fixed':  { title: 'Fixed Follow-Up Form',   desc: 'Edit options for fixed appliance review visits' },
+  'form-fu-aligner':{ title: 'Aligner Follow-Up Form', desc: 'Edit options for clear aligner review visits' },
+  'form-emergency': { title: 'Emergency Visit Form',   desc: 'Edit emergency type pills and treatment options' },
+  'form-debond':    { title: 'Debond & Retainer Form', desc: 'Edit options for debonding and retention visits' },
+  'reset':          { title: 'Reset & Export',          desc: 'Export, import, or restore factory settings' },
+};
+
+// ══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════════
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('panel-' + id)?.classList.add('active');
+  document.getElementById('nav-' + id)?.classList.add('active');
+  const meta = PANEL_META[id];
+  if (meta) {
+    document.getElementById('topbar-title').textContent = meta.title;
+    document.getElementById('topbar-desc').textContent  = meta.desc;
   }
 }
 
-async function saveHero(){
-  const f=id=>document.getElementById(id).value;
-  const img=getMediaVal('hero')||DATA?.hero?.heroImg||'';
-  const hero={
-    badge:f('h-badge'), title1:f('h-t1'), titleGold:f('h-tg'), title2:f('h-t2'),
-    desc:f('h-desc'), btnPrimary:f('h-btn1'), btnSecondary:f('h-btn2'),
-    stat1Num:f('h-s1n'), stat1Label:f('h-s1l'),
-    stat2Num:f('h-s2n'), stat2Label:f('h-s2l'),
-    stat4Num:f('h-s4n'), stat4Label:f('h-s4l'),
-    card1Title:f('h-c1t'), card1Sub:f('h-c1s'),
-    card2Title:f('h-c2t'), card2Sub:f('h-c2s'),
-    heroImg:img,
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+function init() {
+  const saved = localStorage.getItem('ortho_admin_schema');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      schema = deepMerge(deepClone(DEFAULT_SCHEMA), parsed);
+    } catch(e) {}
+  }
+  loadClinicSettings();
+  loadClinicians();
+  loadWireOptions();
+  renderAllFormPanels();
+  updateAllCounts();
+}
+
+// ══════════════════════════════════════════════════════════════
+// CLINIC SETTINGS
+// ══════════════════════════════════════════════════════════════
+function loadClinicSettings() {
+  document.getElementById('clinic-name').value     = schema.clinicName || '';
+  document.getElementById('clinic-currency').value = schema.currency   || 'SAR';
+  document.getElementById('default-interval').value= schema.defaultInterval || '';
+  document.getElementById('aseptic-statement').value = schema.asepticStatement || '';
+  const nota = schema.notation || 'FDI';
+  const el = document.getElementById('notation-' + nota.toLowerCase());
+  if (el) { el.checked = true; updateNotationStyle(); }
+}
+
+function updateNotationStyle() {
+  ['fdi','palmer'].forEach(n => {
+    const lbl = document.getElementById('notation-'+n+'-lbl');
+    const inp = document.getElementById('notation-'+n);
+    if (lbl && inp) lbl.classList.toggle('selected', inp.checked);
+  });
+}
+
+function collectClinicSettings() {
+  schema.clinicName      = document.getElementById('clinic-name').value.trim();
+  schema.currency        = document.getElementById('clinic-currency').value;
+  schema.defaultInterval = document.getElementById('default-interval').value.trim();
+  schema.asepticStatement= document.getElementById('aseptic-statement').value.trim();
+  const notaEl = document.querySelector('[name="notation"]:checked');
+  schema.notation = notaEl ? notaEl.value : 'FDI';
+  localStorage.setItem('ortho_notation', schema.notation);
+}
+
+// ══════════════════════════════════════════════════════════════
+// CLINICIANS
+// ══════════════════════════════════════════════════════════════
+function loadClinicians() {
+  const list = document.getElementById('clinician-list');
+  list.innerHTML = '';
+  schema.clinicians.forEach((name, idx) => {
+    const row = document.createElement('div');
+    row.className = 'clinician-row';
+    row.innerHTML = `
+      <input type="text" class="clinician-input" value="${esc(name)}" placeholder="Dr. ..."
+        oninput="schema.clinicians[${idx}]=this.value; updateAllCounts();">
+      <button class="btn-del" onclick="schema.clinicians.splice(${idx},1); loadClinicians();" title="Remove">✕</button>
+    `;
+    list.appendChild(row);
+  });
+  updateAllCounts();
+}
+
+function addClinician() {
+  const inp = document.getElementById('new-clinician');
+  const val = inp.value.trim();
+  if (!val) { inp.focus(); return; }
+  schema.clinicians.push(val);
+  inp.value = '';
+  loadClinicians();
+}
+
+document.getElementById('new-clinician').addEventListener('keydown', e => { if(e.key==='Enter') addClinician(); });
+
+// ══════════════════════════════════════════════════════════════
+// WIRE OPTIONS
+// ══════════════════════════════════════════════════════════════
+function loadWireOptions() {
+  renderSimpleList('wire-sizes-list', schema.wireSizes, 'size');
+  renderSimpleList('wire-mats-list',  schema.wireMats,  'mat');
+}
+
+function renderSimpleList(containerId, arr, type) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  arr.forEach((val, idx) => {
+    const item = document.createElement('div');
+    item.className = 'option-row';
+    item.draggable = true;
+    item.dataset.idx = idx;
+    setupDrag(item, arr, () => renderSimpleList(containerId, arr, type));
+    item.innerHTML = `
+      <span class="drag-handle" title="Drag to reorder">⠿</span>
+      <input class="option-input" type="text" value="${esc(val)}"
+        oninput="arr[${idx}]=this.value;">
+      <button class="btn-del" title="Remove">✕</button>
+    `;
+    item.querySelector('.btn-del').onclick = () => { arr.splice(idx, 1); renderSimpleList(containerId, arr, type); };
+    container.appendChild(item);
+  });
+}
+
+function addWireOption(type) {
+  const id  = type === 'size' ? 'new-wire-size' : 'new-wire-mat';
+  const inp = document.getElementById(id);
+  const val = inp.value.trim();
+  if (!val) { inp.focus(); return; }
+  if (type === 'size') schema.wireSizes.push(val);
+  else                 schema.wireMats.push(val);
+  inp.value = '';
+  loadWireOptions();
+  document.getElementById(id).focus();
+}
+document.getElementById('new-wire-size').addEventListener('keydown', e => { if(e.key==='Enter') addWireOption('size'); });
+document.getElementById('new-wire-mat').addEventListener('keydown',  e => { if(e.key==='Enter') addWireOption('mat'); });
+
+// ══════════════════════════════════════════════════════════════
+// FORM FIELD RENDERER
+// ══════════════════════════════════════════════════════════════
+const FORM_KEYS = ['exam','plan','bond','fu-fixed','fu-aligner','emergency','debond'];
+
+function renderAllFormPanels() {
+  FORM_KEYS.forEach(key => renderFormPanel(key));
+}
+
+function renderFormPanel(key) {
+  const container = document.getElementById('fields-' + key);
+  if (!container) return;
+  container.innerHTML = '';
+  const fields = schema.fields[key] || [];
+
+  if (!fields.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--grey-400);">No fields defined for this form.</div>';
+    return;
+  }
+
+  fields.forEach((field, fieldIdx) => {
+    const card = buildFieldCard(key, field, fieldIdx);
+    container.appendChild(card);
+  });
+}
+
+function buildFieldCard(formKey, field, fieldIdx) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const typeInfo = {
+    radio:  { badge: 'badge-radio',  label: 'Radio Group' },
+    check:  { badge: 'badge-check',  label: 'Checkboxes' },
+    text:   { badge: 'badge-text',   label: 'Text Field'  },
+    select: { badge: 'badge-select', label: 'Dropdown'    },
+    pills:  { badge: 'badge-pills',  label: 'Clickable Pills' },
+  }[field.type] || { badge: 'badge-text', label: field.type };
+
+  // header
+  const hdr = document.createElement('div');
+  hdr.className = 'card-header';
+  hdr.innerHTML = `
+    <div class="card-title">${esc(field.label)}</div>
+    <span class="badge ${typeInfo.badge}">${typeInfo.label}</span>
+    <span style="font-size:0.69rem;color:var(--grey-400);margin-left:4px;">ID: ${esc(field.id)}</span>
+  `;
+  card.appendChild(hdr);
+
+  // body
+  const body = document.createElement('div');
+  body.className = 'card-body';
+
+  // options list
+  const listWrap = document.createElement('div');
+  listWrap.className = 'options-list';
+  listWrap.id = `optlist-${formKey}-${fieldIdx}`;
+
+  const renderOpts = () => {
+    listWrap.innerHTML = '';
+    field.options.forEach((opt, optIdx) => {
+      const row = document.createElement('div');
+      row.className = 'option-row';
+      row.draggable = true;
+      row.dataset.idx = optIdx;
+      setupDrag(row, field.options, () => { renderOpts(); renderPreview(previewWrap, field); });
+      row.innerHTML = `
+        <span class="drag-handle">⠿</span>
+        <input class="option-input" type="text" value="${esc(opt)}" placeholder="Option text">
+        <button class="btn-del" title="Remove">✕</button>
+      `;
+      row.querySelector('.option-input').addEventListener('input', e => {
+        field.options[optIdx] = e.target.value;
+        renderPreview(previewWrap, field);
+      });
+      row.querySelector('.btn-del').addEventListener('click', () => {
+        field.options.splice(optIdx, 1);
+        renderOpts();
+        renderPreview(previewWrap, field);
+      });
+      listWrap.appendChild(row);
+    });
   };
-  const newData={...DATA, hero};
-  await save(newData);
+
+  // add row
+  const addWrap = document.createElement('div');
+  addWrap.className = 'add-row';
+  const addInp = document.createElement('input');
+  addInp.type = 'text';
+  addInp.className = 'add-input';
+  addInp.placeholder = 'Type new option and press Enter or click Add';
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn btn-primary btn-sm';
+  addBtn.textContent = '+ Add';
+  addBtn.onclick = () => {
+    const val = addInp.value.trim();
+    if (!val) { addInp.focus(); return; }
+    field.options.push(val);
+    addInp.value = '';
+    renderOpts();
+    renderPreview(previewWrap, field);
+    addInp.focus();
+  };
+  addInp.addEventListener('keydown', e => { if(e.key==='Enter') addBtn.click(); });
+  addWrap.appendChild(addInp);
+  addWrap.appendChild(addBtn);
+
+  // preview
+  const previewWrap = document.createElement('div');
+  previewWrap.className = 'preview-strip';
+
+  body.appendChild(listWrap);
+  body.appendChild(addWrap);
+  body.appendChild(previewWrap);
+  card.appendChild(body);
+
+  renderOpts();
+  renderPreview(previewWrap, field);
+
+  return card;
 }
 
-/* ---- ABOUT ---- */
-function loadAboutForm(){
-  const a=DATA?.about||{};
-  const f=id=>document.getElementById(id);
-  f('ab-tag').value=a.tag||''; f('ab-lead').value=a.lead||'';
-  f('ab-f1').value=a.feat1||''; f('ab-f2').value=a.feat2||''; f('ab-f3').value=a.feat3||''; f('ab-f4').value=a.feat4||'';
-  if(a.img){
-    f('about-img-url').value=a.img;
-    const urlDiv=document.getElementById('about-tab-url');
-    const fileDiv=document.getElementById('about-tab-file');
-    if(urlDiv&&fileDiv){
-      fileDiv.style.display='none'; urlDiv.style.display='';
-      document.querySelectorAll('#page-about .media-tab').forEach((b,i)=>{b.classList.toggle('active',i===1);});
-      previewUrlMedia('about-img-url','about-url-prev');
+function renderPreview(wrap, field) {
+  wrap.innerHTML = `<span class="preview-label">Preview — ${field.options.length} option${field.options.length!==1?'s':''}</span>` +
+    field.options.filter(o => o.trim()).map(o =>
+      `<span class="preview-chip">${esc(o)}</span>`
+    ).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// COUNTS
+// ══════════════════════════════════════════════════════════════
+function updateAllCounts() {
+  const n = document.getElementById('cnt-clinicians');
+  if (n) n.textContent = schema.clinicians.filter(c=>c.trim()).length;
+  FORM_KEYS.forEach(key => {
+    const el = document.getElementById('cnt-' + key);
+    if (el) el.textContent = (schema.fields[key]||[]).reduce((s,f)=>s+f.options.length,0);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// DRAG & DROP
+// ══════════════════════════════════════════════════════════════
+let dragSrc = null;
+function setupDrag(item, arr, rerender) {
+  item.addEventListener('dragstart', e => {
+    dragSrc = item; item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  item.addEventListener('dragend', () => {
+    item.classList.remove('dragging');
+    item.parentNode?.querySelectorAll('.option-row').forEach(i => i.classList.remove('drag-over'));
+  });
+  item.addEventListener('dragover', e => {
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+    if (dragSrc && dragSrc !== item) item.classList.add('drag-over');
+  });
+  item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+  item.addEventListener('drop', e => {
+    e.preventDefault(); item.classList.remove('drag-over');
+    if (!dragSrc || dragSrc === item) return;
+    const si = parseInt(dragSrc.dataset.idx), di = parseInt(item.dataset.idx);
+    const [moved] = arr.splice(si, 1);
+    arr.splice(di, 0, moved);
+    rerender();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// SAVE ALL
+// ══════════════════════════════════════════════════════════════
+function saveAll() {
+  // Collect clinic settings
+  collectClinicSettings();
+
+  // Collect clinicians from live inputs
+  schema.clinicians = [...document.querySelectorAll('#clinician-list .clinician-input')]
+    .map(i => i.value.trim()).filter(Boolean);
+
+  // Collect wire options from live inputs
+  schema.wireSizes = [...document.querySelectorAll('#wire-sizes-list .option-input')]
+    .map(i => i.value.trim()).filter(Boolean);
+  schema.wireMats  = [...document.querySelectorAll('#wire-mats-list .option-input')]
+    .map(i => i.value.trim()).filter(Boolean);
+
+  // Collect all field options from live inputs
+  FORM_KEYS.forEach(key => {
+    (schema.fields[key] || []).forEach((field, fi) => {
+      const listEl = document.getElementById(`optlist-${key}-${fi}`);
+      if (!listEl) return;
+      const inputs = listEl.querySelectorAll('.option-input');
+      field.options = [...inputs].map(i => i.value.trim()).filter(Boolean);
+    });
+  });
+
+  localStorage.setItem('ortho_admin_schema', JSON.stringify(schema));
+  localStorage.setItem('ortho_admin_update', Date.now().toString());
+
+  updateAllCounts();
+  showToast('✅ Settings saved successfully!', 'success');
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════════════════════════════
+function exportSettings() {
+  collectClinicSettings();
+  const blob = new Blob([JSON.stringify(schema, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'ortho_admin_settings.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📤 Settings exported!', 'success');
+}
+
+function importSettings(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      schema = JSON.parse(e.target.result);
+      init();
+      showToast('📥 Settings imported successfully!', 'success');
+    } catch {
+      showToast('❌ Invalid JSON file', 'error');
     }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ══════════════════════════════════════════════════════════════
+// RESET
+// ══════════════════════════════════════════════════════════════
+function resetToDefaults() {
+  if (!confirm('Reset ALL options to factory defaults? This cannot be undone.')) return;
+  schema = deepClone(DEFAULT_SCHEMA);
+  init();
+  showToast('🔄 Reset to factory defaults', 'success');
+}
+
+function clearAllDrafts() {
+  if (!confirm('Permanently delete all saved patient form data in this browser? Cannot be undone.')) return;
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('ortho_v4_')) keys.push(k);
   }
+  keys.forEach(k => localStorage.removeItem(k));
+  showToast(`🗑 Cleared ${keys.length} saved form(s)`, 'success');
 }
 
-async function saveAbout(){
-  const f=id=>document.getElementById(id).value;
-  const img=getMediaVal('about')||DATA?.about?.img||'';
-  const about={img, tag:f('ab-tag'), lead:f('ab-lead'), feat1:f('ab-f1'), feat2:f('ab-f2'), feat3:f('ab-f3'), feat4:f('ab-f4')};
-  const newData={...DATA, about};
-  await save(newData);
+// ══════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-/* ---- SOCIAL ---- */
-function loadSocialForm(){
-  const s=DATA?.social||{};
-  ['instagram','twitter','snapchat','tiktok','facebook','youtube'].forEach(k=>{
-    const el=document.getElementById('soc-'+k); if(el) el.value=s[k]||'';
-  });
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-async function saveSocial(){
-  const social={};
-  ['instagram','twitter','snapchat','tiktok','facebook','youtube'].forEach(k=>{
-    const el=document.getElementById('soc-'+k); if(el) social[k]=el.value.trim();
-  });
-  const newData={...DATA, social};
-  await save(newData);
-}
+// ══════════════════════════════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAll(); }
+});
 
-/* ---- LOGO ---- */
-function previewLogo(input){
-  const f=input.files[0];if(!f)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-      const MAX=400;
-      let w=img.width,h=img.height;
-      if(w>MAX){h=Math.round(h*MAX/w);w=MAX}
-      const canvas=document.createElement('canvas');
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      const b64=canvas.toDataURL('image/png',0.9);
-      const prev=document.getElementById('logo-preview');
-      prev.src=b64;prev.style.display='block';
-      document.getElementById('logo-ph').style.display='none';
-      // تخزين مؤقت
-      document.querySelector('.logo-drop').dataset.b64=b64;
-    };img.src=e.target.result;
-  };reader.readAsDataURL(f);
-}
-async function saveLogo(){
-  const b64=document.querySelector('.logo-drop')?.dataset?.b64;
-  if(!b64){toast('اختر صورة أولاً');return}
-  if(!DATA.clinicInfo)DATA.clinicInfo={};
-  DATA.clinicInfo.logoUrl=b64;
-  await save(DATA);
-}
-
-/* ---- TOAST ---- */
-function toast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
-
-/* ---- AUTO-INIT ---- */
-if(localStorage.getItem('adminAuth')==='1'){document.getElementById('login-screen').style.display='none';init();}
+// ══════════════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════════════
+init();
 </script>
 </body>
 </html>
