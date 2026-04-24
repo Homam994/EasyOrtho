@@ -39,16 +39,31 @@
   /* ── Header ── */
   .page-header {
     background: var(--navy); padding: 0 28px;
-    display: flex; align-items: center; justify-content: space-between;
+    display: grid; grid-template-columns: auto 1fr auto;
+    align-items: center; justify-items: center;
     position: sticky; top: 0; z-index: 300;
     box-shadow: 0 2px 20px rgba(0,0,0,0.25);
     height: 60px;
   }
-  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-brand { display: flex; align-items: center; gap: 12px; justify-self: start; }
   .header-icon { width: 34px; height: 34px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
   .header-title { font-family: 'DM Serif Display', serif; color: var(--white); font-size: 1.1rem; }
   .header-sub { color: var(--gold); font-size: 0.63rem; letter-spacing: 0.09em; text-transform: uppercase; margin-top: 1px; }
-  .header-actions { display: flex; gap: 6px; align-items: center; }
+  .header-actions { display: flex; gap: 6px; align-items: center; justify-self: end; }
+
+  /* ── Centered author signature in header ── */
+  .header-author-center {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 12px; border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.08);
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .header-author-center:hover {
+    background: rgba(201,168,76,0.16);
+    border-color: rgba(201,168,76,0.5);
+  }
 
   /* ── Layout ── */
   .layout { display: flex; min-height: calc(100vh - 60px); }
@@ -338,7 +353,10 @@
     padding: 5px 12px; border-radius: 20px;
     border: 1px solid rgba(201,168,76,0.3);
     background: rgba(201,168,76,0.08);
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
   }
+  .footer-author:hover { background: rgba(201,168,76,0.16); border-color: rgba(201,168,76,0.5); }
   .footer-author-name { font-family: 'DM Serif Display', serif; font-size: 0.82rem; color: var(--gold); display: block; }
   .footer-author-label { font-size: 0.58rem; color: rgba(255,255,255,0.25); letter-spacing: 0.07em; text-transform: uppercase; }
   .footer-copy { font-size: 0.65rem; color: rgba(255,255,255,0.18); }
@@ -346,6 +364,8 @@
   /* ── Mobile ── */
   @media (max-width: 768px) {
     .sidebar { display: none; }
+    .page-header { grid-template-columns: 1fr auto; }
+    .header-author-center { display: none; }
     .panel-topbar { padding: 12px 14px; }
     .content-area { padding: 14px 14px 80px; }
     .wire-grid { grid-template-columns: 1fr; }
@@ -362,14 +382,17 @@
       <div class="header-sub">Orthodontic Records System</div>
     </div>
   </div>
-  <div class="header-actions">
-    <div class="author-credit">
-      <div class="author-dot"></div>
-      <div>
-        <div class="author-name">Dr. Mohammed Homam Alsamman</div>
-        <div class="author-role">Designer &amp; Developer</div>
-      </div>
+
+  <!-- Centered author signature -->
+  <a href="mailto:homam.alsmman@gmail.com" class="header-author-center" title="Contact: homam.alsmman@gmail.com">
+    <span style="font-size:14px;">🩺</span>
+    <div>
+      <span class="footer-author-name">Dr. Mohammed Homam Alsamman</span>
+      <span class="footer-author-label">Concept, Design &amp; Development</span>
     </div>
+  </a>
+
+  <div class="header-actions">
     <a href="index.html" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);">← Back to Forms</a>
     <button class="btn btn-outline btn-sm" onclick="exportSettings()">📤 Export</button>
     <button class="btn btn-gold btn-sm" onclick="document.getElementById('file-import').click()">📥 Import</button>
@@ -656,13 +679,13 @@
     <div class="footer-icon">⚙️</div>
     <span class="footer-text">Orthodontic Records — Admin Panel</span>
   </div>
-  <div class="footer-author">
+  <a href="mailto:homam.alsmman@gmail.com" class="footer-author" title="Contact: homam.alsmman@gmail.com">
     <span style="font-size:14px;">🩺</span>
     <div>
       <span class="footer-author-name">Dr. Mohammed Homam Alsamman</span>
       <span class="footer-author-label">Concept, Design &amp; Development</span>
     </div>
-  </div>
+  </a>
   <span class="footer-copy">© 2025 All Rights Reserved</span>
 </footer>
 
