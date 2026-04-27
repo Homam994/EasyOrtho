@@ -4885,8 +4885,11 @@ function saveCurrentForm() {
     if(wireState[cid]) data['wires__'+cid]=wireState[cid];
   });
   if(currentTab==='fu-fixed'){
-    data['_lig_upper']=[...ligSelectedTeeth.upper];
-    data['_lig_lower']=[...ligSelectedTeeth.lower];
+    // FIX: save short and fig8 sets separately as arrays
+    data['_lig_upper_short']=[...ligSelectedTeeth.upper.short];
+    data['_lig_upper_fig8']=[...ligSelectedTeeth.upper.fig8];
+    data['_lig_lower_short']=[...ligSelectedTeeth.lower.short];
+    data['_lig_lower_fig8']=[...ligSelectedTeeth.lower.fig8];
     // Aux wire states
     ['upper','lower'].forEach(arch=>{
       const cid=`fuf-aux-wire-${arch}`;
@@ -4938,13 +4941,27 @@ function loadForm(tab) {
       });
       return;
     }
+    if(key==='_lig_upper_short'||key==='_lig_upper_fig8'||key==='_lig_lower_short'||key==='_lig_lower_fig8'){
+      // FIX: restore separate short/fig8 sets
+      const parts = key.split('_'); // ['','lig','upper','short'] or similar
+      const arch  = key.includes('upper') ? 'upper' : 'lower';
+      const type  = key.includes('short') ? 'short' : 'fig8';
+      ligSelectedTeeth[arch][type].clear();
+      (data[key] || []).forEach(n => ligSelectedTeeth[arch][type].add(n));
+      // Re-draw chart if visible
+      const chartEl = document.getElementById(`fuf-lig-chart-${arch}`);
+      if(chartEl && chartEl.style.display !== 'none') buildLigMiniChart(arch);
+      return;
+    }
+    // Legacy key support (old saved data before fix)
     if(key==='_lig_upper'||key==='_lig_lower'){
       const arch = key==='_lig_upper'?'upper':'lower';
-      ligSelectedTeeth[arch].clear();
-      data[key].forEach(n=>ligSelectedTeeth[arch].add(n));
-      // Re-draw chart if visible
-      const chartEl=document.getElementById(`fuf-lig-chart-${arch}`);
-      if(chartEl && chartEl.style.display!=='none') buildLigMiniChart(arch);
+      ligSelectedTeeth[arch].short.clear();
+      ligSelectedTeeth[arch].fig8.clear();
+      // Put all into short set (best-effort recovery)
+      (data[key] || []).forEach(n => ligSelectedTeeth[arch].short.add(n));
+      const chartEl = document.getElementById(`fuf-lig-chart-${arch}`);
+      if(chartEl && chartEl.style.display !== 'none') buildLigMiniChart(arch);
       return;
     }
     if(key==='__teeth'){
@@ -4980,20 +4997,36 @@ function clearCurrentForm() {
   panel.querySelectorAll('.wire-chip').forEach(c=>c.classList.remove('sel-size','sel-mat'));
   // Reset ligature tooth selections
   if(currentTab==='fu-fixed'){
-    ligSelectedTeeth.upper.clear();
-    ligSelectedTeeth.lower.clear();
+    // FIX: clear the correct Set properties (short & fig8), not the object itself
     ['upper','lower'].forEach(arch=>{
+      ligSelectedTeeth[arch].short.clear();
+      ligSelectedTeeth[arch].fig8.clear();
       const chartEl=document.getElementById(`fuf-lig-chart-${arch}`);
       if(chartEl){ chartEl.style.display='none'; }
-      const selEl=document.getElementById(`fuf-lig-${arch}-selected`);
-      if(selEl) selEl.textContent='—';
+      ['short','fig8'].forEach(type=>{
+        const selEl=document.getElementById(`fuf-lig-${arch}-${type}-selected`);
+        if(selEl) selEl.textContent='—';
+      });
       // Hide aux wire
       const wrap=document.getElementById(`fuf-aux-wire-${arch}-wrap`);
       if(wrap) wrap.style.display='none';
+      const auxCheckbox=document.getElementById(`fuf-aux-wire-${arch}-en`);
+      if(auxCheckbox) auxCheckbox.checked=false;
       const auxWireEl=document.getElementById(`fuf-aux-wire-${arch}`);
       if(auxWireEl) auxWireEl.innerHTML='';
       delete wireState[`fuf-aux-wire-${arch}`];
     });
+  }
+  // Reset GMD Follow-Up tab specific state
+  if(currentTab==='fu-gmd'){
+    const transDetail=document.getElementById('fug-transition-detail');
+    if(transDetail) transDetail.style.display='none';
+  }
+  // Reset TAD tab - reinitialize with one blank screw
+  if(currentTab==='tad'){
+    tadScrews=[];
+    tadActiveScrewIdx=-1;
+    tadAddScrew();
   }
   ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(cid=>{
     if(wireState[cid]){ wireState[cid]={upper:{size:'',mat:''},lower:{size:'',mat:''}}; }
@@ -5019,12 +5052,19 @@ function clearCurrentForm() {
   if(bas) bas.style.display='none';
   const pff=document.getElementById('plan-fixed-fields');
   const paf=document.getElementById('plan-aligner-fields');
+  const pgf=document.getElementById('plan-gmd-fields');
   if(pff) pff.style.display='';
   if(paf) paf.style.display='none';
+  if(pgf) pgf.style.display='none';
+  // Reset CS stage highlights
+  for(let i=1;i<=6;i++){
+    const lbl=document.getElementById('cs-lbl-'+i);
+    if(lbl){lbl.style.borderColor='';lbl.style.background='';}
+  }
 
   localStorage.removeItem('ortho_v4_'+currentTab);
-  // Re-check aseptic (always default on)
-  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','em-aseptic','db-aseptic'].forEach(id=>{
+  // Re-check aseptic (always default on) — FIX: added fug-aseptic and tad-aseptic
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','fug-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.checked=true;
   });
   updateProgress();
@@ -5898,6 +5938,10 @@ function buildFuGmdSummary() {
 // ── Listen for admin changes (when admin panel is open in another tab) ─
 window.addEventListener('storage', e => {
   if (e.key === 'ortho_admin_update') applyAdminSchema();
+  // FIX: also listen for direct notation changes (before full save)
+  if (e.key === 'ortho_notation' && e.newValue) {
+    setNotation(e.newValue);
+  }
 });
 
 // ══════════════════════════════════════════════════════════════
@@ -5958,8 +6002,11 @@ function autoSaveTab(tab) {
     if (wireState[cid]) data['wires__' + cid] = wireState[cid];
   });
   if (tab === 'fu-fixed') {
-    data['_lig_upper'] = [...ligSelectedTeeth.upper.short, ...[...ligSelectedTeeth.upper.fig8]];
-    data['_lig_lower'] = [...ligSelectedTeeth.lower.short, ...[...ligSelectedTeeth.lower.fig8]];
+    // Save short and fig8 sets separately as arrays
+    data['_lig_upper_short'] = [...ligSelectedTeeth.upper.short];
+    data['_lig_upper_fig8']  = [...ligSelectedTeeth.upper.fig8];
+    data['_lig_lower_short'] = [...ligSelectedTeeth.lower.short];
+    data['_lig_lower_fig8']  = [...ligSelectedTeeth.lower.fig8];
     ['upper','lower'].forEach(arch => {
       const cid = `fuf-aux-wire-${arch}`;
       if (wireState[cid]) data['wires__' + cid] = wireState[cid];

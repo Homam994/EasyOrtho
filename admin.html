@@ -882,15 +882,19 @@ function broadcastNotation() {
   schema.notation = el.value;
   // Write to the dedicated key that index.html reads
   localStorage.setItem('ortho_notation', el.value);
-  // Also trigger the admin update event so index.html reapplies schema
+  // Also trigger the admin update event so index.html reapplies full schema
   localStorage.setItem('ortho_admin_update', Date.now().toString());
+  // Re-render demo with confirmed updated value
+  renderNotationDemo();
 }
 
 // ══════════════════════════════════════════════════════════════
 // NOTATION DEMO — live preview of all teeth in selected system
 // ══════════════════════════════════════════════════════════════
 function renderNotationDemo() {
-  const nota = schema.notation || 'FDI';
+  // Read from the currently checked radio button (not schema.notation which may be stale)
+  const checkedEl = document.querySelector('[name="notation"]:checked');
+  const nota = checkedEl ? checkedEl.value : (schema.notation || 'FDI');
   const buildRow = (teeth, elementId, cssClass) => {
     const el = document.getElementById(elementId);
     if (!el) return;
