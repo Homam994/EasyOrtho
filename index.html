@@ -5339,7 +5339,10 @@ function applyAdminSchema() {
     }
 
     // Apply notation system
-    if (schema.notation) { setNotation(schema.notation); }
+    // FIX: prefer the dedicated ortho_notation key (always most up-to-date)
+    // over schema.notation (which may be from an older save)
+    const currentNotation = localStorage.getItem('ortho_notation') || schema.notation;
+    if (currentNotation) { setNotation(currentNotation); }
 
     // Apply clinic name to header if provided
     if (schema.clinicName) {
@@ -5937,11 +5940,13 @@ function buildFuGmdSummary() {
 
 // ── Listen for admin changes (when admin panel is open in another tab) ─
 window.addEventListener('storage', e => {
-  if (e.key === 'ortho_admin_update') applyAdminSchema();
-  // FIX: also listen for direct notation changes (before full save)
+  // FIX: handle ortho_notation FIRST to ensure it's set before applyAdminSchema reads it
   if (e.key === 'ortho_notation' && e.newValue) {
     setNotation(e.newValue);
   }
+  // When full schema is saved/updated, reapply everything
+  // applyAdminSchema now reads ortho_notation (not schema.notation) so it won't override
+  if (e.key === 'ortho_admin_update') applyAdminSchema();
 });
 
 // ══════════════════════════════════════════════════════════════
