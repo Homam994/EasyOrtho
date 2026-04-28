@@ -3733,7 +3733,8 @@ const chkList = name => [...document.querySelectorAll(`[name="${name}"]:checked`
 
 function chartSummary() {
   const g = { carious:[], rcted:[], missing:[], restored:[] };
-  [...upperTeeth,...lowerTeeth].forEach(n => { const s=toothStates[toothState[n]]; if(s!=='normal') g[s].push(n); });
+  // FIX: convert FDI numbers to the active notation via toothLabel()
+  [...upperTeeth,...lowerTeeth].forEach(n => { const s=toothStates[toothState[n]]; if(s!=='normal') g[s].push(toothLabel(n)); });
   const out = [];
   if(g.carious.length)  out.push(`  · Carious teeth: ${g.carious.join(', ')}`);
   if(g.rcted.length)    out.push(`  · RCTed teeth: ${g.rcted.join(', ')}`);
