@@ -1,6 +1,6 @@
 // EasyOrtho Service Worker
-// Build: 202604290717 — update this timestamp on every deploy to force cache refresh
-const VERSION  = '202604290717';
+// Build: 202604290718 — update this timestamp on every deploy to force cache refresh
+const VERSION  = '202604290718';
 const CACHE    = 'easyortho-' + VERSION;
 const CORE     = ['./index.html', './admin.html', './manifest.json',
                   './icon-192.png', './icon-512.png', './sw.js'];
