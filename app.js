@@ -331,6 +331,9 @@ const rebondLabels = {
 const rebondChartSets = {};
 rebondActions.forEach(a => rebondChartSets[a] = new Set());
 
+// Extraction chart (plan tab)
+const extChartSet = new Set();
+
 function toggleRebondChart(id) {
   const wrap = document.getElementById(`${id}-chart-wrap`);
   if (!wrap) return;
@@ -666,7 +669,13 @@ function collectFormData(tab) {
       if(isChk('plan-anch-tad'))ar.push('TADs'); if(isChk('plan-anch-hg'))ar.push('Headgear');
       if(isChk('plan-anch-tpa'))ar.push('TPA/Nance'); if(isChk('plan-anch-elastic'))ar.push('Elastics');
       if(ar.length) R('Anchorage reinforcement', ar.join(', '));
-      R('Extractions', radio('plan-ext'));
+      const extVal = radio('plan-ext');
+      if (extVal === 'Other') {
+        const teeth = [...extChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+        R('Extractions', teeth.length ? teeth.join(', ') : 'Other (no teeth selected)');
+      } else {
+        R('Extractions', extVal);
+      }
       R('Notes',       get('plan-ext-notes'));
 
       S('Treatment Stages');
@@ -1365,6 +1374,7 @@ function saveCurrentForm() {
     });
   }
   if(currentTab==='emergency') data['_em_pills']=[...activeEmPills];
+  if(currentTab==='plan') data['_ext_chart']=[...extChartSet];
   if(currentTab==='exam') data['__teeth']={...toothState};
   localStorage.setItem('ortho_v4_'+currentTab, JSON.stringify(data));
   showToast('💾 Draft saved!','success');
@@ -1399,6 +1409,23 @@ function loadForm(tab) {
             }
           }
         });
+      }
+      return;
+    }
+    if(key==='_ext_chart'){
+      extChartSet.clear();
+      (data[key]||[]).forEach(n => extChartSet.add(n));
+      // إعادة بناء الـ chart إذا كان Other مختاراً
+      const extVal = data['radio__plan-ext'];
+      if (extVal === 'Other') {
+        setTimeout(() => {
+          toggleExtChart();
+          const lbl = document.getElementById('plan-ext-chart-selected');
+          if (lbl) {
+            const sorted = [...extChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+            lbl.textContent = sorted.length ? sorted.join(', ') : '—';
+          }
+        }, 100);
       }
       return;
     }
@@ -1508,6 +1535,17 @@ function clearCurrentForm() {
     });
   }
   // Reset emergency pills
+  if(currentTab==='plan'){
+    extChartSet.clear();
+    const upperRow = document.getElementById('plan-ext-chart-upper');
+    const lowerRow = document.getElementById('plan-ext-chart-lower');
+    if (upperRow) upperRow.innerHTML = '';
+    if (lowerRow) lowerRow.innerHTML = '';
+    const lbl = document.getElementById('plan-ext-chart-selected');
+    if (lbl) lbl.textContent = '—';
+    const wrap = document.getElementById('plan-ext-chart-wrap');
+    if (wrap) wrap.style.display = 'none';
+  }
   if(currentTab==='emergency'){
     // Clear pill buttons
     panel.querySelectorAll('.emergency-pill').forEach(p=>p.classList.remove('active'));
@@ -1733,6 +1771,56 @@ function toggleLigChart(arch) {
   if (shortOn || fig8On) buildLigMiniChart(arch);
 }
 
+
+// ── Extraction chart toggle (Treatment Plan tab) ───────────────────────
+function toggleExtChart() {
+  const val  = document.querySelector('[name="plan-ext"]:checked')?.value || '';
+  const wrap = document.getElementById('plan-ext-chart-wrap');
+  if (!wrap) return;
+
+  if (val === 'Other') {
+    wrap.style.display = '';
+    // بناء الـ chart إذا لم يكن مبنياً بعد
+    const upperRow = document.getElementById('plan-ext-chart-upper');
+    const lowerRow = document.getElementById('plan-ext-chart-lower');
+    if (upperRow && !upperRow.children.length) {
+      buildExtRow(upperRow, upperTeeth);
+    }
+    if (lowerRow && !lowerRow.children.length) {
+      buildExtRow(lowerRow, lowerTeeth);
+    }
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function buildExtRow(rowEl, teeth) {
+  rowEl.innerHTML = '';
+  teeth.forEach((num, i) => {
+    if (i === 8) {
+      const sp = document.createElement('div');
+      sp.style.cssText = 'width:4px;border-left:2px dashed var(--gold);margin:0 1px;';
+      rowEl.appendChild(sp);
+    }
+    const btn = document.createElement('div');
+    btn.className = 'mini-tooth' + (extChartSet.has(num) ? ' selected' : '');
+    btn.textContent = toothLabel(num);
+    btn.dataset.fdi = num;
+    btn.onclick = () => {
+      const n = parseInt(btn.dataset.fdi);
+      if (extChartSet.has(n)) extChartSet.delete(n);
+      else extChartSet.add(n);
+      btn.classList.toggle('selected');
+      const lbl = document.getElementById('plan-ext-chart-selected');
+      if (lbl) {
+        const sorted = [...extChartSet].sort((a,b) => a - b).map(n => toothLabel(n));
+        lbl.textContent = sorted.length ? sorted.join(', ') : '—';
+      }
+    };
+    rowEl.appendChild(btn);
+  });
+}
+
 // ── Elastic config asymmetric toggle ──────────────────────────────────
 function toggleElasticConfig(prefix) {
   const val    = document.querySelector(`[name="${prefix}-elastic-config"]:checked`)?.value;
@@ -1792,6 +1880,9 @@ function applyAdminSchema() {
           }
 
           // Handle radio groups
+          // plan-ext مُدار يدوياً — لا نسمح للـ schema بالكتابة فوقه
+          if (field.id === 'plan-ext') return;
+
           document.querySelectorAll(`[name="${field.id}"]`).forEach(el => {
             const group = el.closest('.toggle-group');
             if (!group) return;
@@ -2357,11 +2448,57 @@ function cycleTab(dir) {
 
   applyAdminSchema();
 
-  // GMD: ربط تغيير نوع الجهاز بـ detail sections
+  // Event delegation: استمع لكل التغييرات في document بدلاً من inline handlers
+  // هذا يضمن عمل الـ handlers حتى بعد إعادة بناء الـ DOM من applyAdminSchema
   document.addEventListener('change', e => {
-    if (e.target.name === 'gmd-removable-type' || e.target.name === 'gmd-fixed-type') {
-      updateGmdDetailSection();
-    }
+    const name = e.target.name;
+    const id   = e.target.id;
+
+    // GMD category & appliance type
+    if (name === 'gmd-category')        updateGmdCategory();
+    if (name === 'gmd-removable-type' || name === 'gmd-fixed-type') updateGmdDetailSection();
+    if (name === 'gmd-cs-stage')        highlightCS();
+    if (name === 'fug-decision')        updateGmdDecision();
+
+    // Extraction chart
+    if (name === 'plan-ext')            toggleExtChart();
+
+    // TAD status
+    if (id === 'fuf-has-tad')           toggleTadStatus('fuf');
+    if (id === 'fua-has-tad')           toggleTadStatus('fua');
+
+    // Appliance cards
+    if (name === 'plan-appliance-type') updateApplianceCard();
+    if (name === 'bond-type')           updateBondCard();
+
+    // Bond summary
+    if (name === 'bond-arch' || name === 'bond-rx' || name === 'bond-brand') updateBondSummary();
+
+    // Aligner progress
+    if (id === 'fua-current-aligner' || id === 'fua-total-aligners') updateAlignerProgress();
+
+    // Elastic config
+    if (name === 'bond-elastic-config') toggleElasticConfig('bond');
+    if (name === 'fuf-elastic-config')  toggleElasticConfig('fuf');
+    if (name === 'fua-elastic-config')  toggleElasticConfig('fua');
+
+    // Ligature charts
+    if (id === 'fuf-lig-upper-short' || id === 'fuf-lig-upper-fig8') toggleLigChart('upper');
+    if (id === 'fuf-lig-lower-short' || id === 'fuf-lig-lower-fig8') toggleLigChart('lower');
+
+    // Aux wire
+    if (id === 'fuf-aux-wire-upper-en') toggleAuxWire('upper');
+    if (id === 'fuf-aux-wire-lower-en') toggleAuxWire('lower');
+
+    // GMD Follow-up calculations
+    if (id === 'fug-oj-now' || id === 'fug-ob-now' || id === 'fug-lfh-now') calcGmdChange();
+  });
+
+  // input event للـ aligner progress (number inputs)
+  document.addEventListener('input', e => {
+    const id = e.target.id;
+    if (id === 'fua-current-aligner' || id === 'fua-total-aligners') updateAlignerProgress();
+    if (id === 'fug-oj-now' || id === 'fug-ob-now' || id === 'fug-lfh-now') calcGmdChange();
   });
   ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad'].forEach(loadForm);
   updateApplianceCard();
