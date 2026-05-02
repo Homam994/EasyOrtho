@@ -236,6 +236,78 @@
     .content-area { padding: 14px 13px 90px; }
     .panel-topbar { padding: 11px 13px; }
   }
+
+  /* ── Admin mobile (≤ 768px) ── */
+  @media (max-width: 768px) {
+    .page-header { padding: 0 12px; height: 52px; }
+    .header-title { font-size: 0.92rem; }
+    .header-sub { font-size: 0.56rem; }
+    .author-pill { display: none; }
+    .header-actions { gap: 4px; }
+    .header-actions .btn { padding: 4px 8px; font-size: 0.7rem; }
+
+    /* Make main content full width since sidebar is hidden */
+    .main { width: 100%; }
+    .content-area { padding: 10px 10px 90px; }
+    .panel-topbar { padding: 10px 12px; flex-direction: column; align-items: flex-start; gap: 4px; }
+    .panel-title { font-size: 1rem; }
+
+    /* Cards */
+    .card-body { padding: 10px 11px; }
+    .card-header { padding: 8px 11px; }
+
+    /* Settings rows */
+    .setting-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 7px;
+      padding: 10px 12px;
+    }
+    .setting-row .inline-input { width: 100% !important; }
+
+    /* Notation picker */
+    .notation-picker { flex-direction: column; gap: 5px; }
+    .notation-opt { width: 100%; }
+
+    /* Wire grid */
+    .wire-grid { grid-template-columns: 1fr; }
+
+    /* Options list */
+    .option-row { padding: 5px 7px; }
+    .option-input { font-size: 0.79rem; }
+
+    /* IO cards */
+    .io-card { padding: 12px; }
+    .io-row { flex-direction: column; }
+    .io-row .btn { width: 100%; justify-content: center; }
+
+    /* Save bar */
+    .save-bar { padding: 8px 12px; gap: 6px; }
+    .save-bar .btn { flex: 1; justify-content: center; }
+
+    /* Footer */
+    .page-footer { flex-direction: column; padding: 10px 12px; gap: 7px; text-align: center; }
+    .footer-copy { display: none; }
+
+    /* Notation demo — scrollable */
+    .notation-demo { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+    .ndemo-tooth { flex-shrink: 0; }
+
+    /* Clinician rows */
+    .clinician-row { gap: 5px; }
+    .clinician-input { font-size: 0.79rem; }
+
+    /* Preview strip */
+    .preview-strip { gap: 3px; }
+    .preview-chip { font-size: 0.68rem; }
+  }
+
+  @media (max-width: 400px) {
+    .page-header { padding: 0 8px; }
+    .header-title { font-size: 0.82rem; }
+    .content-area { padding: 8px 8px 90px; }
+    .btn-sm { padding: 4px 7px; font-size: 0.68rem; }
+  }
 </style>
 </head>
 <body>

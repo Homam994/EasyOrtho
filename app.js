@@ -12,10 +12,28 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + tab).classList.add('active');
-  document.getElementById('tbtn-' + tab).classList.add('active');
+  const activeBtn = document.getElementById('tbtn-' + tab);
+  activeBtn.classList.add('active');
+  // Scroll active tab button into view smoothly
+  activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   currentTab = tab;
   updateProgress();
 }
+
+// ── Tab nav scroll mask update ─────────────────────────────────────────
+function updateTabNavMask() {
+  const wrap = document.getElementById('tab-nav-wrap');
+  if (!wrap) return;
+  const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 4;
+  wrap.classList.toggle('at-end', atEnd);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap = document.getElementById('tab-nav-wrap');
+  if (wrap) {
+    wrap.addEventListener('scroll', updateTabNavMask, { passive: true });
+    updateTabNavMask();
+  }
+});
 
 // ── Section toggle ─────────────────────────────────────────────────────
 function toggleSection(id) { document.getElementById(id).classList.toggle('collapsed'); }

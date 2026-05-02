@@ -96,12 +96,21 @@ body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: va
   .page-footer { padding: 14px 12px; justify-content: center; text-align: center; }
 }
 
-/* ── Tab Navigation ── */
+/* ── Tab nav scroll shadow indicator ── */
 .tab-nav-wrap {
   background: var(--navy);
   border-top: 1px solid rgba(255,255,255,0.07);
   position: sticky; top: 67px; z-index: 190;
   overflow-x: auto; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Fade-out on right edge to hint more content */
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
+/* Remove mask when scrolled to end — handled via JS below */
+.tab-nav-wrap.at-end {
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 .tab-nav-wrap::-webkit-scrollbar { display: none; }
 .tab-nav { display: flex; align-items: stretch; min-width: max-content; padding: 0 20px; }
@@ -119,6 +128,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: va
 /* ── Progress bar ── */
 .progress-bar-wrap { background: var(--grey-200); height: 3px; position: sticky; top: 113px; z-index: 180; }
 .progress-bar { height: 3px; background: linear-gradient(90deg, var(--teal), var(--gold)); width: 0%; transition: width 0.4s ease; }
+
+@media (max-width: 768px) {
+  .tab-nav-wrap { top: 50px; }
+  .progress-bar-wrap { top: 92px; }
+}
 
 /* ── Tab Panels ── */
 .tab-panel { display: none; }
@@ -542,15 +556,145 @@ textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
   text-align: center; font-size: 7pt; color: #c5d1da;
   letter-spacing: 0.12em; text-transform: uppercase; margin-top: 6px;
 }
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — Tab navigation overflow fix (all sizes)
+══════════════════════════════════════════════════ */
+/* Ensure tab nav never wraps — always scrolls horizontally */
+.tab-nav { flex-wrap: nowrap; }
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — Small desktops / tablets (< 1024px)
+══════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .container { max-width: 100%; padding: 14px 14px 100px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .cost-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — Mobile (≤ 768px)
+══════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .page-header { grid-template-columns: 1fr auto; padding: 9px 12px; }
+  /* Header */
+  .page-header {
+    grid-template-columns: 1fr auto;
+    padding: 8px 10px;
+    gap: 6px;
+  }
   .header-author-center { display: none; }
-  .container { padding: 9px 9px 90px; }
+  .header-icon { width: 32px; height: 32px; }
+  .header-title { font-size: 1rem; }
+  .header-sub { font-size: 0.6rem; }
+  .header-date { display: none; }
+
+  /* Tab nav buttons — smaller on mobile */
+  .tab-btn {
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+  .tab-icon { font-size: 12px; }
+
+  /* Progress bar */
+  .progress-bar-wrap { top: 94px; }
+
+  /* Container */
+  .container { padding: 8px 8px 90px; }
+
+  /* Grids — all single column on mobile */
   .grid-2, .grid-3, .grid-4, .cost-grid { grid-template-columns: 1fr; }
-  .patient-bar { grid-template-columns: 1fr 1fr; }
+
+  /* Patient bar — 2 columns */
+  .patient-bar { grid-template-columns: 1fr 1fr; gap: 7px; }
+
+  /* Appliance cards */
   .appliance-cards { grid-template-columns: 1fr; }
-  .wire-arch-row { grid-template-columns: 1fr; }
-  .section-body { padding: 11px; }
-  .tooth-btn { width: 24px; height: 24px; font-size: 0.53rem; }
-  .midline-indicator { height: 30px; }
+
+  /* Wire selector */
+  .wire-arch-row { grid-template-columns: 56px 1fr; }
+
+  /* Section */
+  .section-body { padding: 10px; gap: 9px; }
+  .section-header { padding: 9px 12px; }
+  .section-title { font-size: 0.88rem; }
+
+  /* ── Dental chart — fully responsive ── */
+  .dental-chart { padding: 10px 6px; }
+  .teeth-row {
+    gap: 2px;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    width: 100%;
+  }
+  .tooth-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 0.48rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .midline-indicator { height: 26px; margin: 0 1px; flex-shrink: 0; }
+  .tooth-legend { gap: 8px; }
+  .legend-item { font-size: 0.65rem; }
+  .chart-hint { font-size: 0.65rem; }
+
+  /* Mini tooth charts */
+  .mini-tooth {
+    width: 24px;
+    height: 24px;
+    font-size: 0.55rem;
+    border-radius: 4px;
+  }
+
+  /* Toggle groups — allow wrapping but smaller items */
+  .toggle-group { gap: 4px; }
+  .toggle-group label { padding: 4px 8px; font-size: 0.77rem; }
+
+  /* Check items */
+  .check-item { padding: 6px 9px; }
+  .check-item span { font-size: 0.77rem; }
+
+  /* Ligature row */
+  .ligature-row { grid-template-columns: 1fr; gap: 5px; }
+
+  /* Elastic row */
+  .elastic-row { grid-template-columns: 1fr; }
+
+  /* Cost box */
+  .cost-box { padding: 6px 9px; }
+
+  /* Actions bar */
+  .actions { padding: 7px 10px; gap: 5px; flex-wrap: wrap; justify-content: center; }
+  .btn { padding: 7px 11px; font-size: 0.78rem; }
+
+  /* Footer */
+  .page-footer { padding: 12px 10px; justify-content: center; text-align: center; flex-direction: column; gap: 8px; }
+  .footer-copy { display: none; }
+
+  /* Wire chips — smaller */
+  .wire-chip { padding: 3px 7px; font-size: 0.68rem; }
+
+  /* Section badge */
+  .section-badge { font-size: 0.6rem; padding: 1px 6px; }
+
+  /* Alert boxes */
+  .alert { padding: 8px 10px; font-size: 0.78rem; }
+  .aseptic-row { padding: 8px 10px; font-size: 0.77rem; }
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — Very small phones (≤ 400px)
+══════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  .tooth-btn { width: 19px; height: 19px; font-size: 0.42rem; }
+  .mini-tooth { width: 21px; height: 21px; font-size: 0.5rem; }
+  .patient-bar { grid-template-columns: 1fr; }
+  .tab-btn { padding: 7px 8px; font-size: 0.68rem; }
+  .toggle-group label { padding: 4px 7px; font-size: 0.73rem; }
+  .section-title { font-size: 0.83rem; }
 }
