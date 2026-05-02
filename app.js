@@ -14,14 +14,60 @@ function switchTab(tab) {
   document.getElementById('panel-' + tab).classList.add('active');
   const activeBtn = document.getElementById('tbtn-' + tab);
   activeBtn.classList.add('active');
-  // Scroll active tab button into view smoothly
   activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   currentTab = tab;
   updateProgress();
+  updateTabArrows();
 }
 
-// ── Tab nav: scroll active tab into view on switch ────────────────────
-// (updateTabNavMask removed — gradient hint was removed per design feedback)
+// ── Tab arrow scroll buttons ───────────────────────────────────────────
+function scrollTabs(dir) {
+  const wrap = document.getElementById('tab-nav-wrap');
+  if (!wrap) return;
+  wrap.scrollBy({ left: dir * 160, behavior: 'smooth' });
+  setTimeout(updateTabArrows, 320);
+}
+
+function updateTabArrows() {
+  const outer = document.getElementById('tab-nav-outer');
+  const wrap  = document.getElementById('tab-nav-wrap');
+  const btnL  = document.getElementById('tab-arrow-left');
+  const btnR  = document.getElementById('tab-arrow-right');
+  if (!outer || !wrap || !btnL || !btnR) return;
+
+  const isScrollable = wrap.scrollWidth > wrap.clientWidth + 4;
+  outer.classList.toggle('scrollable', isScrollable);
+
+  btnL.classList.toggle('hidden', wrap.scrollLeft < 8);
+  btnR.classList.toggle('hidden', wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 8);
+}
+
+// ── Tab nav: observe size changes ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap  = document.getElementById('tab-nav-wrap');
+  const outer = document.getElementById('tab-nav-outer');
+  if (!wrap) return;
+  wrap.addEventListener('scroll', updateTabArrows, { passive: true });
+  updateTabArrows();
+  if (window.ResizeObserver) {
+    new ResizeObserver(updateTabArrows).observe(wrap);
+  }
+
+  // ── Fix gap: set tab-nav-outer top = actual header height ──
+  function syncStickyTops() {
+    const header = document.querySelector('.page-header');
+    if (!header || !outer) return;
+    const h = header.getBoundingClientRect().height;
+    outer.style.top = h + 'px';
+    // progress bar sits below tab nav (~42px tall)
+    const pbWrap = document.querySelector('.progress-bar-wrap');
+    if (pbWrap) pbWrap.style.top = (h + 42) + 'px';
+  }
+  syncStickyTops();
+  window.addEventListener('resize', syncStickyTops);
+});
+
+// ── Tab nav: remove mask-related code (gradient removed) ───────────────
 
 // ── Section toggle ─────────────────────────────────────────────────────
 function toggleSection(id) { document.getElementById(id).classList.toggle('collapsed'); }
@@ -1654,18 +1700,20 @@ function buildMiniChart(containerId, selectedSet, onUpdate, teethSubset) {
   rowEl.innerHTML = '';
 
   if (!teethSubset) {
-    // Full mouth — two rows with midline
+    // Full mouth — two rows with midline, each row scrollable on mobile
     const upperWrap = document.createElement('div');
+    upperWrap.className = 'mini-chart-row';
     upperWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;';
     upperTeeth.forEach((num, i) => {
-      if (i === 8) { const sp=document.createElement('div'); sp.style.cssText='width:4px;border-left:2px dashed var(--gold);margin:0 1px;'; upperWrap.appendChild(sp); }
+      if (i === 8) { const sp=document.createElement('div'); sp.style.cssText='width:4px;border-left:2px dashed var(--gold);margin:0 1px;flex-shrink:0;'; upperWrap.appendChild(sp); }
       upperWrap.appendChild(makeMiniTooth(num, selectedSet, onUpdate));
     });
     rowEl.appendChild(upperWrap);
     const lowerWrap = document.createElement('div');
+    lowerWrap.className = 'mini-chart-row';
     lowerWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px;';
     lowerTeeth.forEach((num, i) => {
-      if (i === 8) { const sp=document.createElement('div'); sp.style.cssText='width:4px;border-left:2px dashed var(--gold);margin:0 1px;'; lowerWrap.appendChild(sp); }
+      if (i === 8) { const sp=document.createElement('div'); sp.style.cssText='width:4px;border-left:2px dashed var(--gold);margin:0 1px;flex-shrink:0;'; lowerWrap.appendChild(sp); }
       lowerWrap.appendChild(makeMiniTooth(num, selectedSet, onUpdate));
     });
     rowEl.appendChild(lowerWrap);
