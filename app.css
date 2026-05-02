@@ -103,14 +103,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: va
   position: sticky; top: 67px; z-index: 190;
   overflow-x: auto; scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  /* Fade-out on right edge to hint more content */
-  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
-  mask-image: linear-gradient(to right, black 85%, transparent 100%);
-}
-/* Remove mask when scrolled to end — handled via JS below */
-.tab-nav-wrap.at-end {
-  -webkit-mask-image: none;
-  mask-image: none;
 }
 .tab-nav-wrap::-webkit-scrollbar { display: none; }
 .tab-nav { display: flex; align-items: stretch; min-width: max-content; padding: 0 20px; }
@@ -299,6 +291,7 @@ textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
 
 /* ── Appliance big cards ── */
 .appliance-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.appliance-cards-3 { grid-template-columns: 1fr 1fr 1fr; }
 .appliance-card {
   border: 2px solid var(--grey-200); border-radius: 10px; padding: 12px 14px;
   cursor: pointer; transition: all 0.18s; background: var(--white);
@@ -583,7 +576,8 @@ textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
     gap: 6px;
   }
   .header-author-center { display: none; }
-  .header-icon { width: 32px; height: 32px; }
+  .header-icon { width: 32px; height: 32px; border-radius: 7px; }
+  .header-icon img { width: 32px !important; height: 32px !important; }
   .header-title { font-size: 1rem; }
   .header-sub { font-size: 0.6rem; }
   .header-date { display: none; }
@@ -608,8 +602,37 @@ textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
   /* Patient bar — 2 columns */
   .patient-bar { grid-template-columns: 1fr 1fr; gap: 7px; }
 
-  /* Appliance cards */
-  .appliance-cards { grid-template-columns: 1fr; }
+  /* ── Appliance cards — single column on mobile ── */
+  .appliance-cards,
+  .appliance-cards-3 { grid-template-columns: 1fr; gap: 8px; }
+
+  /* Plan section — GMD fields & all inline content must not overflow */
+  #plan-gmd-fields,
+  #plan-fixed-fields,
+  #plan-aligner-fields { overflow-x: hidden; }
+
+  /* CS stage labels — allow text wrap */
+  #plan-gmd-fields label[id^="cs-lbl-"] {
+    align-items: flex-start;
+  }
+
+  /* Toggle groups inside plan section — wrap tightly */
+  #plan-gmd-fields .toggle-group,
+  #plan-fixed-fields .toggle-group,
+  #plan-aligner-fields .toggle-group { gap: 4px; }
+
+  /* Twin block / GMD detail grids */
+  #gmd-detail-twinblock .grid-3,
+  #gmd-detail-twinblock .grid-2,
+  #gmd-detail-herbst .grid-3,
+  #gmd-detail-generic-removable .grid-2 { grid-template-columns: 1fr; }
+
+  /* Extraction chart rows */
+  #plan-ext-chart-upper,
+  #plan-ext-chart-lower {
+    flex-wrap: wrap;
+    gap: 3px;
+  }
 
   /* Wire selector */
   .wire-arch-row { grid-template-columns: 56px 1fr; }

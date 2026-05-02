@@ -20,20 +20,8 @@ function switchTab(tab) {
   updateProgress();
 }
 
-// ── Tab nav scroll mask update ─────────────────────────────────────────
-function updateTabNavMask() {
-  const wrap = document.getElementById('tab-nav-wrap');
-  if (!wrap) return;
-  const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 4;
-  wrap.classList.toggle('at-end', atEnd);
-}
-document.addEventListener('DOMContentLoaded', () => {
-  const wrap = document.getElementById('tab-nav-wrap');
-  if (wrap) {
-    wrap.addEventListener('scroll', updateTabNavMask, { passive: true });
-    updateTabNavMask();
-  }
-});
+// ── Tab nav: scroll active tab into view on switch ────────────────────
+// (updateTabNavMask removed — gradient hint was removed per design feedback)
 
 // ── Section toggle ─────────────────────────────────────────────────────
 function toggleSection(id) { document.getElementById(id).classList.toggle('collapsed'); }

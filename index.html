@@ -58,7 +58,7 @@
   </div>
 </div>
 
-<div class="tab-nav-wrap">
+<div class="tab-nav-wrap" id="tab-nav-wrap">
   <nav class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('exam')" id="tbtn-exam">
       <span class="tab-icon">🔍</span> Examination<span class="unsaved-dot"></span>
@@ -698,7 +698,7 @@
       <span class="chevron">▼</span>
     </div>
     <div class="section-body">
-      <div class="appliance-cards" style="grid-template-columns:1fr 1fr 1fr;">
+      <div class="appliance-cards appliance-cards-3">
         <label class="appliance-card" id="card-fixed">
           <input type="radio" name="plan-appliance-type" value="fixed" onchange="updateApplianceCard()">
           <div class="appliance-card-icon">🔩</div>
