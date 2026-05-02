@@ -230,34 +230,8 @@
   .ndemo-tooth.lower { border-color: #e8d89a; color: #7a6020; }
   .ndemo-sep { width: 2px; height: 20px; background: var(--gold); border-radius: 2px; margin: 0 3px; align-self: center; }
 
-  /* ── Mobile nav bar (replaces sidebar on small screens) ── */
-  .mobile-nav-bar {
-    display: none; /* hidden on desktop */
-    background: var(--navy-mid);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 8px 12px;
-    position: sticky;
-    top: 58px;
-    z-index: 200;
-  }
-  .mobile-nav-select {
-    width: 100%;
-    background: rgba(255,255,255,0.08);
-    color: var(--teal-mid);
-    border: 1.5px solid rgba(26,122,122,0.35);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    outline: none;
-    cursor: pointer;
-    appearance: auto;
-  }
-
   @media (max-width: 900px) {
     .sidebar { display: none; }
-    .mobile-nav-bar { display: block; }
     .wire-grid { grid-template-columns: 1fr; }
     .content-area { padding: 14px 13px 90px; }
     .panel-topbar { padding: 11px 13px; }
@@ -430,33 +404,6 @@
       </div>
     </div>
   </nav>
-
-  <!-- ══ MOBILE NAV — shown only on small screens (sidebar hidden) ══ -->
-  <div class="mobile-nav-bar" id="mobile-nav-bar">
-    <select class="mobile-nav-select" id="mobile-nav-select" onchange="showPanel(this.value); updateMobileNavLabel();">
-      <optgroup label="General">
-        <option value="clinic">🏥 Clinic Settings</option>
-        <option value="clinicians">👨‍⚕️ Clinicians</option>
-        <option value="notation">🔢 Tooth Notation</option>
-        <option value="wires">🔩 Wire Options</option>
-      </optgroup>
-      <optgroup label="Form Fields — Clinical">
-        <option value="form-exam">🔍 Examination</option>
-        <option value="form-plan">📝 Treatment Plan</option>
-      </optgroup>
-      <optgroup label="Form Fields — Visits">
-        <option value="form-bond">🔗 Bond-Up</option>
-        <option value="form-fu-fixed">🔧 Fixed Follow-Up</option>
-        <option value="form-fu-aligner">💎 Aligner Follow-Up</option>
-        <option value="form-fu-gmd">🌱 GMD Follow-Up</option>
-        <option value="form-emergency">🚨 Emergency</option>
-        <option value="form-debond">✂️ Debond &amp; Retainer</option>
-      </optgroup>
-      <optgroup label="System">
-        <option value="reset">🔄 Reset &amp; Export</option>
-      </optgroup>
-    </select>
-  </div>
 
   <!-- ══ MAIN ══ -->
   <div class="main">
@@ -944,15 +891,6 @@ function showPanel(id) {
   if (meta) {
     document.getElementById('topbar-title').textContent = meta.title;
     document.getElementById('topbar-desc').textContent  = meta.desc;
-  }
-  // Sync mobile dropdown
-  const sel = document.getElementById('mobile-nav-select');
-  if (sel) sel.value = id;
-  // Scroll content area to top on mobile
-  if (window.innerWidth <= 900) {
-    const ca = document.querySelector('.content-area');
-    if (ca) ca.scrollTop = 0;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   // When switching to notation panel, refresh the demo
   if (id === 'notation') renderNotationDemo();

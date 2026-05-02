@@ -14,60 +14,14 @@ function switchTab(tab) {
   document.getElementById('panel-' + tab).classList.add('active');
   const activeBtn = document.getElementById('tbtn-' + tab);
   activeBtn.classList.add('active');
+  // Scroll active tab button into view smoothly
   activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   currentTab = tab;
   updateProgress();
-  updateTabArrows();
 }
 
-// ── Tab arrow scroll buttons ───────────────────────────────────────────
-function scrollTabs(dir) {
-  const wrap = document.getElementById('tab-nav-wrap');
-  if (!wrap) return;
-  wrap.scrollBy({ left: dir * 160, behavior: 'smooth' });
-  setTimeout(updateTabArrows, 320);
-}
-
-function updateTabArrows() {
-  const outer = document.getElementById('tab-nav-outer');
-  const wrap  = document.getElementById('tab-nav-wrap');
-  const btnL  = document.getElementById('tab-arrow-left');
-  const btnR  = document.getElementById('tab-arrow-right');
-  if (!outer || !wrap || !btnL || !btnR) return;
-
-  const isScrollable = wrap.scrollWidth > wrap.clientWidth + 4;
-  outer.classList.toggle('scrollable', isScrollable);
-
-  btnL.classList.toggle('hidden', wrap.scrollLeft < 8);
-  btnR.classList.toggle('hidden', wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 8);
-}
-
-// ── Tab nav: observe size changes ─────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  const wrap  = document.getElementById('tab-nav-wrap');
-  const outer = document.getElementById('tab-nav-outer');
-  if (!wrap) return;
-  wrap.addEventListener('scroll', updateTabArrows, { passive: true });
-  updateTabArrows();
-  if (window.ResizeObserver) {
-    new ResizeObserver(updateTabArrows).observe(wrap);
-  }
-
-  // ── Fix gap: set tab-nav-outer top = actual header height ──
-  function syncStickyTops() {
-    const header = document.querySelector('.page-header');
-    if (!header || !outer) return;
-    const h = header.getBoundingClientRect().height;
-    outer.style.top = h + 'px';
-    // progress bar sits below tab nav (~42px tall)
-    const pbWrap = document.querySelector('.progress-bar-wrap');
-    if (pbWrap) pbWrap.style.top = (h + 42) + 'px';
-  }
-  syncStickyTops();
-  window.addEventListener('resize', syncStickyTops);
-});
-
-// ── Tab nav: remove mask-related code (gradient removed) ───────────────
+// ── Tab nav: scroll active tab into view on switch ────────────────────
+// (updateTabNavMask removed — gradient hint was removed per design feedback)
 
 // ── Section toggle ─────────────────────────────────────────────────────
 function toggleSection(id) { document.getElementById(id).classList.toggle('collapsed'); }
