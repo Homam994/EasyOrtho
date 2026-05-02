@@ -97,15 +97,34 @@ body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: va
 }
 
 /* ── Tab nav scroll shadow indicator ── */
-.tab-nav-wrap {
+.tab-nav-outer {
   background: var(--navy);
   border-top: 1px solid rgba(255,255,255,0.07);
   position: sticky; top: 67px; z-index: 190;
+  display: flex; align-items: stretch;
+}
+.tab-nav-wrap {
+  flex: 1;
   overflow-x: auto; scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 .tab-nav-wrap::-webkit-scrollbar { display: none; }
-.tab-nav { display: flex; align-items: stretch; min-width: max-content; padding: 0 20px; }
+.tab-nav { display: flex; align-items: stretch; min-width: max-content; padding: 0 8px; }
+
+/* ── Tab scroll arrow buttons ── */
+.tab-arrow {
+  display: none; /* hidden on desktop unless needed */
+  align-items: center; justify-content: center;
+  width: 32px; flex-shrink: 0;
+  background: var(--navy); border: none; cursor: pointer;
+  color: var(--grey-400); font-size: 13px;
+  transition: color 0.2s, background 0.2s;
+  padding: 0;
+}
+.tab-arrow:hover { color: var(--teal-mid); background: rgba(255,255,255,0.06); }
+.tab-arrow.hidden { opacity: 0; pointer-events: none; }
+/* Show arrows when tab nav is scrollable */
+.tab-nav-outer.scrollable .tab-arrow { display: flex; }
 .tab-btn {
   display: flex; align-items: center; gap: 6px; padding: 10px 14px;
   font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 600;
@@ -122,7 +141,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: va
 .progress-bar { height: 3px; background: linear-gradient(90deg, var(--teal), var(--gold)); width: 0%; transition: width 0.4s ease; }
 
 @media (max-width: 768px) {
-  .tab-nav-wrap { top: 50px; }
+  .tab-nav-outer { top: 50px; }
   .progress-bar-wrap { top: 92px; }
 }
 
@@ -646,32 +665,64 @@ textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
   .dental-chart { padding: 10px 6px; }
   .teeth-row {
     gap: 2px;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 4px;
     width: 100%;
+    scrollbar-width: none;
   }
+  .teeth-row::-webkit-scrollbar { display: none; }
   .tooth-btn {
-    width: 22px;
-    height: 22px;
-    font-size: 0.48rem;
-    border-radius: 4px;
-    flex-shrink: 0;
-    padding: 0;
+    width: 22px; height: 22px;
+    font-size: 0.48rem; border-radius: 4px;
+    flex-shrink: 0; padding: 0;
   }
   .midline-indicator { height: 26px; margin: 0 1px; flex-shrink: 0; }
   .tooth-legend { gap: 8px; }
   .legend-item { font-size: 0.65rem; }
   .chart-hint { font-size: 0.65rem; }
 
-  /* Mini tooth charts */
+  /* ── ALL mini charts — single row + scroll (matches exam chart) ── */
+  .mini-chart,
+  [id$="-chart-row"],
+  [id$="-tooth-row"],
+  [id^="em-chart-row-"],
+  [id^="fuf-lig-chart-"],
+  [id^="plan-ext-chart-"] {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 2px !important;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    width: 100%;
+  }
+  /* Upper + lower rows inside mini charts — each is one scrollable line */
+  [id^="fuf-lig-chart-"] > div,
+  [id^="tad_"] > div {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
   .mini-tooth {
-    width: 24px;
-    height: 24px;
-    font-size: 0.55rem;
-    border-radius: 4px;
+    width: 22px; height: 22px;
+    font-size: 0.48rem; border-radius: 4px;
+    flex-shrink: 0; padding: 0;
+  }
+  /* Rebond chart boxes */
+  .rebond-chart-box { overflow-x: hidden; }
+  .rebond-chart-box > div {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    display: flex;
+    gap: 2px;
+    padding-bottom: 4px;
   }
 
   /* Toggle groups — allow wrapping but smaller items */
