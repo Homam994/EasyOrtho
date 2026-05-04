@@ -230,30 +230,63 @@
   .ndemo-tooth.lower { border-color: #e8d89a; color: #7a6020; }
   .ndemo-sep { width: 2px; height: 20px; background: var(--gold); border-radius: 2px; margin: 0 3px; align-self: center; }
 
-  /* ── Mobile nav bar (replaces sidebar on small screens) ── */
-  .mobile-nav-bar {
-    display: none; /* hidden on desktop */
-    background: var(--navy-mid);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 8px 12px;
-    position: sticky;
-    top: 58px;
-    z-index: 200;
-  }
-  .mobile-nav-select {
-    width: 100%;
-    background: rgba(255,255,255,0.08);
-    color: var(--teal-mid);
-    border: 1.5px solid rgba(26,122,122,0.35);
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    outline: none;
-    cursor: pointer;
-    appearance: auto;
-  }
+/* ── Mobile nav bar (replaces sidebar on small screens) ── */
+.mobile-nav-bar {
+  display: none;
+  background: var(--navy);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  position: sticky;
+  top: 58px;
+  z-index: 200;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-nav-bar::-webkit-scrollbar { display: none; }
+.mobile-nav-tabs {
+  display: flex;
+  align-items: stretch;
+  min-width: max-content;
+  padding: 0 6px;
+}
+.mobile-nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.45);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.mobile-nav-tab:hover { color: var(--teal-mid); }
+.mobile-nav-tab.active {
+  color: var(--teal-mid);
+  border-bottom-color: var(--teal);
+}
+.mobile-nav-group-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  padding: 9px 6px 9px 10px;
+  align-self: center;
+  white-space: nowrap;
+}
+.mobile-nav-divider {
+  width: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 8px 4px;
+  flex-shrink: 0;
+}
 
   @media (max-width: 900px) {
     .sidebar { display: none; }
@@ -431,32 +464,30 @@
     </div>
   </nav>
 
-  <!-- ══ MOBILE NAV — shown only on small screens (sidebar hidden) ══ -->
-  <div class="mobile-nav-bar" id="mobile-nav-bar">
-    <select class="mobile-nav-select" id="mobile-nav-select" onchange="showPanel(this.value); updateMobileNavLabel();">
-      <optgroup label="General">
-        <option value="clinic">🏥 Clinic Settings</option>
-        <option value="clinicians">👨‍⚕️ Clinicians</option>
-        <option value="notation">🔢 Tooth Notation</option>
-        <option value="wires">🔩 Wire Options</option>
-      </optgroup>
-      <optgroup label="Form Fields — Clinical">
-        <option value="form-exam">🔍 Examination</option>
-        <option value="form-plan">📝 Treatment Plan</option>
-      </optgroup>
-      <optgroup label="Form Fields — Visits">
-        <option value="form-bond">🔗 Bond-Up</option>
-        <option value="form-fu-fixed">🔧 Fixed Follow-Up</option>
-        <option value="form-fu-aligner">💎 Aligner Follow-Up</option>
-        <option value="form-fu-gmd">🌱 GMD Follow-Up</option>
-        <option value="form-emergency">🚨 Emergency</option>
-        <option value="form-debond">✂️ Debond &amp; Retainer</option>
-      </optgroup>
-      <optgroup label="System">
-        <option value="reset">🔄 Reset &amp; Export</option>
-      </optgroup>
-    </select>
+<!-- ══ MOBILE NAV — shown only on small screens (sidebar hidden) ══ -->
+<div class="mobile-nav-bar" id="mobile-nav-bar">
+  <div class="mobile-nav-tabs" id="mobile-nav-tabs">
+    <span class="mobile-nav-group-label">General</span>
+    <button class="mobile-nav-tab active" id="mnav-clinic"     onclick="showPanel('clinic')">🏥 Clinic</button>
+    <button class="mobile-nav-tab"        id="mnav-clinicians" onclick="showPanel('clinicians')">👨‍⚕️ Clinicians</button>
+    <button class="mobile-nav-tab"        id="mnav-notation"   onclick="showPanel('notation')">🔢 Notation</button>
+    <button class="mobile-nav-tab"        id="mnav-wires"      onclick="showPanel('wires')">🔩 Wires</button>
+    <div class="mobile-nav-divider"></div>
+    <span class="mobile-nav-group-label">Clinical</span>
+    <button class="mobile-nav-tab" id="mnav-form-exam"  onclick="showPanel('form-exam')">🔍 Exam</button>
+    <button class="mobile-nav-tab" id="mnav-form-plan"  onclick="showPanel('form-plan')">📝 Plan</button>
+    <div class="mobile-nav-divider"></div>
+    <span class="mobile-nav-group-label">Visits</span>
+    <button class="mobile-nav-tab" id="mnav-form-bond"       onclick="showPanel('form-bond')">🔗 Bond-Up</button>
+    <button class="mobile-nav-tab" id="mnav-form-fu-fixed"   onclick="showPanel('form-fu-fixed')">🔧 Fixed F/U</button>
+    <button class="mobile-nav-tab" id="mnav-form-fu-aligner" onclick="showPanel('form-fu-aligner')">💎 Aligner F/U</button>
+    <button class="mobile-nav-tab" id="mnav-form-fu-gmd"     onclick="showPanel('form-fu-gmd')">🌱 GMD F/U</button>
+    <button class="mobile-nav-tab" id="mnav-form-emergency"  onclick="showPanel('form-emergency')">🚨 Emergency</button>
+    <button class="mobile-nav-tab" id="mnav-form-debond"     onclick="showPanel('form-debond')">✂️ Debond</button>
+    <div class="mobile-nav-divider"></div>
+    <button class="mobile-nav-tab" id="mnav-reset" onclick="showPanel('reset')">🔄 Reset</button>
   </div>
+</div>
 
   <!-- ══ MAIN ══ -->
   <div class="main">
@@ -945,10 +976,14 @@ function showPanel(id) {
     document.getElementById('topbar-title').textContent = meta.title;
     document.getElementById('topbar-desc').textContent  = meta.desc;
   }
-  // Sync mobile dropdown
-  const sel = document.getElementById('mobile-nav-select');
-  if (sel) sel.value = id;
-  // Scroll content area to top on mobile
+// Sync mobile tab strip
+document.querySelectorAll('.mobile-nav-tab').forEach(t => t.classList.remove('active'));
+const activeTab = document.getElementById('mnav-' + id);
+if (activeTab) {
+  activeTab.classList.add('active');
+  activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+// Scroll content area to top on mobile
   if (window.innerWidth <= 900) {
     const ca = document.querySelector('.content-area');
     if (ca) ca.scrollTop = 0;
