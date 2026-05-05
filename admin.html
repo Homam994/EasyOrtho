@@ -290,7 +290,7 @@
 
   @media (max-width: 900px) {
     .sidebar { display: none; }
-    .mobile-nav-bar { display: block; }
+    .mobile-nav-bar { display: block; top: 58px; }
     /* layout يصبح block لأن mobile-nav خارجه */
     .layout { display: block; }
     .wire-grid { grid-template-columns: 1fr; }
@@ -301,6 +301,8 @@
   /* ── Admin mobile (≤ 768px) ── */
   @media (max-width: 768px) {
     .page-header { padding: 0 12px; height: 52px; }
+    .mobile-nav-bar { top: 52px; }
+    .panel-topbar { top: 92px; }
     .header-title { font-size: 0.92rem; }
     .header-sub { font-size: 0.56rem; }
     .author-pill { display: none; }
