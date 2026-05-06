@@ -888,13 +888,9 @@ function collectFormData(tab) {
       R('Alignment progress', radio('fuf-align-prog'));
       R('Patient compliance', radio('fuf-compliance'));
       R('Oral hygiene',       radio('fuf-oh'));
-      if(isChk('fuf-has-tad')){
+      if(isChk('fuf-has-tad') && fuTadState['fuf'].length){
         S('TAD / Mini-screw Status');
-        R('TAD stability',       radio('fuf-tad-stability'));
-        R('TAD loading status',  radio('fuf-tad-loading'));
-        R('Peri-implant tissue', radio('fuf-tad-tissue'));
-        R('Mechanical progress', radio('fuf-tad-progress'));
-        R('TAD notes',           get('fuf-tad-notes'));
+        fuTadSummaryLines('fuf').forEach(line => RB(line));
       }
 
       S('Visit Completion');
@@ -949,13 +945,9 @@ function collectFormData(tab) {
       S('Visit Completion');
       R('Oral hygiene',      radio('fua-oh'));
       R('Wear compliance',   radio('fua-wear-comply'));
-      if(isChk('fua-has-tad')){
+      if(isChk('fua-has-tad') && fuTadState['fua'].length){
         S('TAD / Mini-screw Status');
-        R('TAD stability',       radio('fua-tad-stability'));
-        R('TAD loading status',  radio('fua-tad-loading'));
-        R('Peri-implant tissue', radio('fua-tad-tissue'));
-        R('Mechanical progress', radio('fua-tad-progress'));
-        R('TAD notes',           get('fua-tad-notes'));
+        fuTadSummaryLines('fua').forEach(line => RB(line));
       }
       R('Next visit', get('fua-nv'));
       R('Referral',   get('fua-referral'));
@@ -1426,6 +1418,8 @@ function saveCurrentForm() {
     });
   }
   if(currentTab==='emergency') data['_em_pills']=[...activeEmPills];
+  if(currentTab==='fu-fixed')  data['_fu_tad_fuf']=fuTadState['fuf'];
+  if(currentTab==='fu-aligner') data['_fu_tad_fua']=fuTadState['fua'];
   if(currentTab==='plan') data['_ext_chart']=[...extChartSet];
   if(currentTab==='exam') data['__teeth']={...toothState};
   localStorage.setItem('ortho_v4_'+currentTab, JSON.stringify(data));
@@ -1479,6 +1473,16 @@ function loadForm(tab) {
           }
         }, 100);
       }
+      return;
+    }
+    if(key==='_fu_tad_fuf'){
+      fuTadState['fuf'] = data[key] || [];
+      if(isChk('fuf-has-tad')) fuTadRender('fuf');
+      return;
+    }
+    if(key==='_fu_tad_fua'){
+      fuTadState['fua'] = data[key] || [];
+      if(isChk('fua-has-tad')) fuTadRender('fua');
       return;
     }
     if(key==='_em_pills'){
@@ -1597,6 +1601,16 @@ function clearCurrentForm() {
     if (lbl) lbl.textContent = '—';
     const wrap = document.getElementById('plan-ext-chart-wrap');
     if (wrap) wrap.style.display = 'none';
+  }
+  if(currentTab==='fu-fixed'){
+    fuTadState['fuf'] = [];
+    const c = document.getElementById('fuf-tad-cards');
+    if(c) c.innerHTML = '';
+  }
+  if(currentTab==='fu-aligner'){
+    fuTadState['fua'] = [];
+    const c = document.getElementById('fua-tad-cards');
+    if(c) c.innerHTML = '';
   }
   if(currentTab==='emergency'){
     // Clear pill buttons
@@ -1782,7 +1796,7 @@ const ligSelectedTeeth = {
 };
 
 // ── Tooth subsets ──────────────────────────────────────────────────────
-const molarTeeth = [18,17,16, 26,27,28, 38,37,36, 46,47,48]; // all molars FDI
+const molarTeeth = [18,17,16, 26,27,28, 48,47,46, 36,37,38]; // all molars FDI — lower: right→left
 const molarActions = new Set([
   'fuf-rebond-tube','fuf-rebond-retube','fuf-rebond-replace-tube'
 ]);
@@ -1884,12 +1898,156 @@ function toggleElasticConfig(prefix) {
   if (asymEl) asymEl.style.display = val === 'asymmetric' ? ''     : 'none';
 }
 
-// ── TAD Status toggle ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// MULTI-TAD STATUS — follow-up tabs (fuf / fua)
+// Each TAD gets its own collapsible card with full status fields
+// ══════════════════════════════════════════════════════════════
+const fuTadState = {
+  fuf: [], // array of { stability, loading, tissue, progress, notes, label }
+  fua: [],
+};
+const FU_TAD_COLORS = ['#1a7a7a','#c9a84c','#a02820','#6a1f9e','#1a5c3a','#0d3b6e'];
+
 function toggleTadStatus(prefix) {
   const chk  = document.getElementById(prefix + '-has-tad');
   const wrap = document.getElementById(prefix + '-tad-status-wrap');
   if (!chk || !wrap) return;
-  wrap.style.display = chk.checked ? '' : 'none';
+  if (chk.checked) {
+    wrap.style.display = '';
+    // init with one TAD if empty
+    if (fuTadState[prefix].length === 0) fuTadAddScrew(prefix);
+    else fuTadRender(prefix);
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function fuTadAddScrew(prefix) {
+  const idx = fuTadState[prefix].length;
+  fuTadState[prefix].push({
+    label: 'TAD #' + (idx + 1),
+    stability: '', loading: '', tissue: '', progress: '', notes: ''
+  });
+  fuTadRender(prefix);
+}
+
+function fuTadRemoveScrew(prefix, idx) {
+  if (fuTadState[prefix].length === 1) { showToast('⚠️ At least one TAD required', 'error'); return; }
+  fuTadState[prefix].splice(idx, 1);
+  fuTadState[prefix].forEach((s, i) => s.label = 'TAD #' + (i + 1));
+  fuTadRender(prefix);
+}
+
+function fuTadRender(prefix) {
+  const container = document.getElementById(prefix + '-tad-cards');
+  if (!container) return;
+  container.innerHTML = '';
+
+  fuTadState[prefix].forEach((sc, idx) => {
+    const color = FU_TAD_COLORS[idx % FU_TAD_COLORS.length];
+    const p = prefix; // closure
+
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--grey-50);border:1.5px solid ${color};border-radius:9px;padding:12px 14px;display:grid;gap:9px;margin-bottom:8px;`;
+
+    // Card header
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    hdr.innerHTML = `
+      <div style="width:22px;height:22px;border-radius:5px;background:${color};color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${idx+1}</div>
+      <input type="text" value="${sc.label}"
+        style="flex:1;border:1.5px solid var(--grey-200);border-radius:6px;padding:3px 8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;outline:none;"
+        oninput="fuTadState['${p}'][${idx}].label=this.value;">
+      <button onclick="fuTadRemoveScrew('${p}',${idx})"
+        style="background:transparent;border:none;color:var(--grey-400);cursor:pointer;font-size:14px;padding:2px 4px;"
+        title="Remove">✕</button>`;
+    card.appendChild(hdr);
+
+    // Fields
+    const grid = document.createElement('div');
+    grid.className = 'grid-2';
+
+    const radioField = (labelTxt, name, options, curVal) => {
+      const d = document.createElement('div');
+      d.className = 'field';
+      d.innerHTML = `<label>${labelTxt}</label>`;
+      const tg = document.createElement('div');
+      tg.className = 'toggle-group';
+      options.forEach(([val, lbl]) => {
+        const l = document.createElement('label');
+        const inp = document.createElement('input');
+        inp.type = 'radio'; inp.name = `${p}-tad-${name}-${idx}`; inp.value = val;
+        if (val === curVal) inp.checked = true;
+        inp.onchange = () => { fuTadState[p][idx][name] = val; };
+        const sp = document.createElement('span');
+        sp.textContent = lbl;
+        l.appendChild(inp); l.appendChild(sp);
+        tg.appendChild(l);
+      });
+      d.appendChild(tg);
+      return d;
+    };
+
+    grid.appendChild(radioField('TAD Stability', 'stability', [
+      ['Stable — no mobility',       '✅ Stable'],
+      ['Slightly mobile — monitor',  '⚠️ Slightly mobile'],
+      ['Mobile — needs removal',     '❌ Mobile'],
+    ], sc.stability));
+
+    grid.appendChild(radioField('Loading Status', 'loading', [
+      ['Active — force applied',       '✅ Active'],
+      ['Passive — resting',            '🔵 Passive'],
+      ['Force modified this visit',    '🔄 Modified'],
+      ['Removed this visit',           '✂️ Removed'],
+    ], sc.loading));
+
+    card.appendChild(grid);
+
+    const grid2 = document.createElement('div');
+    grid2.className = 'grid-2';
+
+    grid2.appendChild(radioField('Peri-implant Tissue', 'tissue', [
+      ['Healthy — no inflammation',              '✅ Healthy'],
+      ['Mild inflammation — OH reinforced',      '⚠️ Mild — OH reinforced'],
+      ['Moderate — chlorhexidine prescribed',    '🔴 Moderate — CHX'],
+      ['Hyperplastic — surgical review',         '❌ Hyperplastic'],
+    ], sc.tissue));
+
+    grid2.appendChild(radioField('Mechanical Progress', 'progress', [
+      ['On track — objective progressing',          '✅ On track'],
+      ['Slower than expected — monitor',            '⚠️ Slower than expected'],
+      ['Objective achieved — TAD to be removed',   '🏁 Objective achieved'],
+      ['Failed — re-insertion planned',             '❌ Failed — re-insertion planned'],
+    ], sc.progress));
+
+    card.appendChild(grid2);
+
+    // Notes
+    const notesD = document.createElement('div');
+    notesD.className = 'field';
+    notesD.innerHTML = '<label>Notes</label>';
+    const notesInp = document.createElement('input');
+    notesInp.type = 'text';
+    notesInp.value = sc.notes || '';
+    notesInp.placeholder = 'Force magnitude, attachment point changes, patient feedback...';
+    notesInp.oninput = () => { fuTadState[p][idx].notes = notesInp.value; };
+    notesD.appendChild(notesInp);
+    card.appendChild(notesD);
+
+    container.appendChild(card);
+  });
+}
+
+// Collect multi-TAD data for summary
+function fuTadSummaryLines(prefix) {
+  const lines = [];
+  fuTadState[prefix].forEach((sc, i) => {
+    const parts = [sc.stability, sc.loading, sc.tissue, sc.progress].filter(Boolean);
+    if (parts.length || sc.notes) {
+      lines.push(`  ${sc.label}: ${parts.join(' · ')}${sc.notes ? ' — ' + sc.notes : ''}`);
+    }
+  });
+  return lines;
 }
 
 
