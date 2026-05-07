@@ -1539,118 +1539,196 @@ function loadForm(tab) {
 
 function clearCurrentForm() {
   if(!confirm('Clear all data in this form? This cannot be undone.')) return;
+
+  // ── Step 1: حذف localStorage للتبويب الحالي ──
+  localStorage.removeItem('ortho_v4_' + currentTab);
+
+  // ── Step 2: إعادة تهيئة الحالة في الذاكرة ──
+  // Wire state
+  ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(cid=>{
+    wireState[cid] = { upper:{size:'',mat:''}, lower:{size:'',mat:''} };
+  });
+  // Ligature sets
+  ['upper','lower'].forEach(arch=>{
+    ligSelectedTeeth[arch].short.clear();
+    ligSelectedTeeth[arch].fig8.clear();
+    delete wireState[`fuf-aux-wire-${arch}`];
+  });
+  // Tooth chart (exam)
+  if(currentTab==='exam'){
+    [...upperTeeth,...lowerTeeth].forEach(num=>{ toothState[num]=0; });
+  }
+  // Extraction chart (plan)
+  extChartSet.clear();
+  // Emergency pills
+  activeEmPills.clear();
+  Object.keys(emChartSets).forEach(val => emChartSets[val].clear());
+  // Rebond chart sets
+  Object.keys(rebondChartSets).forEach(a => rebondChartSets[a].clear());
+  // Multi-TAD state
+  fuTadState['fuf'] = [];
+  fuTadState['fua'] = [];
+  // TAD screws
+  if(currentTab==='tad'){
+    tadScrews=[];
+    tadActiveScrewIdx=-1;
+  }
+
+  // ── Step 3: إعادة رسم DOM كاملاً ──
   const panel = document.querySelector('.tab-panel.active');
+
+  // 3a. كل inputs/selects/textareas
   panel.querySelectorAll('input,select,textarea').forEach(el=>{
     if(el.type==='checkbox'||el.type==='radio') el.checked=false;
     else el.value='';
   });
-  // Reset wire chips in this panel
+
+  // 3b. Wire chips
   panel.querySelectorAll('.wire-chip').forEach(c=>c.classList.remove('sel-size','sel-mat'));
-  // Reset ligature tooth selections
-  if(currentTab==='fu-fixed'){
-    // FIX: clear the correct Set properties (short & fig8), not the object itself
-    ['upper','lower'].forEach(arch=>{
-      ligSelectedTeeth[arch].short.clear();
-      ligSelectedTeeth[arch].fig8.clear();
-      const chartEl=document.getElementById(`fuf-lig-chart-${arch}`);
-      if(chartEl){ chartEl.style.display='none'; }
-      ['short','fig8'].forEach(type=>{
-        const selEl=document.getElementById(`fuf-lig-${arch}-${type}-selected`);
-        if(selEl) selEl.textContent='—';
-      });
-      // Hide aux wire
-      const wrap=document.getElementById(`fuf-aux-wire-${arch}-wrap`);
-      if(wrap) wrap.style.display='none';
-      const auxCheckbox=document.getElementById(`fuf-aux-wire-${arch}-en`);
-      if(auxCheckbox) auxCheckbox.checked=false;
-      const auxWireEl=document.getElementById(`fuf-aux-wire-${arch}`);
-      if(auxWireEl) auxWireEl.innerHTML='';
-      delete wireState[`fuf-aux-wire-${arch}`];
-    });
-  }
-  // Reset GMD Follow-Up tab specific state
-  if(currentTab==='fu-gmd'){
-    const transDetail=document.getElementById('fug-transition-detail');
-    if(transDetail) transDetail.style.display='none';
-  }
-  // Reset TAD tab - reinitialize with one blank screw
-  if(currentTab==='tad'){
-    tadScrews=[];
-    tadActiveScrewIdx=-1;
-    tadAddScrew();
-  }
-  ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(cid=>{
-    if(wireState[cid]){ wireState[cid]={upper:{size:'',mat:''},lower:{size:'',mat:''}}; }
+
+  // 3c. Tooth chart buttons
+  panel.querySelectorAll('.tooth-btn').forEach(btn=>{
+    btn.className='tooth-btn';
+    btn.title='';
   });
-  // Reset tooth chart
-  if(currentTab==='exam'){
-    [...upperTeeth,...lowerTeeth].forEach(num=>{
-      toothState[num]=0;
-      const btn=document.getElementById('tooth-'+num);
-      if(btn) btn.className='tooth-btn';
+  panel.querySelectorAll('.mini-tooth').forEach(btn=>{
+    btn.classList.remove('selected');
+  });
+
+  // 3d. Ligature charts — إخفاء وتفريغ
+  ['upper','lower'].forEach(arch=>{
+    const chartEl = document.getElementById(`fuf-lig-chart-${arch}`);
+    if(chartEl) chartEl.style.display='none';
+    ['short','fig8'].forEach(type=>{
+      const row = document.getElementById(`fuf-lig-chart-${arch}-${type}-row`);
+      if(row) row.innerHTML='';
+      const selEl = document.getElementById(`fuf-lig-${arch}-${type}-selected`);
+      if(selEl) selEl.textContent='—';
     });
-  }
-  // Reset emergency pills
-  if(currentTab==='plan'){
-    extChartSet.clear();
-    const upperRow = document.getElementById('plan-ext-chart-upper');
-    const lowerRow = document.getElementById('plan-ext-chart-lower');
-    if (upperRow) upperRow.innerHTML = '';
-    if (lowerRow) lowerRow.innerHTML = '';
-    const lbl = document.getElementById('plan-ext-chart-selected');
-    if (lbl) lbl.textContent = '—';
-    const wrap = document.getElementById('plan-ext-chart-wrap');
-    if (wrap) wrap.style.display = 'none';
-  }
-  if(currentTab==='fu-fixed'){
-    fuTadState['fuf'] = [];
-    const c = document.getElementById('fuf-tad-cards');
-    if(c) c.innerHTML = '';
-  }
-  if(currentTab==='fu-aligner'){
-    fuTadState['fua'] = [];
-    const c = document.getElementById('fua-tad-cards');
-    if(c) c.innerHTML = '';
-  }
-  if(currentTab==='emergency'){
-    // Clear pill buttons
-    panel.querySelectorAll('.emergency-pill').forEach(p=>p.classList.remove('active'));
-    activeEmPills.clear();
-    // FIX: also clear all mini tooth charts and hide them
-    Object.keys(emChartSets).forEach(val => emChartSets[val].clear());
-    // Hide all em-chart-wrap divs and clear their tooth rows
-    panel.querySelectorAll('[id^="em-chart-wrap-"]').forEach(wrap => {
-      wrap.style.display = 'none';
-      const key = wrap.id.replace('em-chart-wrap-','');
-      const row = document.getElementById('em-chart-row-' + key);
-      if(row) row.innerHTML = '';
-      const sel = document.getElementById('em-chart-sel-' + key);
-      if(sel) sel.textContent = '—';
-    });
-  }
-  // Reset appliance cards
+    // Aux wire
+    const auxWrap = document.getElementById(`fuf-aux-wire-${arch}-wrap`);
+    if(auxWrap) auxWrap.style.display='none';
+    const auxEl = document.getElementById(`fuf-aux-wire-${arch}`);
+    if(auxEl) auxEl.innerHTML='';
+  });
+
+  // 3e. Rebond charts — إخفاء وتفريغ
+  panel.querySelectorAll('[id^="fuf-rebond-"][id$="-chart-wrap"]').forEach(wrap=>{
+    wrap.style.display='none';
+    const key = wrap.id.replace('-chart-wrap','');
+    const row = document.getElementById(key+'-chart-row');
+    if(row) row.innerHTML='';
+    const sel = document.getElementById(key+'-chart-selected');
+    if(sel) sel.textContent='—';
+  });
+
+  // 3f. Emergency pills وcharts
+  panel.querySelectorAll('.emergency-pill').forEach(p=>p.classList.remove('active'));
+  panel.querySelectorAll('[id^="em-chart-wrap-"]').forEach(wrap=>{
+    wrap.style.display='none';
+    const key = wrap.id.replace('em-chart-wrap-','');
+    const row = document.getElementById('em-chart-row-'+key);
+    if(row) row.innerHTML='';
+    const sel = document.getElementById('em-chart-sel-'+key);
+    if(sel) sel.textContent='—';
+  });
+
+  // 3g. Extraction chart (plan)
+  const extUpper = document.getElementById('plan-ext-chart-upper');
+  const extLower = document.getElementById('plan-ext-chart-lower');
+  const extWrap  = document.getElementById('plan-ext-chart-wrap');
+  const extLbl   = document.getElementById('plan-ext-chart-selected');
+  if(extUpper) extUpper.innerHTML='';
+  if(extLower) extLower.innerHTML='';
+  if(extWrap)  extWrap.style.display='none';
+  if(extLbl)   extLbl.textContent='—';
+
+  // 3h. Appliance cards
   panel.querySelectorAll('.appliance-card').forEach(c=>c.classList.remove('selected'));
-  const bfs=document.getElementById('bond-fixed-section');
-  const bas=document.getElementById('bond-aligner-section');
-  if(bfs) bfs.style.display='';
-  if(bas) bas.style.display='none';
+
+  // 3i. Plan section visibility
   const pff=document.getElementById('plan-fixed-fields');
   const paf=document.getElementById('plan-aligner-fields');
   const pgf=document.getElementById('plan-gmd-fields');
   if(pff) pff.style.display='';
   if(paf) paf.style.display='none';
   if(pgf) pgf.style.display='none';
-  // Reset CS stage highlights
+
+  // 3j. Bond sections
+  const bfs=document.getElementById('bond-fixed-section');
+  const bas=document.getElementById('bond-aligner-section');
+  if(bfs) bfs.style.display='';
+  if(bas) bas.style.display='none';
+
+  // 3k. GMD sub-sections
+  ['gmd-removable-wrap','gmd-fixed-wrap','gmd-headgear-wrap',
+   'gmd-detail-twinblock','gmd-detail-herbst','gmd-detail-generic-removable',
+   'fug-transition-detail'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+
+  // 3l. CS stage highlights
   for(let i=1;i<=6;i++){
     const lbl=document.getElementById('cs-lbl-'+i);
-    if(lbl){lbl.style.borderColor='';lbl.style.background='';}
+    if(lbl){ lbl.style.borderColor=''; lbl.style.background=''; }
   }
 
-  localStorage.removeItem('ortho_v4_'+currentTab);
-  // Re-check aseptic (always default on) — FIX: added fug-aseptic and tad-aseptic
-  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','fug-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.checked=true;
+  // 3m. Wire selectors — إعادة بناء
+  ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(cid=>{
+    const el=document.getElementById(cid);
+    if(el){ el.innerHTML=''; buildWireSelector(cid); }
   });
+
+  // 3n. TAD cards
+  const fufCards=document.getElementById('fuf-tad-cards');
+  const fuaCards=document.getElementById('fua-tad-cards');
+  if(fufCards) fufCards.innerHTML='';
+  if(fuaCards) fuaCards.innerHTML='';
+  const fufWrap=document.getElementById('fuf-tad-status-wrap');
+  const fuaWrap=document.getElementById('fua-tad-status-wrap');
+  if(fufWrap) fufWrap.style.display='none';
+  if(fuaWrap) fuaWrap.style.display='none';
+
+  // 3o. TAD tab — إعادة بدء بمسمار واحد فارغ
+  if(currentTab==='tad'){
+    tadAddScrew();
+    const tadContainer=document.getElementById('tad-screws-container');
+    if(tadContainer) tadContainer.innerHTML='';
+    tadScrews=[];
+    tadActiveScrewIdx=-1;
+    tadAddScrew();
+  }
+
+  // 3p. Elastic config — إظهار symmetric بشكل افتراضي
+  ['bond','fuf','fua'].forEach(pfx=>{
+    const sym=document.getElementById(`${pfx}-elastic-sym`);
+    const asy=document.getElementById(`${pfx}-elastic-asym`);
+    if(sym) sym.style.display='';
+    if(asy) asy.style.display='none';
+  });
+
+  // 3q. Aligner progress bar
+  const alignerFill=document.getElementById('aligner-fill');
+  const alignerPct=document.getElementById('aligner-pct');
+  if(alignerFill) alignerFill.style.width='0%';
+  if(alignerPct)  alignerPct.textContent='Fill in aligner numbers above';
+
+  // 3r. GMD change indicators
+  ['fug-oj-change','fug-ob-change','fug-lfh-change'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent='';
+  });
+
+  // ── Step 4: إعادة تفعيل aseptic checkboxes ──
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic',
+   'fug-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.checked=true;
+  });
+
+  // ── Step 5: تحديثات UI نهائية ──
+  markSaved(currentTab);
   updateProgress();
   showToast('🗑 Form cleared','success');
 }
