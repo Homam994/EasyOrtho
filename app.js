@@ -164,7 +164,7 @@ function getWireText(containerId, arch) {
 }
 
 // Build wire selectors for all forms
-['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(buildWireSelector);
+['bond-wire-selector','fuf-wire-selector','em-wire-selector','ref-wire-selector'].forEach(buildWireSelector);
 
 
 // ══════════════════════════════════════════════════════════════
@@ -1129,6 +1129,121 @@ function collectFormData(tab) {
     }
 
     // ══════════════════════════════════════
+    case 'referred': {
+      S('Referred Patient Assessment');
+      R('Patient',   get('ref-name'));
+      R('Age',       get('ref-age') ? get('ref-age')+' years' : '');
+      R('Clinician', get('ref-clinician'));
+      R('Date',      get('ref-date'));
+
+      S('Referral Details');
+      R('Referring clinician', get('ref-referring-clinician'));
+      R('Referring practice',  get('ref-referring-practice'));
+      const reasons = [...document.querySelectorAll('[name="ref-reason"]:checked')].map(e=>e.value);
+      R('Reason for referral', reasons.join(', '));
+      R('Referral reason details', get('ref-reason-detail'));
+      const recs=[];
+      if(isChk('ref-rec-opg'))    recs.push('OPG');
+      if(isChk('ref-rec-ceph'))   recs.push('Lateral cephalogram');
+      if(isChk('ref-rec-photos')) recs.push('Clinical photographs');
+      if(isChk('ref-rec-models')) recs.push('Study models / scans');
+      if(isChk('ref-rec-plan'))   recs.push('Previous treatment plan');
+      if(isChk('ref-rec-letter')) recs.push('Referral letter');
+      if(isChk('ref-rec-consent'))recs.push('Previous consent forms');
+      if(isChk('ref-rec-xrays')) recs.push('Periapical X-rays');
+      if(isChk('ref-rec-none'))   recs.push('No records received');
+      if(recs.length) R('Records received', recs.join(', '));
+      R('Records quality',    radio('ref-rec-quality'));
+      R('New records required', get('ref-new-records'));
+
+      S('Previous Treatment History');
+      R('Previous appliance',   radio('ref-prev-appliance'));
+      R('Previous prescription', radio('ref-prev-rx'));
+      R('Previous slot size',   radio('ref-prev-slot'));
+      R('Duration of previous treatment', get('ref-prev-duration'));
+      R('Approx. visits',       get('ref-prev-visits'));
+      R('Assessment interval',  get('ref-prev-interval'));
+      R('Stage at transfer',    radio('ref-prev-stage'));
+      const prevExt = radio('ref-prev-ext');
+      R('Extractions performed', prevExt + (get('ref-prev-ext-detail') ? ' — '+get('ref-prev-ext-detail') : ''));
+      const aux=[];
+      if(isChk('ref-aux-tad'))        aux.push('TADs / mini-screws');
+      if(isChk('ref-aux-elastics'))   aux.push('Elastics');
+      if(isChk('ref-aux-hg'))         aux.push('Headgear');
+      if(isChk('ref-aux-functional')) aux.push('Fixed functional');
+      if(isChk('ref-aux-tpa'))        aux.push('TPA / Nance');
+      if(isChk('ref-aux-none'))       aux.push('None documented');
+      if(aux.length) R('Active auxiliaries at transfer', aux.join(', '));
+      R('Auxiliary details', get('ref-aux-detail'));
+      R('Previous compliance', radio('ref-prev-compliance'));
+      R('Previous treatment summary', get('ref-prev-summary'));
+
+      S('Clinical Assessment at Transfer');
+      R('Appliance condition', radio('ref-appliance-cond'));
+      R('Bracket integrity',   radio('ref-bracket-cond'));
+      const rwU = getWireText('ref-wire-selector','upper');
+      const rwL = getWireText('ref-wire-selector','lower');
+      if(rwU) R('Archwire — Upper', rwU);
+      if(rwL) R('Archwire — Lower', rwL);
+      R('Wire appropriateness', radio('ref-wire-appropriate'));
+      const ojV=get('ref-oj-val'), ojS=radio('ref-oj-status');
+      R('Overjet at transfer',  [ojS, ojV?ojV+' mm':''].filter(Boolean).join(' — '));
+      const obV=get('ref-ob-val'), obS=radio('ref-ob-status');
+      R('Overbite at transfer', [obS, obV?obV+' mm':''].filter(Boolean).join(' — '));
+      const bR=radio('ref-buccal-r'), bL=radio('ref-buccal-l');
+      if(bR||bL) R('Buccal relation', `Right: ${bR||'—'}   |   Left: ${bL||'—'}`);
+      R('Upper midline', radio('ref-upper-mid'));
+      R('Lower midline', radio('ref-lower-mid'));
+      R('White spot lesions', radio('ref-wsl'));
+      R('Periodontal status', radio('ref-perio'));
+      R('Root resorption',    radio('ref-root-resorption'));
+      R('Root parallelism',   radio('ref-root-parallel'));
+      R('Clinical notes',     get('ref-clinical-notes'));
+
+      S('Treatment Progress Audit');
+      R('Original objectives', get('ref-orig-objectives'));
+      const objs=[];
+      if(isChk('ref-obj-align'))     objs.push('Alignment completed');
+      if(isChk('ref-obj-level'))     objs.push('Leveling completed');
+      if(isChk('ref-obj-space'))     objs.push('Space closure completed');
+      if(isChk('ref-obj-oj'))        objs.push('OJ correction completed');
+      if(isChk('ref-obj-ob'))        objs.push('OB correction completed');
+      if(isChk('ref-obj-midline'))   objs.push('Midline corrected');
+      if(isChk('ref-obj-transverse'))objs.push('Transverse corrected');
+      if(isChk('ref-obj-molar'))     objs.push('Molar Class I achieved');
+      if(isChk('ref-obj-none'))      objs.push('None completed yet');
+      if(objs.length) R('Objectives achieved so far', objs.join(', '));
+      R('Estimated remaining time', radio('ref-remaining-time'));
+      R('Complexity at transfer',   radio('ref-complexity'));
+
+      S('Clinical Decision');
+      R('Treatment decision', radio('ref-decision'));
+      const mods=[];
+      if(isChk('ref-mod-rebracket'))   mods.push('Change bracket prescription / re-bracket');
+      if(isChk('ref-mod-reposition'))  mods.push('Bracket repositioning');
+      if(isChk('ref-mod-extract'))     mods.push('Extract teeth not previously extracted');
+      if(isChk('ref-mod-tad'))         mods.push('Add TAD / mini-screw anchorage');
+      if(isChk('ref-mod-retention'))   mods.push('Modify retention plan');
+      if(isChk('ref-mod-objectives'))  mods.push('Alter finishing objectives (compromise)');
+      if(isChk('ref-mod-perio'))       mods.push('Perio treatment required');
+      if(isChk('ref-mod-restorative')) mods.push('Restorative work required');
+      if(mods.length) R('Modifications required', mods.join(', '));
+      R('Modification details', get('ref-mod-detail'));
+      R('Consent status',       radio('ref-consent'));
+      R('Financial arrangement', radio('ref-financial'));
+      R('Agreed fee', get('ref-fee') ? 'SAR '+get('ref-fee') : '');
+
+      S('Communication & Documentation');
+      R('Communication with referring clinician', radio('ref-comm'));
+      R('Patient / parent concerns', get('ref-patient-concerns'));
+      R('Plan moving forward',        get('ref-plan-forward'));
+      R('Next visit purpose',         get('ref-next-visit'));
+      if(isChk('ref-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Additional notes', get('ref-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
     case 'tad': {
       if(tadActiveScrewIdx >= 0) tadCollectScrew(tadActiveScrewIdx);
       const purposeMap={anch:'Anchorage',intr:'Intrusion',dist:'Distalization',
@@ -1249,6 +1364,7 @@ const TAB_LABELS = {
   'emergency':  'Emergency Visit',
   'debond':     'Debond & Retainer',
   'tad':        'TAD / Mini-screw',
+  'referred':   'Referred Patient Assessment',
 };
 
 
@@ -1402,7 +1518,7 @@ function saveCurrentForm() {
     else if(el.id) data[el.id]=el.value;
   });
   // Save wire states for this panel
-  ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(cid=>{
+  ['bond-wire-selector','fuf-wire-selector','em-wire-selector','ref-wire-selector'].forEach(cid=>{
     if(wireState[cid]) data['wires__'+cid]=wireState[cid];
   });
   if(currentTab==='fu-fixed'){
@@ -1722,10 +1838,19 @@ function clearCurrentForm() {
 
   // ── Step 4: إعادة تفعيل aseptic checkboxes ──
   ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic',
-   'fug-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
+   'fug-aseptic','em-aseptic','db-aseptic','tad-aseptic','ref-aseptic'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.checked=true;
   });
+
+  // ── Step 4b: إعادة تهيئة referred tab ──
+  if(currentTab==='referred'){
+    const dd=document.getElementById('ref-decision-detail');
+    if(dd) dd.style.display='none';
+    // إعادة بناء wire selector
+    const rws=document.getElementById('ref-wire-selector');
+    if(rws){ rws.innerHTML=''; delete wireState['ref-wire-selector']; buildWireSelector('ref-wire-selector'); }
+  }
 
   // ── Step 5: تحديثات UI نهائية ──
   markSaved(currentTab);
@@ -2141,7 +2266,7 @@ function applyAdminSchema() {
     if (schema.wireMats)  WIRE_MATS.length  = 0, schema.wireMats.forEach(m => WIRE_MATS.push(m));
 
     // Rebuild wire selectors with new options
-    ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(id => {
+    ['bond-wire-selector','fuf-wire-selector','em-wire-selector','ref-wire-selector'].forEach(id => {
       const el = document.getElementById(id);
       if (el) { el.innerHTML = ''; delete wireState[id]; buildWireSelector(id); }
     });
@@ -2562,7 +2687,25 @@ function tadCollectScrew(idx) {
   sc.loadingNotes   = document.getElementById(fid('loadingNotes'))?.value||'';
 }
 
-// ── Listen for admin changes (when admin panel is open in another tab) ─
+// ══════════════════════════════════════════════════════════════
+// REFERRED PATIENT — helper functions
+// ══════════════════════════════════════════════════════════════
+
+function updateRefDecision() {
+  const val = document.querySelector('[name="ref-decision"]:checked')?.value || '';
+  const detail = document.getElementById('ref-decision-detail');
+  if (!detail) return;
+  // Show modification panel for all decisions except "continue as planned"
+  const showDetail = val && val !== 'Continue treatment — original plan appropriate';
+  detail.style.display = showDetail ? '' : 'none';
+}
+
+// Build the wire selector for referred tab on first use
+function initRefWireSelector() {
+  const el = document.getElementById('ref-wire-selector');
+  if (!el || el.children.length) return; // already built
+  buildWireSelector('ref-wire-selector');
+}
 window.addEventListener('storage', e => {
   // FIX: handle ortho_notation FIRST to ensure it's set before applyAdminSchema reads it
   if (e.key === 'ortho_notation' && e.newValue) {
@@ -2627,7 +2770,7 @@ function autoSaveTab(tab) {
   });
 
   // Wire states
-  ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(cid => {
+  ['bond-wire-selector','fuf-wire-selector','em-wire-selector','ref-wire-selector'].forEach(cid => {
     if (wireState[cid]) data['wires__' + cid] = wireState[cid];
   });
   if (tab === 'fu-fixed') {
@@ -2720,7 +2863,7 @@ document.addEventListener('keydown', e => {
 });
 
 function cycleTab(dir) {
-  const tabIds = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad'];
+  const tabIds = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred'];
   const cur = tabIds.indexOf(currentTab);
   const next = (cur + dir + tabIds.length) % tabIds.length;
   switchTab(tabIds[next]);
@@ -2732,7 +2875,7 @@ function cycleTab(dir) {
   document.querySelectorAll('input[type="date"]').forEach(el=>el.value=today);
 
   // Default: all aseptic checkboxes checked
-  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','em-aseptic','db-aseptic'].forEach(id=>{
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','em-aseptic','db-aseptic','ref-aseptic'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.checked=true;
   });
 
@@ -2743,6 +2886,9 @@ function cycleTab(dir) {
   document.addEventListener('change', e => {
     const name = e.target.name;
     const id   = e.target.id;
+
+    // Referred patient decision
+    if (name === 'ref-decision') updateRefDecision();
 
     // GMD category & appliance type
     if (name === 'gmd-category')        updateGmdCategory();
@@ -2790,13 +2936,13 @@ function cycleTab(dir) {
     if (id === 'fua-current-aligner' || id === 'fua-total-aligners') updateAlignerProgress();
     if (id === 'fug-oj-now' || id === 'fug-ob-now' || id === 'fug-lfh-now') calcGmdChange();
   });
-  ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad'].forEach(loadForm);
+  ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred'].forEach(loadForm);
   updateApplianceCard();
   updateBondCard();
   updateProgress();
 
   // Default: all aseptic checkboxes checked (including tad)
-  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','fug-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','fug-aseptic','em-aseptic','db-aseptic','tad-aseptic','ref-aseptic'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.checked=true;
   });
 
