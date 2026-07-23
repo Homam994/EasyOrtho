@@ -2979,6 +2979,13 @@
             <label><input type="radio" name="ref-prev-ext" value="Other"><span>Other</span></label>
             <label><input type="radio" name="ref-prev-ext" value="Unknown"><span>❓ Unknown</span></label>
           </div>
+          <!-- Dental chart — يظهر عند اختيار Other -->
+          <div id="ref-ext-chart-wrap" style="display:none;margin-top:10px;background:var(--grey-50);border:1.5px solid var(--teal-mid);border-radius:9px;padding:12px 14px;">
+            <div style="font-size:0.68rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Select teeth previously extracted</div>
+            <div id="ref-ext-chart-upper" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px;"></div>
+            <div id="ref-ext-chart-lower" style="display:flex;flex-wrap:wrap;gap:3px;"></div>
+            <div style="font-size:0.72rem;color:var(--grey-500);margin-top:7px;">Selected: <span id="ref-ext-chart-selected" style="font-weight:700;color:var(--teal);">—</span></div>
+          </div>
           <input type="text" id="ref-prev-ext-detail" placeholder="Details if Other..." style="margin-top:5px;">
         </div>
         <div class="field">

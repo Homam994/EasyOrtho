@@ -18,6 +18,55 @@ function switchTab(tab) {
   currentTab = tab;
   updateProgress();
   updateTabArrows();
+
+  // ── Lazy init for referred tab ──────────────────────────────────────
+  // Wire selector must be built after the panel is visible (display:block)
+  if (tab === 'referred') {
+    const rws = document.getElementById('ref-wire-selector');
+    if (rws && !rws.children.length) {
+      buildWireSelector('ref-wire-selector');
+      // Restore saved wire state if present
+      const saved = localStorage.getItem('ortho_v4_referred');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          const ws = data['wires__ref-wire-selector'];
+          if (ws && wireState['ref-wire-selector']) {
+            ['upper','lower'].forEach(arch => {
+              if (!ws[arch]) return;
+              wireState['ref-wire-selector'][arch] = ws[arch];
+              if (ws[arch].size) {
+                const chip = [...rws.querySelectorAll(`.wire-chip[data-arch="${arch}"][data-type="size"]`)]
+                  .find(c => c.dataset.val === ws[arch].size);
+                if (chip) {
+                  rws.querySelectorAll(`.wire-chip[data-arch="${arch}"][data-type="size"]`)
+                    .forEach(c => c.classList.remove('sel-size'));
+                  chip.classList.add('sel-size');
+                }
+              }
+              if (ws[arch].mat) {
+                const chip = [...rws.querySelectorAll(`.wire-chip[data-arch="${arch}"][data-type="mat"]`)]
+                  .find(c => c.dataset.val === ws[arch].mat);
+                if (chip) {
+                  rws.querySelectorAll(`.wire-chip[data-arch="${arch}"][data-type="mat"]`)
+                    .forEach(c => c.classList.remove('sel-mat'));
+                  chip.classList.add('sel-mat');
+                }
+              }
+            });
+          }
+        } catch(e) { /* ignore */ }
+      }
+    }
+    // Build ext chart if Other was previously selected
+    const extVal = document.querySelector('[name="ref-prev-ext"]:checked')?.value;
+    if (extVal === 'Other') {
+      const uw = document.getElementById('ref-ext-chart-upper');
+      const lw = document.getElementById('ref-ext-chart-lower');
+      if (uw && !uw.children.length) buildRefExtRow(uw, upperTeeth);
+      if (lw && !lw.children.length) buildRefExtRow(lw, lowerTeeth);
+    }
+  }
 }
 
 // ── Tab arrow scroll buttons ───────────────────────────────────────────
@@ -164,7 +213,8 @@ function getWireText(containerId, arch) {
 }
 
 // Build wire selectors for all forms
-['bond-wire-selector','fuf-wire-selector','em-wire-selector','ref-wire-selector'].forEach(buildWireSelector);
+// Note: ref-wire-selector is built lazily on first tab activation (see switchTab)
+['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(buildWireSelector);
 
 
 // ══════════════════════════════════════════════════════════════
@@ -1165,7 +1215,12 @@ function collectFormData(tab) {
       R('Assessment interval',  get('ref-prev-interval'));
       R('Stage at transfer',    radio('ref-prev-stage'));
       const prevExt = radio('ref-prev-ext');
-      R('Extractions performed', prevExt + (get('ref-prev-ext-detail') ? ' — '+get('ref-prev-ext-detail') : ''));
+      if (prevExt === 'Other') {
+        const teeth = [...refExtChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+        R('Extractions performed', teeth.length ? 'Other — '+teeth.join(', ') : 'Other (no teeth selected)');
+      } else {
+        R('Extractions performed', prevExt + (get('ref-prev-ext-detail') ? ' — '+get('ref-prev-ext-detail') : ''));
+      }
       const aux=[];
       if(isChk('ref-aux-tad'))        aux.push('TADs / mini-screws');
       if(isChk('ref-aux-elastics'))   aux.push('Elastics');
@@ -1537,6 +1592,7 @@ function saveCurrentForm() {
   if(currentTab==='fu-fixed')  data['_fu_tad_fuf']=fuTadState['fuf'];
   if(currentTab==='fu-aligner') data['_fu_tad_fua']=fuTadState['fua'];
   if(currentTab==='plan') data['_ext_chart']=[...extChartSet];
+  if(currentTab==='referred') data['_ref_ext_chart']=[...refExtChartSet];
   if(currentTab==='exam') data['__teeth']={...toothState};
   localStorage.setItem('ortho_v4_'+currentTab, JSON.stringify(data));
   showToast('💾 Draft saved!','success');
@@ -1571,6 +1627,23 @@ function loadForm(tab) {
             }
           }
         });
+      }
+      return;
+    }
+    if(key==='_ref_ext_chart'){
+      refExtChartSet.clear();
+      (data[key]||[]).forEach(n => refExtChartSet.add(n));
+      // إعادة بناء الـ chart إذا كان Other مختاراً وكان التبويب مرئياً
+      const extVal = data['radio__ref-prev-ext'];
+      if (extVal === 'Other') {
+        setTimeout(() => {
+          toggleRefExtChart();
+          const lbl = document.getElementById('ref-ext-chart-selected');
+          if (lbl) {
+            const sorted = [...refExtChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+            lbl.textContent = sorted.length ? sorted.join(', ') : '—';
+          }
+        }, 100);
       }
       return;
     }
@@ -1674,8 +1747,9 @@ function clearCurrentForm() {
   if(currentTab==='exam'){
     [...upperTeeth,...lowerTeeth].forEach(num=>{ toothState[num]=0; });
   }
-  // Extraction chart (plan)
+  // Extraction charts
   extChartSet.clear();
+  refExtChartSet.clear();
   // Emergency pills
   activeEmPills.clear();
   Object.keys(emChartSets).forEach(val => emChartSets[val].clear());
@@ -1849,7 +1923,18 @@ function clearCurrentForm() {
     if(dd) dd.style.display='none';
     // إعادة بناء wire selector
     const rws=document.getElementById('ref-wire-selector');
-    if(rws){ rws.innerHTML=''; delete wireState['ref-wire-selector']; buildWireSelector('ref-wire-selector'); }
+    if(rws && rws.children.length){
+      rws.innerHTML=''; delete wireState['ref-wire-selector']; buildWireSelector('ref-wire-selector');
+    }
+    // إعادة تهيئة extraction chart
+    const refExtWrap  = document.getElementById('ref-ext-chart-wrap');
+    const refExtUpper = document.getElementById('ref-ext-chart-upper');
+    const refExtLower = document.getElementById('ref-ext-chart-lower');
+    const refExtLbl   = document.getElementById('ref-ext-chart-selected');
+    if(refExtWrap)  refExtWrap.style.display='none';
+    if(refExtUpper) refExtUpper.innerHTML='';
+    if(refExtLower) refExtLower.innerHTML='';
+    if(refExtLbl)   refExtLbl.textContent='—';
   }
 
   // ── Step 5: تحديثات UI نهائية ──
@@ -2266,10 +2351,16 @@ function applyAdminSchema() {
     if (schema.wireMats)  WIRE_MATS.length  = 0, schema.wireMats.forEach(m => WIRE_MATS.push(m));
 
     // Rebuild wire selectors with new options
-    ['bond-wire-selector','fuf-wire-selector','em-wire-selector','ref-wire-selector'].forEach(id => {
+    // ref-wire-selector is rebuilt lazily — only if it already has children (tab was visited)
+    ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(id => {
       const el = document.getElementById(id);
       if (el) { el.innerHTML = ''; delete wireState[id]; buildWireSelector(id); }
     });
+    // Rebuild ref-wire-selector only if already built (tab was visited at least once)
+    const refWs = document.getElementById('ref-wire-selector');
+    if (refWs && refWs.children.length) {
+      refWs.innerHTML = ''; delete wireState['ref-wire-selector']; buildWireSelector('ref-wire-selector');
+    }
 
     // Apply field options to toggle groups
     if (schema.fields) {
@@ -2691,20 +2782,57 @@ function tadCollectScrew(idx) {
 // REFERRED PATIENT — helper functions
 // ══════════════════════════════════════════════════════════════
 
+// Extraction chart for referred tab
+const refExtChartSet = new Set();
+
+function toggleRefExtChart() {
+  const val  = document.querySelector('[name="ref-prev-ext"]:checked')?.value || '';
+  const wrap = document.getElementById('ref-ext-chart-wrap');
+  if (!wrap) return;
+  if (val === 'Other') {
+    wrap.style.display = '';
+    const upperRow = document.getElementById('ref-ext-chart-upper');
+    const lowerRow = document.getElementById('ref-ext-chart-lower');
+    if (upperRow && !upperRow.children.length) buildRefExtRow(upperRow, upperTeeth);
+    if (lowerRow && !lowerRow.children.length) buildRefExtRow(lowerRow, lowerTeeth);
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function buildRefExtRow(rowEl, teeth) {
+  rowEl.innerHTML = '';
+  teeth.forEach((num, i) => {
+    if (i === 8) {
+      const sp = document.createElement('div');
+      sp.style.cssText = 'width:4px;border-left:2px dashed var(--gold);margin:0 1px;flex-shrink:0;';
+      rowEl.appendChild(sp);
+    }
+    const btn = document.createElement('div');
+    btn.className = 'mini-tooth' + (refExtChartSet.has(num) ? ' selected' : '');
+    btn.textContent = toothLabel(num);
+    btn.dataset.fdi = num;
+    btn.onclick = () => {
+      const n = parseInt(btn.dataset.fdi);
+      if (refExtChartSet.has(n)) refExtChartSet.delete(n);
+      else refExtChartSet.add(n);
+      btn.classList.toggle('selected');
+      const lbl = document.getElementById('ref-ext-chart-selected');
+      if (lbl) {
+        const sorted = [...refExtChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+        lbl.textContent = sorted.length ? sorted.join(', ') : '—';
+      }
+    };
+    rowEl.appendChild(btn);
+  });
+}
+
 function updateRefDecision() {
   const val = document.querySelector('[name="ref-decision"]:checked')?.value || '';
   const detail = document.getElementById('ref-decision-detail');
   if (!detail) return;
-  // Show modification panel for all decisions except "continue as planned"
   const showDetail = val && val !== 'Continue treatment — original plan appropriate';
   detail.style.display = showDetail ? '' : 'none';
-}
-
-// Build the wire selector for referred tab on first use
-function initRefWireSelector() {
-  const el = document.getElementById('ref-wire-selector');
-  if (!el || el.children.length) return; // already built
-  buildWireSelector('ref-wire-selector');
 }
 window.addEventListener('storage', e => {
   // FIX: handle ortho_notation FIRST to ensure it's set before applyAdminSchema reads it
@@ -2887,8 +3015,9 @@ function cycleTab(dir) {
     const name = e.target.name;
     const id   = e.target.id;
 
-    // Referred patient decision
-    if (name === 'ref-decision') updateRefDecision();
+    // Referred patient decision & extraction chart
+    if (name === 'ref-decision')  updateRefDecision();
+    if (name === 'ref-prev-ext')  toggleRefExtChart();
 
     // GMD category & appliance type
     if (name === 'gmd-category')        updateGmdCategory();
