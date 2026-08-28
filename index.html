@@ -92,6 +92,9 @@
     <button class="tab-btn" onclick="switchTab('referred')" id="tbtn-referred">
       <span class="tab-icon">🔄</span> Referred Patient<span class="unsaved-dot"></span>
     </button>
+    <button class="tab-btn" onclick="switchTab('retention')" id="tbtn-retention">
+      <span class="tab-icon">🔵</span> Retention F/U<span class="unsaved-dot"></span>
+    </button>
   </nav>
   </div><!-- /tab-nav-wrap -->
   <button class="tab-arrow" id="tab-arrow-right" onclick="scrollTabs(1)" title="More tabs">›</button>
@@ -3318,6 +3321,485 @@
   </div>
 
 </div><!-- /panel-referred -->
+
+
+<!-- ═══════════════════════════════════════════════
+     TAB 10: RETENTION FOLLOW-UP
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-retention">
+  <div class="patient-bar">
+    <div class="field"><label>Patient Name</label><input type="text" id="ret-name" placeholder="Full name"></div>
+    <div class="field"><label>Retention Visit #</label><input type="number" id="ret-visit-no" placeholder="e.g. 1" min="1"></div>
+    <div class="field"><label>Clinician</label><input type="text" id="ret-clinician" placeholder="Dr. ..."></div>
+    <div class="visit-date-box"><label>Date</label><input type="date" id="ret-date"></div>
+  </div>
+
+  <!-- ─── SECTION 1: Retention Phase ─── -->
+  <div class="section-card" id="ret-sec-phase">
+    <div class="section-header" onclick="toggleSection('ret-sec-phase')">
+      <div class="section-icon navy">🔵</div>
+      <div class="section-title">Retention Phase &amp; Protocol</div>
+      <div class="section-badge">Required</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Time Since Debond</label>
+          <input type="text" id="ret-time-since-debond" placeholder="e.g. 3 months, 1 year 2 months">
+        </div>
+        <div class="field">
+          <label>Current Retention Phase</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-phase" value="Phase 1 — Active retention (0–6 months)"><span>Phase 1 — Active (0–6 months)</span></label>
+            <label><input type="radio" name="ret-phase" value="Phase 2 — Passive retention (6 months–2 years)"><span>Phase 2 — Passive (6m–2yr)</span></label>
+            <label><input type="radio" name="ret-phase" value="Phase 3 — Long-term review (2+ years)"><span>Phase 3 — Long-term (2yr+)</span></label>
+            <label><input type="radio" name="ret-phase" value="Post-surgical retention"><span>Post-surgical</span></label>
+            <label><input type="radio" name="ret-phase" value="Growth completion retention"><span>Growth completion (adolescent)</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="sub-title">Protocol in Place</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Fixed Retainers</label>
+          <div class="toggle-group">
+            <label><input type="checkbox" id="ret-proto-fixed-upper"><span>Fixed retainer — Upper</span></label>
+            <label><input type="checkbox" id="ret-proto-fixed-lower"><span>Fixed retainer — Lower</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Removable Retainers</label>
+          <div class="toggle-group">
+            <label><input type="checkbox" id="ret-proto-vfr"><span>VFR / Essix</span></label>
+            <label><input type="checkbox" id="ret-proto-hawley"><span>Hawley retainer</span></label>
+            <label><input type="checkbox" id="ret-proto-spring"><span>Spring retainer</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 2: Fixed Retainer Assessment ─── -->
+  <div class="section-card" id="ret-sec-fixed">
+    <div class="section-header" onclick="toggleSection('ret-sec-fixed')">
+      <div class="section-icon">🔗</div>
+      <div class="section-title">Fixed Retainer Assessment</div>
+      <div class="section-badge">Core</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+
+      <!-- Upper fixed retainer -->
+      <div class="sub-title">Upper Fixed Retainer</div>
+      <div style="background:var(--grey-50);border:1.5px solid var(--grey-200);border-radius:9px;padding:12px 14px;display:grid;gap:10px;">
+        <div class="grid-2">
+          <div class="field">
+            <label>Integrity</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-fr-upper-integrity" value="Intact — all bonding points secure" onchange="toggleRetChart('upper')"><span>✅ Intact — all points secure</span></label>
+              <label><input type="radio" name="ret-fr-upper-integrity" value="Partial debond" onchange="toggleRetChart('upper')"><span>⚠️ Partial debond</span></label>
+              <label><input type="radio" name="ret-fr-upper-integrity" value="Complete debond — retainer detached" onchange="toggleRetChart('upper')"><span>❌ Complete debond</span></label>
+              <label><input type="radio" name="ret-fr-upper-integrity" value="Wire fracture" onchange="toggleRetChart('upper')"><span>❌ Wire fracture</span></label>
+              <label><input type="radio" name="ret-fr-upper-integrity" value="Wire distortion noted" onchange="toggleRetChart('upper')"><span>⚠️ Wire distortion</span></label>
+              <label><input type="radio" name="ret-fr-upper-integrity" value="No upper fixed retainer"><span>No upper fixed retainer</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Plaque / Calculus Accumulation</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-fr-upper-plaque" value="None"><span>✅ None</span></label>
+              <label><input type="radio" name="ret-fr-upper-plaque" value="Mild — OH reinforced"><span>Mild — OH reinforced</span></label>
+              <label><input type="radio" name="ret-fr-upper-plaque" value="Moderate — scaling required"><span>⚠️ Moderate — scaling</span></label>
+              <label><input type="radio" name="ret-fr-upper-plaque" value="Severe — perio referral"><span>❌ Severe — perio refer</span></label>
+            </div>
+          </div>
+        </div>
+        <!-- Debond tooth chart — upper -->
+        <div id="ret-chart-upper-wrap" style="display:none;">
+          <div style="background:var(--red-light);border:1.5px solid #f5a0a0;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:0.68rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:7px;">Select affected teeth — Upper</div>
+            <div id="ret-chart-upper-row"></div>
+            <div style="font-size:0.7rem;color:var(--grey-600);margin-top:5px;">Selected: <span id="ret-chart-upper-selected" style="font-weight:700;color:var(--red);">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lower fixed retainer -->
+      <div class="sub-title" style="margin-top:4px;">Lower Fixed Retainer</div>
+      <div style="background:var(--grey-50);border:1.5px solid var(--grey-200);border-radius:9px;padding:12px 14px;display:grid;gap:10px;">
+        <div class="grid-2">
+          <div class="field">
+            <label>Integrity</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-fr-lower-integrity" value="Intact — all bonding points secure" onchange="toggleRetChart('lower')"><span>✅ Intact — all points secure</span></label>
+              <label><input type="radio" name="ret-fr-lower-integrity" value="Partial debond" onchange="toggleRetChart('lower')"><span>⚠️ Partial debond</span></label>
+              <label><input type="radio" name="ret-fr-lower-integrity" value="Complete debond — retainer detached" onchange="toggleRetChart('lower')"><span>❌ Complete debond</span></label>
+              <label><input type="radio" name="ret-fr-lower-integrity" value="Wire fracture" onchange="toggleRetChart('lower')"><span>❌ Wire fracture</span></label>
+              <label><input type="radio" name="ret-fr-lower-integrity" value="Wire distortion noted" onchange="toggleRetChart('lower')"><span>⚠️ Wire distortion</span></label>
+              <label><input type="radio" name="ret-fr-lower-integrity" value="No lower fixed retainer"><span>No lower fixed retainer</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Plaque / Calculus Accumulation</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-fr-lower-plaque" value="None"><span>✅ None</span></label>
+              <label><input type="radio" name="ret-fr-lower-plaque" value="Mild — OH reinforced"><span>Mild — OH reinforced</span></label>
+              <label><input type="radio" name="ret-fr-lower-plaque" value="Moderate — scaling required"><span>⚠️ Moderate — scaling</span></label>
+              <label><input type="radio" name="ret-fr-lower-plaque" value="Severe — perio referral"><span>❌ Severe — perio refer</span></label>
+            </div>
+          </div>
+        </div>
+        <!-- Debond tooth chart — lower -->
+        <div id="ret-chart-lower-wrap" style="display:none;">
+          <div style="background:var(--red-light);border:1.5px solid #f5a0a0;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:0.68rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:7px;">Select affected teeth — Lower</div>
+            <div id="ret-chart-lower-row"></div>
+            <div style="font-size:0.7rem;color:var(--grey-600);margin-top:5px;">Selected: <span id="ret-chart-lower-selected" style="font-weight:700;color:var(--red);">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action taken -->
+      <div class="sub-title" style="margin-top:4px;">Action Taken on Fixed Retainer</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Procedure</label>
+          <div class="toggle-group">
+            <label><input type="checkbox" id="ret-action-rebond"><span>Re-bond</span></label>
+            <label><input type="checkbox" id="ret-action-replace-same"><span>Replace wire — same design</span></label>
+            <label><input type="checkbox" id="ret-action-replace-diff"><span>Replace wire — different design</span></label>
+            <label><input type="checkbox" id="ret-action-sap"><span>Scale &amp; polish around retainer</span></label>
+            <label><input type="checkbox" id="ret-action-trim"><span>Wire trimmed / adjusted</span></label>
+            <label><input type="checkbox" id="ret-action-none"><span>No action required</span></label>
+            <label><input type="checkbox" id="ret-action-remove-patient"><span>Removed — patient request</span></label>
+            <label><input type="checkbox" id="ret-action-remove-perio"><span>Removed — periodontal reasons</span></label>
+            <label><input type="checkbox" id="ret-action-remove-end"><span>Removed — planned end of retention</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Wire Type Used (if replaced)</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-wire-type" value="Multi-stranded 4×0.009&quot;"><span>Multi-stranded 4×0.009"</span></label>
+            <label><input type="radio" name="ret-wire-type" value="Braided 0.0175&quot; Dead Soft"><span>Braided 0.0175" Dead Soft</span></label>
+            <label><input type="radio" name="ret-wire-type" value="Twist-flex 0.0175&quot;"><span>Twist-flex 0.0175"</span></label>
+            <label><input type="radio" name="ret-wire-type" value="Solid 0.016&quot; SS"><span>Solid 0.016" SS</span></label>
+            <label><input type="radio" name="ret-wire-type" value="Fiber-reinforced composite"><span>Fiber-reinforced composite</span></label>
+            <label><input type="radio" name="ret-wire-type" value="N/A — no replacement"><span>N/A</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Occlusal Interference from Fixed Retainer</label>
+        <div class="toggle-group">
+          <label><input type="radio" name="ret-occlusal-interference" value="None"><span>✅ None</span></label>
+          <label><input type="radio" name="ret-occlusal-interference" value="Mild — monitored"><span>Mild — monitored</span></label>
+          <label><input type="radio" name="ret-occlusal-interference" value="Significant — adjusted this visit"><span>⚠️ Significant — adjusted</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Fixed Retainer Notes</label><input type="text" id="ret-fixed-notes" placeholder="Adhesive used, teeth rebonded, adjustments made..."></div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 3: Removable Retainer Assessment ─── -->
+  <div class="section-card" id="ret-sec-removable">
+    <div class="section-header" onclick="toggleSection('ret-sec-removable')">
+      <div class="section-icon purple">💎</div>
+      <div class="section-title">Removable Retainer Assessment</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Fit Assessment</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-removable-fit" value="Fits well — full seating"><span>✅ Fits well — full seating</span></label>
+            <label><input type="radio" name="ret-removable-fit" value="Minor discrepancy — acceptable"><span>⚠️ Minor discrepancy</span></label>
+            <label><input type="radio" name="ret-removable-fit" value="Poor fit — significant gaps"><span>❌ Poor fit — significant gaps</span></label>
+            <label><input type="radio" name="ret-removable-fit" value="Does not seat — remake required"><span>❌ Does not seat — remake</span></label>
+            <label><input type="radio" name="ret-removable-fit" value="Lost or broken — replacement needed"><span>❌ Lost / broken</span></label>
+            <label><input type="radio" name="ret-removable-fit" value="No removable retainer in protocol"><span>No removable retainer</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Retainer Condition</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-removable-condition" value="Good — no wear or damage"><span>✅ Good — no damage</span></label>
+            <label><input type="radio" name="ret-removable-condition" value="Acceptable — minor wear"><span>Acceptable — minor wear</span></label>
+            <label><input type="radio" name="ret-removable-condition" value="Damaged — crack or fracture"><span>⚠️ Damaged</span></label>
+            <label><input type="radio" name="ret-removable-condition" value="Heavily worn — replacement advised"><span>❌ Heavily worn</span></label>
+            <label><input type="radio" name="ret-removable-condition" value="Discoloured or poor hygiene — counselled"><span>Discoloured — OH counselled</span></label>
+            <label><input type="radio" name="ret-removable-condition" value="N/A"><span>N/A</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Wear Compliance (patient-reported)</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-wear-compliance" value="Full-time as instructed (22 hrs/day)"><span>✅ Full-time as instructed</span></label>
+            <label><input type="radio" name="ret-wear-compliance" value="Nights only — as instructed"><span>✅ Nights only — as instructed</span></label>
+            <label><input type="radio" name="ret-wear-compliance" value="Wearing but inconsistently"><span>⚠️ Inconsistent</span></label>
+            <label><input type="radio" name="ret-wear-compliance" value="Rarely wearing (&lt;3 nights/week)"><span>❌ Rarely wearing</span></label>
+            <label><input type="radio" name="ret-wear-compliance" value="Not wearing at all"><span>❌ Not wearing</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Compliance — Objective Evidence</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-compliance-evidence" value="Consistent with reported — retainer fits well"><span>✅ Consistent — fits well</span></label>
+            <label><input type="radio" name="ret-compliance-evidence" value="Inconsistent — retainer tight on seating"><span>⚠️ Tight on seating</span></label>
+            <label><input type="radio" name="ret-compliance-evidence" value="Inconsistent — visible relapse noted"><span>❌ Visible relapse</span></label>
+            <label><input type="radio" name="ret-compliance-evidence" value="Cannot assess"><span>Cannot assess</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Action Taken on Removable Retainer</label>
+        <div class="toggle-group">
+          <label><input type="radio" name="ret-removable-action" value="Continue same protocol"><span>✅ Continue same protocol</span></label>
+          <label><input type="radio" name="ret-removable-action" value="New retainer fabricated — impression or scan taken"><span>New retainer fabricated</span></label>
+          <label><input type="radio" name="ret-removable-action" value="Wear protocol modified"><span>Protocol modified</span></label>
+          <label><input type="radio" name="ret-removable-action" value="Discontinued by clinician"><span>Discontinued — clinician</span></label>
+          <label><input type="radio" name="ret-removable-action" value="Discontinued — patient declines"><span>Discontinued — patient</span></label>
+        </div>
+      </div>
+      <div class="field"><label>Removable Retainer Notes</label><input type="text" id="ret-removable-notes" placeholder="Impression taken, adjustment details, compliance counselling..."></div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 4: Stability Assessment ─── -->
+  <div class="section-card" id="ret-sec-stability">
+    <div class="section-header" onclick="toggleSection('ret-sec-stability')">
+      <div class="section-icon gold">📊</div>
+      <div class="section-title">Occlusal Stability Assessment</div>
+      <div class="section-badge gold">Critical</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+
+      <div class="sub-title">Alignment Stability</div>
+      <div style="background:var(--grey-50);border:1px solid var(--grey-200);border-radius:9px;padding:11px 13px;display:grid;gap:9px;">
+        <div class="grid-2">
+          <div class="field">
+            <label>Upper Arch Alignment</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-align-upper" value="Stable — no change"><span>✅ Stable</span></label>
+              <label><input type="radio" name="ret-align-upper" value="Mild change — physiologic, acceptable"><span>Mild — physiologic</span></label>
+              <label><input type="radio" name="ret-align-upper" value="Moderate change — monitor closely"><span>⚠️ Moderate — monitor</span></label>
+              <label><input type="radio" name="ret-align-upper" value="Significant relapse — intervention warranted"><span>❌ Significant relapse</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Lower Arch Alignment</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-align-lower" value="Stable — no change"><span>✅ Stable</span></label>
+              <label><input type="radio" name="ret-align-lower" value="Mild change — physiologic, acceptable"><span>Mild — physiologic</span></label>
+              <label><input type="radio" name="ret-align-lower" value="Moderate change — monitor closely"><span>⚠️ Moderate — monitor</span></label>
+              <label><input type="radio" name="ret-align-lower" value="Significant relapse — intervention warranted"><span>❌ Significant relapse</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-title" style="margin-top:4px;">Key Measurements</div>
+      <div style="background:var(--grey-50);border:1px solid var(--grey-200);border-radius:9px;padding:11px 13px;display:grid;gap:9px;">
+        <div class="grid-3">
+          <div class="field">
+            <label>Overjet (current)</label>
+            <input type="number" id="ret-oj-val" placeholder="mm" step="0.5" min="0" max="20">
+            <div class="toggle-group" style="margin-top:5px;">
+              <label><input type="radio" name="ret-oj-status" value="Stable vs debond"><span>✅ Stable</span></label>
+              <label><input type="radio" name="ret-oj-status" value="Slightly increased — monitor"><span>⚠️ Slightly increased</span></label>
+              <label><input type="radio" name="ret-oj-status" value="Increased — investigate cause"><span>❌ Increased</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Overbite (current)</label>
+            <input type="number" id="ret-ob-val" placeholder="mm" step="0.5" min="-5" max="15">
+            <div class="toggle-group" style="margin-top:5px;">
+              <label><input type="radio" name="ret-ob-status" value="Stable"><span>✅ Stable</span></label>
+              <label><input type="radio" name="ret-ob-status" value="Deepened — monitor"><span>⚠️ Deepened</span></label>
+              <label><input type="radio" name="ret-ob-status" value="Reduced or opening — investigate"><span>⚠️ Reduced</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Buccal Occlusion</label>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-size:0.7rem;font-weight:700;color:var(--grey-600);min-width:40px;">Right</span>
+                <div class="toggle-group">
+                  <label><input type="radio" name="ret-buccal-r" value="Class I"><span>I</span></label>
+                  <label><input type="radio" name="ret-buccal-r" value="½ Class II"><span>½ II</span></label>
+                  <label><input type="radio" name="ret-buccal-r" value="Class II"><span>II</span></label>
+                  <label><input type="radio" name="ret-buccal-r" value="½ Class III"><span>½ III</span></label>
+                  <label><input type="radio" name="ret-buccal-r" value="Class III"><span>III</span></label>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-size:0.7rem;font-weight:700;color:var(--grey-600);min-width:40px;">Left</span>
+                <div class="toggle-group">
+                  <label><input type="radio" name="ret-buccal-l" value="Class I"><span>I</span></label>
+                  <label><input type="radio" name="ret-buccal-l" value="½ Class II"><span>½ II</span></label>
+                  <label><input type="radio" name="ret-buccal-l" value="Class II"><span>II</span></label>
+                  <label><input type="radio" name="ret-buccal-l" value="½ Class III"><span>½ III</span></label>
+                  <label><input type="radio" name="ret-buccal-l" value="Class III"><span>III</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Midline</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-midline" value="Stable — coincident"><span>✅ Stable — coincident</span></label>
+              <label><input type="radio" name="ret-midline" value="Upper shifted"><span>Upper shifted</span></label>
+              <label><input type="radio" name="ret-midline" value="Lower shifted"><span>Lower shifted</span></label>
+              <label><input type="radio" name="ret-midline" value="Both shifted"><span>Both shifted</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Spaces</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="ret-spaces" value="No spaces present"><span>✅ No spaces</span></label>
+              <label><input type="radio" name="ret-spaces" value="Median diastema present"><span>Median diastema</span></label>
+              <label><input type="radio" name="ret-spaces" value="Extraction site reopening"><span>Extraction site reopening</span></label>
+              <label><input type="radio" name="ret-spaces" value="Other spacing"><span>Other spacing</span></label>
+            </div>
+            <input type="text" id="ret-spaces-detail" placeholder="mm / location details..." style="margin-top:5px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-title" style="margin-top:4px;">Relapse Risk Factors</div>
+      <div class="grid-3">
+        <label class="check-item"><input type="checkbox" id="ret-risk-3rd-molar"><span>Third molar eruption pressure</span></label>
+        <label class="check-item"><input type="checkbox" id="ret-risk-growth"><span>Continued mandibular growth</span></label>
+        <label class="check-item"><input type="checkbox" id="ret-risk-perio"><span>Periodontal / bone loss</span></label>
+        <label class="check-item"><input type="checkbox" id="ret-risk-parafunction"><span>Parafunction (bruxism / clenching)</span></label>
+        <label class="check-item"><input type="checkbox" id="ret-risk-habit"><span>Tongue thrust / lip habit persisting</span></label>
+        <label class="check-item"><input type="checkbox" id="ret-risk-compliance"><span>Poor retainer compliance</span></label>
+        <label class="check-item"><input type="checkbox" id="ret-risk-failure"><span>Retainer failure (debond / fracture)</span></label>
+        <label class="check-item"><input type="checkbox" id="ret-risk-none"><span>No risk factors identified</span></label>
+      </div>
+
+      <div class="grid-2" style="margin-top:4px;">
+        <div class="field">
+          <label>Overall Relapse Severity</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-relapse" value="No relapse — stable result"><span>✅ No relapse</span></label>
+            <label><input type="radio" name="ret-relapse" value="Physiologic / minor — acceptable"><span>Physiologic — acceptable</span></label>
+            <label><input type="radio" name="ret-relapse" value="Mild relapse — monitor closely"><span>⚠️ Mild — monitor</span></label>
+            <label><input type="radio" name="ret-relapse" value="Moderate relapse — active intervention needed"><span>❌ Moderate — intervene</span></label>
+            <label><input type="radio" name="ret-relapse" value="Significant relapse — re-treatment discussion"><span>❌ Significant — re-treatment</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>White Spot Lesions (WSL) — Post-treatment Monitoring</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-wsl" value="None"><span>✅ None</span></label>
+            <label><input type="radio" name="ret-wsl" value="Improving — remineralisation evident"><span>✅ Improving</span></label>
+            <label><input type="radio" name="ret-wsl" value="Static — stable, no change"><span>Static — stable</span></label>
+            <label><input type="radio" name="ret-wsl" value="Worsening — restorative referral"><span>❌ Worsening — refer</span></label>
+          </div>
+          <div class="toggle-group" style="margin-top:6px;">
+            <label><input type="checkbox" id="ret-wsl-fluoride"><span>Fluoride varnish applied</span></label>
+            <label><input type="checkbox" id="ret-wsl-cppacp"><span>CPP-ACP (Tooth Mousse) prescribed</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 5: Clinical Decision ─── -->
+  <div class="section-card" id="ret-sec-decision">
+    <div class="section-header" onclick="toggleSection('ret-sec-decision')">
+      <div class="section-icon red">⚖️</div>
+      <div class="section-title">Clinical Decision</div>
+      <div class="section-badge red">Required</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Decision This Visit</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-decision" value="Continue current retention protocol — stable" onchange="updateRetDecision()"><span>✅ Continue — protocol stable</span></label>
+            <label><input type="radio" name="ret-decision" value="Continue — minor protocol modification" onchange="updateRetDecision()"><span>Continue — minor modification</span></label>
+            <label><input type="radio" name="ret-decision" value="Increase removable retainer wear time" onchange="updateRetDecision()"><span>⬆️ Increase wear time</span></label>
+            <label><input type="radio" name="ret-decision" value="Reinforce or replace fixed retainer" onchange="updateRetDecision()"><span>🔧 Reinforce / replace fixed</span></label>
+            <label><input type="radio" name="ret-decision" value="Fabricate new removable retainer" onchange="updateRetDecision()"><span>New removable retainer</span></label>
+            <label><input type="radio" name="ret-decision" value="Active intervention — limited fixed correction" onchange="updateRetDecision()"><span>⚠️ Limited fixed correction</span></label>
+            <label><input type="radio" name="ret-decision" value="Refer for re-treatment assessment" onchange="updateRetDecision()"><span>🏥 Refer — re-treatment</span></label>
+            <label><input type="radio" name="ret-decision" value="Discharge — retention complete" onchange="updateRetDecision()"><span>✅ Discharge — complete</span></label>
+            <label><input type="radio" name="ret-decision" value="Discharge — patient declines further review" onchange="updateRetDecision()"><span>Discharge — patient declines</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Next Retention Visit Interval</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-next-interval" value="1 month"><span>1 month</span></label>
+            <label><input type="radio" name="ret-next-interval" value="3 months"><span>3 months</span></label>
+            <label><input type="radio" name="ret-next-interval" value="6 months"><span>6 months</span></label>
+            <label><input type="radio" name="ret-next-interval" value="1 year"><span>1 year</span></label>
+            <label><input type="radio" name="ret-next-interval" value="Discharge — no further routine review"><span>Discharge</span></label>
+            <label><input type="radio" name="ret-next-interval" value="PRN — as needed"><span>PRN</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Discharge criteria — shows when discharging -->
+      <div id="ret-discharge-wrap" style="display:none;">
+        <div style="background:var(--green-light);border:1px solid #a5d6a7;border-radius:9px;padding:13px 15px;display:grid;gap:9px;">
+          <div class="sub-title" style="color:var(--green);">Discharge Criteria Confirmed</div>
+          <div class="grid-2">
+            <div>
+              <label class="check-item"><input type="checkbox" id="ret-dc-stable"><span>Occlusion stable ≥ 2 years</span></label>
+              <label class="check-item" style="margin-top:5px;"><input type="checkbox" id="ret-dc-lifelong"><span>Patient understands lifelong retainer wear</span></label>
+              <label class="check-item" style="margin-top:5px;"><input type="checkbox" id="ret-dc-fixed-ok"><span>Fixed retainer in good condition</span></label>
+            </div>
+            <div>
+              <label class="check-item"><input type="checkbox" id="ret-dc-removable-given"><span>Removable retainer provided as backup</span></label>
+              <label class="check-item" style="margin-top:5px;"><input type="checkbox" id="ret-dc-signs"><span>Patient advised on signs of relapse</span></label>
+              <label class="check-item" style="margin-top:5px;"><input type="checkbox" id="ret-dc-gp"><span>GP / GDP notified of discharge</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field"><label>Referral</label><textarea id="ret-referral" placeholder="Perio, restorative, oral surgery (3rd molars), GDP..."></textarea></div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 6: Completion ─── -->
+  <div class="section-card" id="ret-sec-end">
+    <div class="section-header" onclick="toggleSection('ret-sec-end')">
+      <div class="section-icon green">✅</div>
+      <div class="section-title">Visit Completion</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Oral Hygiene</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="ret-oh" value="Good"><span>✅ Good</span></label>
+            <label><input type="radio" name="ret-oh" value="Fair"><span>⚠️ Fair</span></label>
+            <label><input type="radio" name="ret-oh" value="Poor — OH instructions given"><span>❌ Poor — instructed</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Patient Concerns</label>
+          <textarea id="ret-patient-concerns" placeholder="Aesthetic concerns, discomfort from retainer, questions about wear protocol..."></textarea>
+        </div>
+      </div>
+      <div class="aseptic-row"><input type="checkbox" id="ret-aseptic"><span>🛡️ Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.</span></div>
+      <div class="field"><label>Notes</label><textarea id="ret-notes" class="notes-area" placeholder="Overall impression, patient cooperation, clinical observations..."></textarea></div>
+    </div>
+  </div>
+
+</div><!-- /panel-retention -->
 
 </div><!-- /container -->
 

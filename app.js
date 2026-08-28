@@ -1299,6 +1299,119 @@ function collectFormData(tab) {
     }
 
     // ══════════════════════════════════════
+    case 'retention': {
+      S('Retention Follow-Up Visit');
+      R('Patient',          get('ret-name'));
+      R('Retention visit #', get('ret-visit-no'));
+      R('Clinician',        get('ret-clinician'));
+      R('Date',             get('ret-date'));
+      R('Time since debond', get('ret-time-since-debond'));
+
+      S('Retention Phase & Protocol');
+      R('Current phase', radio('ret-phase'));
+      const proto=[];
+      if(isChk('ret-proto-fixed-upper')) proto.push('Fixed retainer — Upper');
+      if(isChk('ret-proto-fixed-lower')) proto.push('Fixed retainer — Lower');
+      if(isChk('ret-proto-vfr'))         proto.push('VFR / Essix');
+      if(isChk('ret-proto-hawley'))      proto.push('Hawley retainer');
+      if(isChk('ret-proto-spring'))      proto.push('Spring retainer');
+      if(proto.length) R('Protocol in place', proto.join(', '));
+
+      S('Fixed Retainer Assessment');
+      // Upper
+      const frUI = radio('ret-fr-upper-integrity');
+      const frUP = radio('ret-fr-upper-plaque');
+      if(frUI) {
+        const upperTeethSel = [...retChartSets.upper].sort((a,b)=>a-b).map(n=>toothLabel(n));
+        const teethStr = upperTeethSel.length ? ` — teeth: ${upperTeethSel.join(', ')}` : '';
+        R('Upper fixed retainer — integrity', frUI + teethStr);
+      }
+      R('Upper — plaque / calculus', frUP);
+      // Lower
+      const frLI = radio('ret-fr-lower-integrity');
+      const frLP = radio('ret-fr-lower-plaque');
+      if(frLI) {
+        const lowerTeethSel = [...retChartSets.lower].sort((a,b)=>a-b).map(n=>toothLabel(n));
+        const teethStr = lowerTeethSel.length ? ` — teeth: ${lowerTeethSel.join(', ')}` : '';
+        R('Lower fixed retainer — integrity', frLI + teethStr);
+      }
+      R('Lower — plaque / calculus', frLP);
+      // Actions
+      const frActions=[];
+      if(isChk('ret-action-rebond'))         frActions.push('Re-bond');
+      if(isChk('ret-action-replace-same'))   frActions.push('Replace wire — same design');
+      if(isChk('ret-action-replace-diff'))   frActions.push('Replace wire — different design');
+      if(isChk('ret-action-sap'))            frActions.push('Scale & polish around retainer');
+      if(isChk('ret-action-trim'))           frActions.push('Wire trimmed / adjusted');
+      if(isChk('ret-action-none'))           frActions.push('No action required');
+      if(isChk('ret-action-remove-patient')) frActions.push('Removed — patient request');
+      if(isChk('ret-action-remove-perio'))   frActions.push('Removed — periodontal reasons');
+      if(isChk('ret-action-remove-end'))     frActions.push('Removed — planned end of retention');
+      if(frActions.length) R('Action taken on fixed retainer', frActions.join(', '));
+      R('Wire type used',              radio('ret-wire-type'));
+      R('Occlusal interference',       radio('ret-occlusal-interference'));
+      R('Fixed retainer notes',        get('ret-fixed-notes'));
+
+      S('Removable Retainer Assessment');
+      R('Fit',                    radio('ret-removable-fit'));
+      R('Condition',              radio('ret-removable-condition'));
+      R('Wear compliance',        radio('ret-wear-compliance'));
+      R('Compliance evidence',    radio('ret-compliance-evidence'));
+      R('Action taken',           radio('ret-removable-action'));
+      R('Removable retainer notes', get('ret-removable-notes'));
+
+      S('Occlusal Stability Assessment');
+      R('Upper arch alignment',   radio('ret-align-upper'));
+      R('Lower arch alignment',   radio('ret-align-lower'));
+      const ojV=get('ret-oj-val'), ojS=radio('ret-oj-status');
+      R('Overjet',  [ojV?ojV+' mm':'', ojS].filter(Boolean).join(' — '));
+      const obV=get('ret-ob-val'), obS=radio('ret-ob-status');
+      R('Overbite', [obV?obV+' mm':'', obS].filter(Boolean).join(' — '));
+      const bR=radio('ret-buccal-r'), bL=radio('ret-buccal-l');
+      if(bR||bL) R('Buccal occlusion', `Right: ${bR||'—'}   |   Left: ${bL||'—'}`);
+      R('Midline', radio('ret-midline'));
+      const spVal=radio('ret-spaces'), spDet=get('ret-spaces-detail');
+      R('Spaces', spVal?(spDet?`${spVal} — ${spDet}`:spVal):'');
+      const risks=[];
+      if(isChk('ret-risk-3rd-molar'))    risks.push('Third molar eruption pressure');
+      if(isChk('ret-risk-growth'))        risks.push('Continued mandibular growth');
+      if(isChk('ret-risk-perio'))         risks.push('Periodontal / bone loss');
+      if(isChk('ret-risk-parafunction'))  risks.push('Parafunction');
+      if(isChk('ret-risk-habit'))         risks.push('Tongue thrust / lip habit');
+      if(isChk('ret-risk-compliance'))    risks.push('Poor retainer compliance');
+      if(isChk('ret-risk-failure'))       risks.push('Retainer failure');
+      if(isChk('ret-risk-none'))          risks.push('No risk factors identified');
+      if(risks.length) R('Relapse risk factors', risks.join(', '));
+      R('Overall relapse severity', radio('ret-relapse'));
+      const wslVal=radio('ret-wsl');
+      const wslTx=[];
+      if(isChk('ret-wsl-fluoride')) wslTx.push('Fluoride varnish applied');
+      if(isChk('ret-wsl-cppacp'))   wslTx.push('CPP-ACP prescribed');
+      R('WSL status', [wslVal, ...wslTx].filter(Boolean).join('; '));
+
+      S('Clinical Decision');
+      R('Decision', radio('ret-decision'));
+      R('Next visit interval', radio('ret-next-interval'));
+      // Discharge criteria
+      const dc=[];
+      if(isChk('ret-dc-stable'))          dc.push('Occlusion stable ≥2 years');
+      if(isChk('ret-dc-lifelong'))        dc.push('Lifelong wear discussed');
+      if(isChk('ret-dc-fixed-ok'))        dc.push('Fixed retainer intact');
+      if(isChk('ret-dc-removable-given')) dc.push('Removable provided as backup');
+      if(isChk('ret-dc-signs'))           dc.push('Signs of relapse discussed');
+      if(isChk('ret-dc-gp'))              dc.push('GDP notified');
+      if(dc.length) R('Discharge criteria met', dc.join(', '));
+      R('Referral', get('ret-referral'));
+
+      S('Visit Completion');
+      R('Oral hygiene', radio('ret-oh'));
+      R('Patient concerns', get('ret-patient-concerns'));
+      if(isChk('ret-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Notes', get('ret-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
     case 'tad': {
       if(tadActiveScrewIdx >= 0) tadCollectScrew(tadActiveScrewIdx);
       const purposeMap={anch:'Anchorage',intr:'Intrusion',dist:'Distalization',
@@ -1420,6 +1533,7 @@ const TAB_LABELS = {
   'debond':     'Debond & Retainer',
   'tad':        'TAD / Mini-screw',
   'referred':   'Referred Patient Assessment',
+  'retention':  'Retention Follow-Up',
 };
 
 
@@ -1593,6 +1707,10 @@ function saveCurrentForm() {
   if(currentTab==='fu-aligner') data['_fu_tad_fua']=fuTadState['fua'];
   if(currentTab==='plan') data['_ext_chart']=[...extChartSet];
   if(currentTab==='referred') data['_ref_ext_chart']=[...refExtChartSet];
+  if(currentTab==='retention'){
+    data['_ret_chart_upper']=[...retChartSets.upper];
+    data['_ret_chart_lower']=[...retChartSets.lower];
+  }
   if(currentTab==='exam') data['__teeth']={...toothState};
   localStorage.setItem('ortho_v4_'+currentTab, JSON.stringify(data));
   showToast('💾 Draft saved!','success');
@@ -1628,6 +1746,29 @@ function loadForm(tab) {
           }
         });
       }
+      return;
+    }
+    if(key==='_ret_chart_upper'){
+      retChartSets.upper.clear();
+      (data[key]||[]).forEach(n => retChartSets.upper.add(n));
+      // Rebuild chart if visible (tab was active)
+      setTimeout(() => {
+        const intVal = document.querySelector('[name="ret-fr-upper-integrity"]:checked')?.value || '';
+        if(intVal && intVal !== 'Intact — all bonding points secure' && intVal !== 'No upper fixed retainer') {
+          toggleRetChart('upper');
+        }
+      }, 100);
+      return;
+    }
+    if(key==='_ret_chart_lower'){
+      retChartSets.lower.clear();
+      (data[key]||[]).forEach(n => retChartSets.lower.add(n));
+      setTimeout(() => {
+        const intVal = document.querySelector('[name="ret-fr-lower-integrity"]:checked')?.value || '';
+        if(intVal && intVal !== 'Intact — all bonding points secure' && intVal !== 'No lower fixed retainer') {
+          toggleRetChart('lower');
+        }
+      }, 100);
       return;
     }
     if(key==='_ref_ext_chart'){
@@ -1750,6 +1891,9 @@ function clearCurrentForm() {
   // Extraction charts
   extChartSet.clear();
   refExtChartSet.clear();
+  // Retention charts
+  retChartSets.upper.clear();
+  retChartSets.lower.clear();
   // Emergency pills
   activeEmPills.clear();
   Object.keys(emChartSets).forEach(val => emChartSets[val].clear());
@@ -1912,7 +2056,7 @@ function clearCurrentForm() {
 
   // ── Step 4: إعادة تفعيل aseptic checkboxes ──
   ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic',
-   'fug-aseptic','em-aseptic','db-aseptic','tad-aseptic','ref-aseptic'].forEach(id=>{
+   'fug-aseptic','em-aseptic','db-aseptic','tad-aseptic','ref-aseptic','ret-aseptic'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.checked=true;
   });
@@ -1921,12 +2065,10 @@ function clearCurrentForm() {
   if(currentTab==='referred'){
     const dd=document.getElementById('ref-decision-detail');
     if(dd) dd.style.display='none';
-    // إعادة بناء wire selector
     const rws=document.getElementById('ref-wire-selector');
     if(rws && rws.children.length){
       rws.innerHTML=''; delete wireState['ref-wire-selector']; buildWireSelector('ref-wire-selector');
     }
-    // إعادة تهيئة extraction chart
     const refExtWrap  = document.getElementById('ref-ext-chart-wrap');
     const refExtUpper = document.getElementById('ref-ext-chart-upper');
     const refExtLower = document.getElementById('ref-ext-chart-lower');
@@ -1935,6 +2077,21 @@ function clearCurrentForm() {
     if(refExtUpper) refExtUpper.innerHTML='';
     if(refExtLower) refExtLower.innerHTML='';
     if(refExtLbl)   refExtLbl.textContent='—';
+  }
+
+  // ── Step 4c: إعادة تهيئة retention tab ──
+  if(currentTab==='retention'){
+    // إخفاء discharge wrap و debond charts
+    const retDischarge = document.getElementById('ret-discharge-wrap');
+    if(retDischarge) retDischarge.style.display='none';
+    ['upper','lower'].forEach(arch=>{
+      const wrap = document.getElementById(`ret-chart-${arch}-wrap`);
+      const row  = document.getElementById(`ret-chart-${arch}-row`);
+      const lbl  = document.getElementById(`ret-chart-${arch}-selected`);
+      if(wrap) wrap.style.display='none';
+      if(row)  row.innerHTML='';
+      if(lbl)  lbl.textContent='—';
+    });
   }
 
   // ── Step 5: تحديثات UI نهائية ──
@@ -2834,6 +2991,44 @@ function updateRefDecision() {
   const showDetail = val && val !== 'Continue treatment — original plan appropriate';
   detail.style.display = showDetail ? '' : 'none';
 }
+
+// ══════════════════════════════════════════════════════════════
+// RETENTION FOLLOW-UP — helper functions
+// ══════════════════════════════════════════════════════════════
+
+const retChartSets = {
+  upper: new Set(),
+  lower: new Set(),
+};
+
+function toggleRetChart(arch) {
+  const integrityVal = document.querySelector(`[name="ret-fr-${arch}-integrity"]:checked`)?.value || '';
+  const wrap = document.getElementById(`ret-chart-${arch}-wrap`);
+  if (!wrap) return;
+  const needsChart = integrityVal === 'Partial debond'
+    || integrityVal === 'Complete debond — retainer detached'
+    || integrityVal === 'Wire fracture'
+    || integrityVal === 'Wire distortion noted';
+  wrap.style.display = needsChart ? '' : 'none';
+  if (needsChart) {
+    const rowEl = document.getElementById(`ret-chart-${arch}-row`);
+    if (rowEl && !rowEl.children.length) {
+      const teeth = arch === 'upper' ? upperTeeth : lowerTeeth;
+      buildMiniChart(`ret-chart-${arch}-row`, retChartSets[arch], () => {
+        const lbl = document.getElementById(`ret-chart-${arch}-selected`);
+        if (lbl) lbl.textContent = selectedLabel(retChartSets[arch]);
+      }, teeth);
+    }
+  }
+}
+
+function updateRetDecision() {
+  const val = document.querySelector('[name="ret-decision"]:checked')?.value || '';
+  const dischargeWrap = document.getElementById('ret-discharge-wrap');
+  if (!dischargeWrap) return;
+  dischargeWrap.style.display = val.startsWith('Discharge') ? '' : 'none';
+}
+
 window.addEventListener('storage', e => {
   // FIX: handle ortho_notation FIRST to ensure it's set before applyAdminSchema reads it
   if (e.key === 'ortho_notation' && e.newValue) {
@@ -2914,6 +3109,11 @@ function autoSaveTab(tab) {
   }
   if (tab === 'emergency') data['_em_pills'] = [...activeEmPills];
   if (tab === 'exam')      data['__teeth']   = { ...toothState };
+  if (tab === 'referred')  data['_ref_ext_chart'] = [...refExtChartSet];
+  if (tab === 'retention') {
+    data['_ret_chart_upper'] = [...retChartSets.upper];
+    data['_ret_chart_lower'] = [...retChartSets.lower];
+  }
 
   localStorage.setItem('ortho_v4_' + tab, JSON.stringify(data));
   localStorage.setItem('ortho_v4_autosave_time', Date.now().toString());
@@ -2991,7 +3191,7 @@ document.addEventListener('keydown', e => {
 });
 
 function cycleTab(dir) {
-  const tabIds = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred'];
+  const tabIds = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred','retention'];
   const cur = tabIds.indexOf(currentTab);
   const next = (cur + dir + tabIds.length) % tabIds.length;
   switchTab(tabIds[next]);
@@ -3003,7 +3203,7 @@ function cycleTab(dir) {
   document.querySelectorAll('input[type="date"]').forEach(el=>el.value=today);
 
   // Default: all aseptic checkboxes checked
-  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','em-aseptic','db-aseptic','ref-aseptic'].forEach(id=>{
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','em-aseptic','db-aseptic','ref-aseptic','ret-aseptic'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.checked=true;
   });
 
@@ -3018,6 +3218,11 @@ function cycleTab(dir) {
     // Referred patient decision & extraction chart
     if (name === 'ref-decision')  updateRefDecision();
     if (name === 'ref-prev-ext')  toggleRefExtChart();
+
+    // Retention follow-up
+    if (name === 'ret-fr-upper-integrity') toggleRetChart('upper');
+    if (name === 'ret-fr-lower-integrity') toggleRetChart('lower');
+    if (name === 'ret-decision')           updateRetDecision();
 
     // GMD category & appliance type
     if (name === 'gmd-category')        updateGmdCategory();
@@ -3065,13 +3270,13 @@ function cycleTab(dir) {
     if (id === 'fua-current-aligner' || id === 'fua-total-aligners') updateAlignerProgress();
     if (id === 'fug-oj-now' || id === 'fug-ob-now' || id === 'fug-lfh-now') calcGmdChange();
   });
-  ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred'].forEach(loadForm);
+  ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred','retention'].forEach(loadForm);
   updateApplianceCard();
   updateBondCard();
   updateProgress();
 
   // Default: all aseptic checkboxes checked (including tad)
-  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','fug-aseptic','em-aseptic','db-aseptic','tad-aseptic','ref-aseptic'].forEach(id=>{
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','fug-aseptic','em-aseptic','db-aseptic','tad-aseptic','ref-aseptic','ret-aseptic'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.checked=true;
   });
 
