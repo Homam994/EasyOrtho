@@ -67,6 +67,19 @@ function switchTab(tab) {
       if (lw && !lw.children.length) buildRefExtRow(lw, lowerTeeth);
     }
   }
+
+  // ── Lazy init for referral tab ──────────────────────────────────────
+  if (tab === 'referral') {
+    initRflChart();
+    // Restore selected teeth labels after chart is built
+    if (rflChartSet.size) {
+      const lbl = document.getElementById('rfl-chart-selected');
+      if (lbl) {
+        const sorted = [...rflChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+        lbl.textContent = sorted.join(', ');
+      }
+    }
+  }
 }
 
 // ── Tab arrow scroll buttons ───────────────────────────────────────────
@@ -1320,6 +1333,82 @@ function collectFormData(tab) {
     }
 
     // ══════════════════════════════════════
+    case 'referral': {
+      S('Interdisciplinary Referral');
+      R('Patient',    get('rfl-name'));
+      R('Age',        get('rfl-age') ? get('rfl-age')+' years' : '');
+      R('Sex',        radio('rfl-sex'));
+      R('Clinician',  get('rfl-clinician'));
+      R('Date',       get('rfl-date'));
+
+      S('Referral Destination');
+      R('Specialty',       radio('rfl-specialty'));
+      R('Specialty detail',get('rfl-specialty-other'));
+      R('Urgency',         radio('rfl-urgency'));
+      R('Urgency reason',  get('rfl-urgency-reason'));
+      R('Referred to',     get('rfl-dest-clinician'));
+      R('Clinic / Hospital', get('rfl-dest-clinic'));
+
+      S('Reason for Referral');
+      const procs=[];
+      if(isChk('rfl-proc-ext-simple'))        procs.push('Extraction — simple');
+      if(isChk('rfl-proc-ext-surgical'))      procs.push('Extraction — surgical');
+      if(isChk('rfl-proc-exposure'))          procs.push('Exposure of impacted tooth');
+      if(isChk('rfl-proc-uprighting'))        procs.push('Surgical uprighting');
+      if(isChk('rfl-proc-frenectomy-labial')) procs.push('Frenectomy — labial');
+      if(isChk('rfl-proc-frenectomy-lingual'))procs.push('Frenectomy — lingual');
+      if(isChk('rfl-proc-gingivectomy'))      procs.push('Gingivectomy');
+      if(isChk('rfl-proc-crown-lengthening')) procs.push('Crown lengthening');
+      if(isChk('rfl-proc-bone-graft'))        procs.push('Bone grafting');
+      if(isChk('rfl-proc-perio-nonsurg'))     procs.push('Periodontal treatment (non-surgical)');
+      if(isChk('rfl-proc-perio-surg'))        procs.push('Periodontal surgery');
+      if(isChk('rfl-proc-caries'))            procs.push('Caries management / Restoration');
+      if(isChk('rfl-proc-rct'))               procs.push('Root canal treatment');
+      if(isChk('rfl-proc-bleaching'))         procs.push('Bleaching / Whitening');
+      if(isChk('rfl-proc-prosthetic'))        procs.push('Crown / Bridge / Veneer');
+      if(isChk('rfl-proc-implant-place'))     procs.push('Implant placement');
+      if(isChk('rfl-proc-implant-restore'))   procs.push('Implant restoration');
+      if(isChk('rfl-proc-biopsy'))            procs.push('Biopsy / Lesion assessment');
+      if(isChk('rfl-proc-tmj'))               procs.push('TMJ assessment');
+      if(isChk('rfl-proc-cbct'))              procs.push('CBCT assessment');
+      if(isChk('rfl-proc-sleep'))             procs.push('Sleep apnoea assessment');
+      if(isChk('rfl-proc-other') && get('rfl-proc-other-detail')) procs.push(get('rfl-proc-other-detail'));
+      if(procs.length) R('Procedures required', procs.join(', '));
+      const teethSel=[...rflChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+      if(teethSel.length) R('Teeth involved', teethSel.join(', '));
+      R('Clinical findings / Diagnosis', get('rfl-diagnosis'));
+      R('Orthodontic stage', radio('rfl-ortho-stage'));
+
+      S('Background Information');
+      R('Relevant medical history', get('rfl-medical-hx'));
+      R('Current medications',      get('rfl-medications'));
+      R('Allergies',                get('rfl-allergies'));
+      R('Previous dental treatment',get('rfl-prev-dental'));
+      const xrays=[];
+      if(isChk('rfl-xray-opg'))  xrays.push('OPG');
+      if(isChk('rfl-xray-pa'))   xrays.push('PA X-ray');
+      if(isChk('rfl-xray-cbct')) xrays.push('CBCT');
+      if(isChk('rfl-xray-ceph')) xrays.push('Cephalogram');
+      if(isChk('rfl-xray-bw'))   xrays.push('Bitewings');
+      if(isChk('rfl-xray-none')) xrays.push('No radiographs');
+      if(xrays.length) R('Radiographs', xrays.join(', '));
+      const recs=[];
+      if(isChk('rfl-rec-photos'))  recs.push('Clinical photographs');
+      if(isChk('rfl-rec-models'))  recs.push('Study models / scans');
+      if(isChk('rfl-rec-letter'))  recs.push('Previous referral letters');
+      if(isChk('rfl-rec-consent')) recs.push('Consent form');
+      if(recs.length) R('Enclosed records', recs.join(', '));
+
+      S('Specific Instructions');
+      R('Specific request',     get('rfl-specific-request'));
+      R('Post-procedure',       radio('rfl-followup'));
+      R('Timing',               radio('rfl-timing'));
+      R('Expected outcome',     get('rfl-expected-outcome'));
+      R('Additional notes',     get('rfl-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
     case 'retention': {
       S('Retention Follow-Up Visit');
       R('Patient',          get('ret-name'));
@@ -1555,6 +1644,7 @@ const TAB_LABELS = {
   'tad':        'TAD / Mini-screw',
   'referred':   'Referred Patient Assessment',
   'retention':  'Retention Follow-Up',
+  'referral':   'Interdisciplinary Referral',
 };
 
 
@@ -1728,6 +1818,7 @@ function saveCurrentForm() {
   if(currentTab==='fu-aligner') data['_fu_tad_fua']=fuTadState['fua'];
   if(currentTab==='plan') data['_ext_chart']=[...extChartSet];
   if(currentTab==='referred') data['_ref_ext_chart']=[...refExtChartSet];
+  if(currentTab==='referral') data['_rfl_chart']     =[...rflChartSet];
   if(currentTab==='retention'){
     data['_ret_chart_upper']=[...retChartSets.upper];
     data['_ret_chart_lower']=[...retChartSets.lower];
@@ -1767,6 +1858,30 @@ function loadForm(tab) {
           }
         });
       }
+      return;
+    }
+    if(key==='_rfl_chart'){
+      rflChartSet.clear();
+      (data[key]||[]).forEach(n => rflChartSet.add(n));
+      // Rebuild chart labels if tab was already visited
+      setTimeout(() => {
+        const upper = document.getElementById('rfl-chart-upper');
+        if (upper && upper.children.length) {
+          upper.querySelectorAll('.mini-tooth').forEach(btn => {
+            const n = parseInt(btn.dataset.fdi);
+            btn.classList.toggle('selected', rflChartSet.has(n));
+          });
+          document.getElementById('rfl-chart-lower')?.querySelectorAll('.mini-tooth').forEach(btn => {
+            const n = parseInt(btn.dataset.fdi);
+            btn.classList.toggle('selected', rflChartSet.has(n));
+          });
+          const lbl = document.getElementById('rfl-chart-selected');
+          if(lbl){
+            const sorted=[...rflChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+            lbl.textContent=sorted.length?sorted.join(', '):'—';
+          }
+        }
+      }, 100);
       return;
     }
     if(key==='_ret_chart_upper'){
@@ -1914,6 +2029,7 @@ function clearCurrentForm() {
   // Extraction charts
   extChartSet.clear();
   refExtChartSet.clear();
+  rflChartSet.clear();
   // Retention charts
   retChartSets.upper.clear();
   retChartSets.lower.clear();
@@ -3022,6 +3138,257 @@ function updateRefDecision() {
 }
 
 // ══════════════════════════════════════════════════════════════
+// INTERDISCIPLINARY REFERRAL — helper functions
+// ══════════════════════════════════════════════════════════════
+
+const rflChartSet = new Set();
+
+function initRflChart() {
+  const upperRow = document.getElementById('rfl-chart-upper');
+  const lowerRow = document.getElementById('rfl-chart-lower');
+  if (!upperRow || upperRow.children.length) return;
+  // Build upper row
+  upperTeeth.forEach((num, i) => {
+    if (i === 8) {
+      const sp = document.createElement('div');
+      sp.style.cssText = 'width:4px;border-left:2px dashed var(--gold);margin:0 1px;flex-shrink:0;';
+      upperRow.appendChild(sp);
+    }
+    const btn = document.createElement('div');
+    btn.className = 'mini-tooth' + (rflChartSet.has(num) ? ' selected' : '');
+    btn.textContent = toothLabel(num);
+    btn.dataset.fdi = num;
+    btn.onclick = () => toggleRflTooth(btn, num);
+    upperRow.appendChild(btn);
+  });
+  // Build lower row
+  lowerTeeth.forEach((num, i) => {
+    if (i === 8) {
+      const sp = document.createElement('div');
+      sp.style.cssText = 'width:4px;border-left:2px dashed var(--gold);margin:0 1px;flex-shrink:0;';
+      lowerRow.appendChild(sp);
+    }
+    const btn = document.createElement('div');
+    btn.className = 'mini-tooth' + (rflChartSet.has(num) ? ' selected' : '');
+    btn.textContent = toothLabel(num);
+    btn.dataset.fdi = num;
+    btn.onclick = () => toggleRflTooth(btn, num);
+    lowerRow.appendChild(btn);
+  });
+}
+
+function toggleRflTooth(btn, num) {
+  num = parseInt(num);
+  if (rflChartSet.has(num)) rflChartSet.delete(num);
+  else rflChartSet.add(num);
+  btn.classList.toggle('selected');
+  const lbl = document.getElementById('rfl-chart-selected');
+  if (lbl) {
+    const sorted = [...rflChartSet].sort((a, b) => a - b).map(n => toothLabel(n));
+    lbl.textContent = sorted.length ? sorted.join(', ') : '—';
+  }
+}
+
+function printReferralLetter() {
+  // Collect data
+  const name      = document.getElementById('rfl-name')?.value || '___________';
+  const age       = document.getElementById('rfl-age')?.value || '___';
+  const sex       = document.querySelector('[name="rfl-sex"]:checked')?.value || '';
+  const clinician = document.getElementById('rfl-clinician')?.value || '___________';
+  const dateVal   = document.getElementById('rfl-date')?.value || '';
+  const dateStr   = dateVal ? new Date(dateVal).toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}) : new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+  const specialty = document.querySelector('[name="rfl-specialty"]:checked')?.value || '';
+  const urgency   = document.querySelector('[name="rfl-urgency"]:checked')?.value || '';
+  const urgencyReason = document.getElementById('rfl-urgency-reason')?.value || '';
+  const destClinician = document.getElementById('rfl-dest-clinician')?.value || 'Dear Colleague';
+  const destClinic    = document.getElementById('rfl-dest-clinic')?.value || '';
+  const diagnosis     = document.getElementById('rfl-diagnosis')?.value || '';
+  const orthoStage    = document.querySelector('[name="rfl-ortho-stage"]:checked')?.value || '';
+  const medHx         = document.getElementById('rfl-medical-hx')?.value || '';
+  const meds          = document.getElementById('rfl-medications')?.value || '';
+  const allergies     = document.getElementById('rfl-allergies')?.value || 'NKDA';
+  const prevDental    = document.getElementById('rfl-prev-dental')?.value || '';
+  const specificReq   = document.getElementById('rfl-specific-request')?.value || '';
+  const followup      = document.querySelector('[name="rfl-followup"]:checked')?.value || '';
+  const timing        = document.querySelector('[name="rfl-timing"]:checked')?.value || '';
+  const outcome       = document.getElementById('rfl-expected-outcome')?.value || '';
+  const notes         = document.getElementById('rfl-notes')?.value || '';
+
+  // Procedures
+  const procs = [];
+  const procMap = {
+    'rfl-proc-ext-simple':        'simple extraction',
+    'rfl-proc-ext-surgical':      'surgical extraction',
+    'rfl-proc-exposure':          'surgical exposure of impacted tooth',
+    'rfl-proc-uprighting':        'surgical uprighting',
+    'rfl-proc-frenectomy-labial': 'labial frenectomy',
+    'rfl-proc-frenectomy-lingual':'lingual frenectomy (tongue tie release)',
+    'rfl-proc-gingivectomy':      'gingivectomy / gingival recontouring',
+    'rfl-proc-crown-lengthening': 'crown lengthening',
+    'rfl-proc-bone-graft':        'bone grafting / ridge augmentation',
+    'rfl-proc-perio-nonsurg':     'non-surgical periodontal treatment (scaling and root surface debridement)',
+    'rfl-proc-perio-surg':        'periodontal surgery',
+    'rfl-proc-caries':            'caries management and restoration',
+    'rfl-proc-rct':               'root canal treatment',
+    'rfl-proc-bleaching':         'tooth bleaching / whitening',
+    'rfl-proc-prosthetic':        'provision of crown / bridge / veneer',
+    'rfl-proc-implant-place':     'implant placement',
+    'rfl-proc-implant-restore':   'implant crown / prosthetic restoration',
+    'rfl-proc-biopsy':            'biopsy and lesion assessment',
+    'rfl-proc-tmj':               'TMJ assessment and management',
+    'rfl-proc-cbct':              'CBCT / advanced radiographic assessment',
+    'rfl-proc-sleep':             'sleep apnoea assessment',
+  };
+  Object.entries(procMap).forEach(([id, label]) => {
+    if (document.getElementById(id)?.checked) procs.push(label);
+  });
+  const otherProc = document.getElementById('rfl-proc-other')?.checked
+    ? document.getElementById('rfl-proc-other-detail')?.value : '';
+  if (otherProc) procs.push(otherProc);
+
+  // Teeth
+  const teethSorted = [...rflChartSet].sort((a,b)=>a-b).map(n=>toothLabel(n));
+  const teethStr = teethSorted.length ? teethSorted.join(', ') : '';
+
+  // Radiographs
+  const xrays = [];
+  if (document.getElementById('rfl-xray-opg')?.checked)  xrays.push('OPG');
+  if (document.getElementById('rfl-xray-pa')?.checked)   xrays.push('periapical radiograph');
+  if (document.getElementById('rfl-xray-cbct')?.checked) xrays.push('CBCT');
+  if (document.getElementById('rfl-xray-ceph')?.checked) xrays.push('lateral cephalogram');
+  if (document.getElementById('rfl-xray-bw')?.checked)   xrays.push('bitewing radiographs');
+
+  // Records
+  const records = [];
+  if (document.getElementById('rfl-rec-photos')?.checked) records.push('clinical photographs');
+  if (document.getElementById('rfl-rec-models')?.checked) records.push('study models / digital scans');
+  if (document.getElementById('rfl-rec-letter')?.checked) records.push('previous referral letters');
+  if (document.getElementById('rfl-rec-consent')?.checked) records.push('consent form');
+
+  // Build letter
+  const procSentence = procs.length
+    ? `We would be grateful if you could undertake the following: <strong>${procs.join(', ')}</strong>${teethStr ? ` (${teethStr})` : ''}.`
+    : 'We would be grateful for your assessment and management of this patient.';
+
+  const urgencyLine = urgency
+    ? `<p><strong>Urgency:</strong> ${urgency}${urgencyReason ? ` — ${urgencyReason}` : ''}.</p>` : '';
+
+  const stageLine = orthoStage
+    ? `<p>This patient is currently at the <strong>${orthoStage}</strong> stage of orthodontic treatment.</p>` : '';
+
+  const diagLine = diagnosis
+    ? `<p><strong>Clinical findings / Diagnosis:</strong> ${diagnosis}</p>` : '';
+
+  const medLine  = medHx
+    ? `<p><strong>Relevant medical history:</strong> ${medHx}</p>` : '';
+  const medsLine = meds
+    ? `<p><strong>Current medications:</strong> ${meds}</p>` : '';
+  const allergyLine = `<p><strong>Allergies:</strong> ${allergies}</p>`;
+
+  const prevLine = prevDental
+    ? `<p><strong>Relevant previous dental treatment:</strong> ${prevDental}</p>` : '';
+
+  const xrayLine = xrays.length
+    ? `<p><strong>Radiographs enclosed / available:</strong> ${xrays.join(', ')}.</p>` : '';
+  const recLine = records.length
+    ? `<p><strong>Enclosed records:</strong> ${records.join(', ')}.</p>` : '';
+
+  const specificLine = specificReq
+    ? `<p><strong>Specific instructions:</strong> ${specificReq}</p>` : '';
+
+  const followupLine = followup
+    ? `<p>Following the procedure, we would ask that you <strong>${followup.toLowerCase()}</strong>.</p>` : '';
+
+  const timingLine = timing
+    ? `<p><strong>Timing:</strong> This procedure is required <strong>${timing.toLowerCase()}</strong>.</p>` : '';
+
+  const outcomeLine = outcome
+    ? `<p><strong>Expected outcome:</strong> ${outcome}</p>` : '';
+
+  const notesLine = notes
+    ? `<p><strong>Additional notes:</strong> ${notes}</p>` : '';
+
+  const salutation = destClinician && destClinician !== 'Dr. ...'
+    ? `Dear Dr. ${destClinician.replace(/^Dr\.?\s*/i, '')},`
+    : `Dear Colleague,`;
+
+  const clinicLine = destClinic ? `<br>${destClinic}` : '';
+
+  const letter = `
+<div class="print-referral-letter">
+  <div class="rfl-header">
+    <div class="rfl-clinic-name" id="print-clinic-name-rfl">EasyOrtho Orthodontic Clinic</div>
+    <div class="rfl-date">${dateStr}</div>
+  </div>
+  <div class="rfl-to">
+    ${salutation}${clinicLine ? '<br>' + destClinic : ''}
+    ${specialty ? '<br><em>' + specialty + '</em>' : ''}
+  </div>
+  <div class="rfl-re"><strong>Re: ${name}${age ? ', ' + age + ' years' : ''}${sex ? ', ' + sex : ''}</strong></div>
+  ${urgencyLine}
+  <p>Thank you for seeing the above-named patient who is under our care${orthoStage && orthoStage !== 'Not under orthodontic treatment' ? ' for orthodontic treatment' : ''}. ${procSentence}</p>
+  ${stageLine}
+  ${diagLine}
+  ${medLine}
+  ${medsLine}
+  ${allergyLine}
+  ${prevLine}
+  ${xrayLine}
+  ${recLine}
+  ${specificLine}
+  ${timingLine}
+  ${followupLine}
+  ${outcomeLine}
+  ${notesLine}
+  <p>Please do not hesitate to contact us if you require any further information. We look forward to your report.</p>
+  <div class="rfl-signature">
+    <p>Yours sincerely,</p>
+    <div class="rfl-sig-line"></div>
+    <p><strong>${clinician || '___________'}</strong><br>Orthodontist</p>
+  </div>
+</div>`;
+
+  // Print
+  const printWin = window.open('', '_blank', 'width=900,height=700');
+  if (!printWin) { showToast('⚠️ Pop-up blocked — allow pop-ups and try again','error'); return; }
+
+  const writeLetter = (css) => {
+    const styleBlock = css
+      ? `<style>${css}
+.print-referral-letter{max-width:720px;margin:40px auto;font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.7;color:#1a1a1a;}
+.rfl-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1a3448;padding-bottom:12px;margin-bottom:24px;}
+.rfl-clinic-name{font-size:18px;font-weight:700;color:#1a3448;}
+.rfl-date{font-size:13px;color:#555;}
+.rfl-to{margin-bottom:16px;line-height:1.8;}
+.rfl-re{margin-bottom:20px;font-size:15px;border-left:4px solid #1a3448;padding-left:12px;}
+.rfl-signature{margin-top:36px;}
+.rfl-sig-line{border-top:1px solid #999;width:220px;margin:24px 0 8px;}
+p{margin:0 0 10px;}
+@media print{body{margin:0;padding:0;}}
+</style>`
+      : `<link rel="stylesheet" href="./app.css">`;
+    printWin.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Referral Letter — ${name}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+${styleBlock}
+</head><body>${letter}</body></html>`);
+    printWin.document.close();
+    printWin.onload = () => setTimeout(() => { printWin.focus(); printWin.print(); setTimeout(() => printWin.close(), 1000); }, 600);
+    setTimeout(() => { if (!printWin.closed) { printWin.focus(); printWin.print(); setTimeout(() => printWin.close(), 1000); } }, 2000);
+  };
+
+  if ('caches' in window) {
+    caches.match('./app.css')
+      .then(r => r ? r.text() : fetch('./app.css', {cache:'force-cache'}).then(r=>r.text()))
+      .then(css => writeLetter(css))
+      .catch(() => writeLetter(null));
+  } else {
+    fetch('./app.css').then(r=>r.text()).then(css=>writeLetter(css)).catch(()=>writeLetter(null));
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 // RETENTION FOLLOW-UP — helper functions
 // ══════════════════════════════════════════════════════════════
 
@@ -3139,6 +3506,7 @@ function autoSaveTab(tab) {
   if (tab === 'emergency') data['_em_pills'] = [...activeEmPills];
   if (tab === 'exam')      data['__teeth']   = { ...toothState };
   if (tab === 'referred')  data['_ref_ext_chart'] = [...refExtChartSet];
+  if (tab === 'referral')  data['_rfl_chart']      = [...rflChartSet];
   if (tab === 'retention') {
     data['_ret_chart_upper'] = [...retChartSets.upper];
     data['_ret_chart_lower'] = [...retChartSets.lower];
@@ -3220,7 +3588,7 @@ document.addEventListener('keydown', e => {
 });
 
 function cycleTab(dir) {
-  const tabIds = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred','retention'];
+  const tabIds = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred','retention','referral'];
   const cur = tabIds.indexOf(currentTab);
   const next = (cur + dir + tabIds.length) % tabIds.length;
   switchTab(tabIds[next]);
@@ -3302,7 +3670,7 @@ function cycleTab(dir) {
     if (id === 'fua-current-aligner' || id === 'fua-total-aligners') updateAlignerProgress();
     if (id === 'fug-oj-now' || id === 'fug-ob-now' || id === 'fug-lfh-now') calcGmdChange();
   });
-  ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred','retention'].forEach(loadForm);
+  ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad','referred','retention','referral'].forEach(loadForm);
   updateApplianceCard();
   updateBondCard();
   updateProgress();

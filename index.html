@@ -95,6 +95,9 @@
     <button class="tab-btn" onclick="switchTab('retention')" id="tbtn-retention">
       <span class="tab-icon">🔵</span> Retention F/U<span class="unsaved-dot"></span>
     </button>
+    <button class="tab-btn" onclick="switchTab('referral')" id="tbtn-referral">
+      <span class="tab-icon">📨</span> Referral<span class="unsaved-dot"></span>
+    </button>
   </nav>
   </div><!-- /tab-nav-wrap -->
   <button class="tab-arrow" id="tab-arrow-right" onclick="scrollTabs(1)" title="More tabs">›</button>
@@ -3853,6 +3856,236 @@
   </div>
 
 </div><!-- /panel-retention -->
+
+
+<!-- ═══════════════════════════════════════════════
+     TAB 11: INTERDISCIPLINARY REFERRAL
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-referral">
+  <div class="patient-bar">
+    <div class="field"><label>Patient Name</label><input type="text" id="rfl-name" placeholder="Full name"></div>
+    <div class="field"><label>Age</label><input type="number" id="rfl-age" placeholder="Years" min="1" max="120"></div>
+    <div class="field"><label>Sex</label>
+      <div class="toggle-group" style="flex-direction:row;gap:6px;">
+        <label><input type="radio" name="rfl-sex" value="Male"><span>M</span></label>
+        <label><input type="radio" name="rfl-sex" value="Female"><span>F</span></label>
+      </div>
+    </div>
+    <div class="field"><label>Referring Clinician</label><input type="text" id="rfl-clinician" placeholder="Dr. ..." list="clinician-list-datalist"></div>
+    <div class="visit-date-box"><label>Date</label><input type="date" id="rfl-date"></div>
+  </div>
+
+  <!-- Banner -->
+  <div style="background:linear-gradient(135deg,#0d1b2a,#1a3448);border-radius:10px;padding:13px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="font-size:22px;flex-shrink:0;">📨</div>
+    <div>
+      <div style="color:var(--teal-mid);font-size:0.8rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;">Interdisciplinary Referral</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:0.73rem;margin-top:2px;">Complete all relevant sections then use Print Referral Letter to generate a professional referral document.</div>
+    </div>
+    <button onclick="printReferralLetter()" style="margin-left:auto;background:var(--teal);color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:0.78rem;font-weight:700;cursor:pointer;flex-shrink:0;">🖨 Print Referral Letter</button>
+  </div>
+
+  <!-- ─── SECTION 1: Referral Destination ─── -->
+  <div class="section-card" id="rfl-sec-dest">
+    <div class="section-header" onclick="toggleSection('rfl-sec-dest')">
+      <div class="section-icon navy">🏥</div>
+      <div class="section-title">Referral Destination</div>
+      <div class="section-badge">Required</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Referred To — Specialty</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="rfl-specialty" value="Oral Surgery"><span>🔪 Oral Surgery</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Periodontology / Gum Specialist"><span>🦷 Periodontology</span></label>
+            <label><input type="radio" name="rfl-specialty" value="General Dental Practitioner (GDP)"><span>🏥 GDP</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Restorative / Conservative Dentistry"><span>🔧 Restorative</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Endodontics"><span>🦷 Endodontics</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Paediatric Dentistry"><span>👶 Paediatric</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Oral Medicine / Pathology"><span>🔬 Oral Medicine</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Maxillofacial Surgery (OMFS)"><span>🏥 OMFS</span></label>
+            <label><input type="radio" name="rfl-specialty" value="ENT"><span>👂 ENT</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Implantology"><span>🔩 Implantology</span></label>
+            <label><input type="radio" name="rfl-specialty" value="Other"><span>Other</span></label>
+          </div>
+          <input type="text" id="rfl-specialty-other" placeholder="Other specialty..." style="margin-top:5px;">
+        </div>
+        <div class="field">
+          <label>Urgency</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="rfl-urgency" value="Routine (within 4–6 weeks)"><span>🟢 Routine (4–6 weeks)</span></label>
+            <label><input type="radio" name="rfl-urgency" value="Soon (within 2 weeks)"><span>🟡 Soon (2 weeks)</span></label>
+            <label><input type="radio" name="rfl-urgency" value="Urgent (within 48–72 hrs)"><span>🟠 Urgent (48–72 hrs)</span></label>
+            <label><input type="radio" name="rfl-urgency" value="Emergency (same day)"><span>🔴 Emergency (same day)</span></label>
+          </div>
+          <input type="text" id="rfl-urgency-reason" placeholder="Urgency justification (if urgent)..." style="margin-top:5px;">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Referred Clinician Name</label><input type="text" id="rfl-dest-clinician" placeholder="Dr. ..."></div>
+        <div class="field"><label>Clinic / Hospital</label><input type="text" id="rfl-dest-clinic" placeholder="Clinic or hospital name"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 2: Reason for Referral ─── -->
+  <div class="section-card" id="rfl-sec-reason">
+    <div class="section-header" onclick="toggleSection('rfl-sec-reason')">
+      <div class="section-icon gold">📋</div>
+      <div class="section-title">Reason for Referral</div>
+      <div class="section-badge">Core</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="sub-title">Procedure(s) Required</div>
+      <div class="grid-3">
+        <label class="check-item"><input type="checkbox" id="rfl-proc-ext-simple"><span>Extraction — simple</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-ext-surgical"><span>Extraction — surgical</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-exposure"><span>Exposure of impacted tooth</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-uprighting"><span>Surgical uprighting</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-frenectomy-labial"><span>Frenectomy — labial</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-frenectomy-lingual"><span>Frenectomy — lingual (tongue tie)</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-gingivectomy"><span>Gingivectomy / Gingival recontouring</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-crown-lengthening"><span>Crown lengthening</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-bone-graft"><span>Bone grafting / Ridge augmentation</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-perio-nonsurg"><span>Periodontal treatment (scaling / RSD)</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-perio-surg"><span>Periodontal surgery</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-caries"><span>Caries management / Restoration</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-rct"><span>Root canal treatment (RCT)</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-bleaching"><span>Tooth bleaching / Whitening</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-prosthetic"><span>Crown / Bridge / Veneer</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-implant-place"><span>Implant placement</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-implant-restore"><span>Implant crown / Restoration</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-biopsy"><span>Biopsy / Lesion assessment</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-tmj"><span>TMJ assessment / Treatment</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-cbct"><span>CBCT / Radiographic assessment</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-sleep"><span>Sleep apnoea assessment</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-proc-other"><span>Other (specify below)</span></label>
+      </div>
+      <div class="field"><label>Other / Additional Procedure Details</label>
+        <input type="text" id="rfl-proc-other-detail" placeholder="Describe additional procedures...">
+      </div>
+
+      <div class="sub-title" style="margin-top:4px;">Teeth Involved</div>
+      <div style="background:var(--grey-50);border:1.5px solid var(--teal-mid);border-radius:9px;padding:12px 14px;">
+        <div style="font-size:0.68rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Select involved teeth</div>
+        <div id="rfl-chart-upper" style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px;"></div>
+        <div id="rfl-chart-lower" style="display:flex;flex-wrap:wrap;gap:3px;"></div>
+        <div style="font-size:0.72rem;color:var(--grey-500);margin-top:7px;">Selected: <span id="rfl-chart-selected" style="font-weight:700;color:var(--teal);">—</span></div>
+      </div>
+
+      <div class="grid-2" style="margin-top:4px;">
+        <div class="field">
+          <label>Clinical Findings / Diagnosis</label>
+          <textarea id="rfl-diagnosis" placeholder="Relevant clinical and radiographic findings, diagnosis..."></textarea>
+        </div>
+        <div class="field">
+          <label>Current Stage of Orthodontic Treatment</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="rfl-ortho-stage" value="Pre-treatment — not yet started"><span>Pre-treatment</span></label>
+            <label><input type="radio" name="rfl-ortho-stage" value="Early alignment / leveling"><span>Early alignment</span></label>
+            <label><input type="radio" name="rfl-ortho-stage" value="Space closure"><span>Space closure</span></label>
+            <label><input type="radio" name="rfl-ortho-stage" value="Finishing"><span>Finishing</span></label>
+            <label><input type="radio" name="rfl-ortho-stage" value="Retention"><span>Retention</span></label>
+            <label><input type="radio" name="rfl-ortho-stage" value="Not under orthodontic treatment"><span>Not under ortho tx</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 3: Background Information ─── -->
+  <div class="section-card" id="rfl-sec-background">
+    <div class="section-header" onclick="toggleSection('rfl-sec-background')">
+      <div class="section-icon purple">🩺</div>
+      <div class="section-title">Background Information</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Relevant Medical History</label>
+          <textarea id="rfl-medical-hx" placeholder="Systemic conditions, previous surgeries, relevant history..."></textarea>
+        </div>
+        <div class="field">
+          <label>Current Medications</label>
+          <textarea id="rfl-medications" placeholder="List current medications and dosages..."></textarea>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Allergies</label>
+          <input type="text" id="rfl-allergies" placeholder="Drug, latex, material allergies — NKDA if none">
+        </div>
+        <div class="field"><label>Previous Dental Treatment Relevant to Referral</label>
+          <input type="text" id="rfl-prev-dental" placeholder="e.g. Previous RCT on 36, extraction of 48 in 2022...">
+        </div>
+      </div>
+      <div class="sub-title">Radiographs Available</div>
+      <div class="grid-3">
+        <label class="check-item"><input type="checkbox" id="rfl-xray-opg"><span>🦴 OPG enclosed / available</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-xray-pa"><span>🔬 PA X-ray enclosed</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-xray-cbct"><span>📡 CBCT available</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-xray-ceph"><span>📐 Cephalogram available</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-xray-bw"><span>🦷 Bitewing X-rays</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-xray-none"><span>❌ No radiographs available</span></label>
+      </div>
+      <div class="sub-title" style="margin-top:4px;">Records Enclosed</div>
+      <div class="grid-3">
+        <label class="check-item"><input type="checkbox" id="rfl-rec-photos"><span>📸 Clinical photographs</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-rec-models"><span>🔵 Study models / Digital scans</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-rec-letter"><span>✉️ Previous referral letters</span></label>
+        <label class="check-item"><input type="checkbox" id="rfl-rec-consent"><span>✍️ Consent form</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 4: Specific Instructions ─── -->
+  <div class="section-card" id="rfl-sec-instructions">
+    <div class="section-header" onclick="toggleSection('rfl-sec-instructions')">
+      <div class="section-icon">📝</div>
+      <div class="section-title">Specific Instructions to Colleague</div>
+      <div class="section-badge">Important</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Specific Request</label>
+        <textarea id="rfl-specific-request" placeholder="e.g. Please expose 13 with a gold chain and refer back once eruption traction can commence. Please ensure the chain is of sufficient length to allow bonding of the attachment."></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Post-procedure Follow-up</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="rfl-followup" value="Refer back to our clinic after procedure"><span>↩️ Refer back to our clinic</span></label>
+            <label><input type="radio" name="rfl-followup" value="Shared care — update us and continue with GDP"><span>🤝 Shared care</span></label>
+            <label><input type="radio" name="rfl-followup" value="Discharge back to GDP after procedure"><span>Discharge to GDP</span></label>
+            <label><input type="radio" name="rfl-followup" value="Review in our clinic at next scheduled appointment"><span>Review at next scheduled appt</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Timing Relative to Orthodontic Treatment</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="rfl-timing" value="Before orthodontic treatment begins"><span>Before ortho begins</span></label>
+            <label><input type="radio" name="rfl-timing" value="During active orthodontic treatment"><span>During active treatment</span></label>
+            <label><input type="radio" name="rfl-timing" value="After orthodontic treatment completes"><span>After ortho completes</span></label>
+            <label><input type="radio" name="rfl-timing" value="Independent of orthodontic timeline"><span>Independent of ortho</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Expected Outcome / Treatment Goal</label>
+        <textarea id="rfl-expected-outcome" placeholder="What we hope to achieve from this referral and how it integrates with the overall treatment plan..."></textarea>
+      </div>
+      <div class="field">
+        <label>Additional Notes</label>
+        <textarea id="rfl-notes" class="notes-area" placeholder="Any other relevant information for the receiving clinician..."></textarea>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /panel-referral -->
 
 </div><!-- /container -->
 
