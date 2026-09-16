@@ -1334,32 +1334,32 @@ function collectFormData(tab) {
 
     // ══════════════════════════════════════
     case 'referral': {
-      // ── جمع البيانات ──────────────────────────────────────────────
-      const rflPatient    = get('rfl-name')           || '___________';
-      const rflAge        = get('rfl-age')            || '___';
-      const rflSex        = radio('rfl-sex')          || '';
-      const rflClinician  = get('rfl-clinician')      || '___________';
+      // ── جمع البيانات الخام ────────────────────────────────────────
+      const rflPatient    = get('rfl-name')            || '';
+      const rflAge        = get('rfl-age')             || '';
+      const rflSex        = radio('rfl-sex')           || '';
+      const rflClinician  = get('rfl-clinician')       || '';
       const rflDateVal    = get('rfl-date')            || '';
       const rflDateStr    = rflDateVal
         ? new Date(rflDateVal + 'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})
         : new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
-      const rflSpecialty  = radio('rfl-specialty')    || '';
-      const rflOther      = get('rfl-specialty-other')|| '';
-      const rflUrgency    = radio('rfl-urgency')      || '';
-      const rflUrgReason  = get('rfl-urgency-reason') || '';
-      const rflDestClin   = get('rfl-dest-clinician') || '';
-      const rflDestClinic = get('rfl-dest-clinic')    || '';
-      const rflDiagnosis  = get('rfl-diagnosis')      || '';
-      const rflStage      = radio('rfl-ortho-stage')  || '';
-      const rflMedHx      = get('rfl-medical-hx')     || '';
-      const rflMeds       = get('rfl-medications')    || '';
-      const rflAllergies  = get('rfl-allergies')      || 'NKDA';
-      const rflPrevDental = get('rfl-prev-dental')    || '';
+      const rflSpecialty  = radio('rfl-specialty')     || '';
+      const rflOtherSpec  = get('rfl-specialty-other') || '';
+      const rflUrgency    = radio('rfl-urgency')       || '';
+      const rflUrgReason  = get('rfl-urgency-reason')  || '';
+      const rflDestClin   = get('rfl-dest-clinician')  || '';
+      const rflDestClinic = get('rfl-dest-clinic')     || '';
+      const rflDiagnosis  = get('rfl-diagnosis')       || '';
+      const rflStage      = radio('rfl-ortho-stage')   || '';
+      const rflMedHx      = get('rfl-medical-hx')      || '';
+      const rflMeds       = get('rfl-medications')     || '';
+      const rflAllergies  = get('rfl-allergies')       || 'NKDA';
+      const rflPrevDental = get('rfl-prev-dental')     || '';
       const rflReq        = get('rfl-specific-request')|| '';
-      const rflFollowup   = radio('rfl-followup')     || '';
-      const rflTiming     = radio('rfl-timing')       || '';
+      const rflFollowup   = radio('rfl-followup')      || '';
+      const rflTiming     = radio('rfl-timing')        || '';
       const rflOutcome    = get('rfl-expected-outcome')|| '';
-      const rflNotes      = get('rfl-notes')          || '';
+      const rflNotes      = get('rfl-notes')           || '';
 
       const rflProcs = [];
       if(isChk('rfl-proc-ext-simple'))        rflProcs.push('simple extraction');
@@ -1399,68 +1399,69 @@ function collectFormData(tab) {
       if(isChk('rfl-rec-letter'))  rflRecs.push('previous referral letters');
       if(isChk('rfl-rec-consent')) rflRecs.push('consent form');
 
-      // ── بناء الرسالة السردية ──────────────────────────────────────
-      const salutation = rflDestClin
-        ? `Dear Dr. ${rflDestClin.replace(/^Dr\.?\s*/i,'')},`
+      // ── بناء نص الرسالة السردية ──────────────────────────────────
+      const rflSpecialtyStr = rflSpecialty === 'Other' ? (rflOtherSpec||'Specialist') : (rflSpecialty||'Specialist');
+      const rflSalutation   = rflDestClin
+        ? 'Dear Dr. ' + rflDestClin.replace(/^Dr\.?\s*/i,'') + ','
         : 'Dear Colleague,';
-      const specialtyStr = rflSpecialty === 'Other' ? (rflOther || 'Specialist') : (rflSpecialty || 'Specialist');
-      const procStr = rflProcs.length
-        ? rflProcs.join('; ')
-        : 'assessment and management';
-      const teethStr = rflTeeth.length ? ` (${rflTeeth.join(', ')})` : '';
-      const underCare = rflStage && rflStage !== 'Not under orthodontic treatment'
-        ? ` who is currently under our care for orthodontic treatment (${rflStage})`
+      const rflPatDesc = [
+        rflPatient || '___________',
+        rflAge     ? 'a ' + rflAge + '-year-old' : '',
+        rflSex     ? rflSex.toLowerCase() : '',
+      ].filter(Boolean).join(', ');
+      const rflUnderCare = (rflStage && rflStage !== 'Not under orthodontic treatment')
+        ? ' who is currently under our care for orthodontic treatment (' + rflStage + ')'
         : '';
-      const urgencyNote = rflUrgency
-        ? `\nUrgency: ${rflUrgency}${rflUrgReason ? ' — ' + rflUrgReason : ''}.`
-        : '';
-      const clinicLine = rflDestClinic ? `\n${rflDestClinic}` : '';
+      const rflProcStr  = rflProcs.length ? rflProcs.join('; ') : 'assessment and management';
+      const rflTeethStr = rflTeeth.length ? ' — teeth: ' + rflTeeth.join(', ') : '';
+      const rflDestStr  = (rflDestClin ? 'Dr. ' + rflDestClin.replace(/^Dr\.?\s*/i,'') : 'Colleague')
+                        + (rflDestClinic ? ' — ' + rflDestClinic : '');
 
-      // ── تجميع الرسالة كـ printable block ─────────────────────────
-      sections.push({
-        title: '━━━ REFERRAL LETTER ━━━',
-        rows: [
-          ['Date', rflDateStr],
-          ['From', rflClinician || '___________'],
-          ['To',   (rflDestClin ? 'Dr. ' + rflDestClin.replace(/^Dr\.?\s*/i,'') : 'Dear Colleague') + (clinicLine ? '\n' + rflDestClinic : '')],
-          ['Specialty', specialtyStr],
-          ...(rflUrgency ? [['Urgency', rflUrgency + (rflUrgReason ? ' — ' + rflUrgReason : '')]] : []),
-        ]
-      });
-      sections.push({
-        title: 'Re: Patient',
-        rows: [
-          ['Name', rflPatient],
-          ['Age', rflAge ? rflAge + ' years' : ''],
-          ['Sex', rflSex],
-        ]
-      });
-      // نص الرسالة كـ narrative row
-      const narrative = [
-        `${salutation}`,
-        ``,
-        `Thank you for seeing ${rflPatient}${rflAge ? ', a ' + rflAge + '-year-old' : ''}${rflSex ? ' ' + rflSex.toLowerCase() : ''}${underCare}. We would be grateful if you could undertake the following: ${procStr}${teethStr}.`,
-        rflDiagnosis ? `\nClinical findings / Diagnosis: ${rflDiagnosis}` : '',
-        rflMedHx     ? `\nRelevant medical history: ${rflMedHx}` : '',
-        rflMeds      ? `Current medications: ${rflMeds}` : '',
-        `Allergies: ${rflAllergies}`,
-        rflPrevDental? `Relevant previous dental treatment: ${rflPrevDental}` : '',
-        rflXrays.length ? `Radiographs enclosed / available: ${rflXrays.join(', ')}.` : '',
-        rflRecs.length  ? `Enclosed records: ${rflRecs.join(', ')}.` : '',
-        rflTiming    ? `\nTiming: This procedure is required ${rflTiming.toLowerCase()}.` : '',
-        rflReq       ? `\nSpecific instructions: ${rflReq}` : '',
-        rflFollowup  ? `Following the procedure, we would ask that you ${rflFollowup.toLowerCase()}.` : '',
-        rflOutcome   ? `\nExpected outcome: ${rflOutcome}` : '',
-        rflNotes     ? `\nAdditional notes: ${rflNotes}` : '',
-        `\nPlease do not hesitate to contact us should you require any further information. We look forward to your report.`,
-        `\nYours sincerely,\n\n\n___________________________\n${rflClinician || '___________'}\nOrthodontist`,
-      ].filter(Boolean).join('\n');
+      const rflLines = [
+        rflSalutation, '',
+        'Thank you for seeing ' + rflPatDesc + rflUnderCare
+          + '. We would be grateful if you could undertake the following: '
+          + rflProcStr + rflTeethStr + '.',
+      ];
+      if(rflDiagnosis)     rflLines.push('', 'Clinical findings / Diagnosis: ' + rflDiagnosis);
+      if(rflMedHx)         rflLines.push('', 'Relevant medical history: '       + rflMedHx);
+      if(rflMeds)          rflLines.push('Current medications: '                + rflMeds);
+      rflLines.push('Allergies: ' + rflAllergies);
+      if(rflPrevDental)    rflLines.push('Relevant previous dental treatment: ' + rflPrevDental);
+      if(rflXrays.length)  rflLines.push('', 'Radiographs enclosed / available: ' + rflXrays.join(', ') + '.');
+      if(rflRecs.length)   rflLines.push('Enclosed records: ' + rflRecs.join(', ') + '.');
+      if(rflTiming)        rflLines.push('', 'Timing: This procedure is required ' + rflTiming.toLowerCase() + '.');
+      if(rflReq)           rflLines.push('', 'Specific instructions: ' + rflReq);
+      if(rflFollowup)      rflLines.push('Following the procedure, we would ask that you ' + rflFollowup.toLowerCase() + '.');
+      if(rflOutcome)       rflLines.push('', 'Expected outcome: ' + rflOutcome);
+      if(rflNotes)         rflLines.push('', 'Additional notes: ' + rflNotes);
+      rflLines.push(
+        '', 'Please do not hesitate to contact us should you require any further information. We look forward to your report.',
+        '', 'Yours sincerely,',
+        '', '',
+        '___________________________',
+        rflClinician || '___________',
+        'Orthodontist'
+      );
 
-      sections.push({ title: 'Letter', rows: [['', narrative]] });
+      // ── إخراج بـ S() و R() ───────────────────────────────────────
+      S('Referral Letter');
+      R('Date',      rflDateStr);
+      R('From',      rflClinician);
+      R('To',        rflDestStr);
+      R('Specialty', rflSpecialtyStr);
+      if(rflUrgency) R('Urgency', rflUrgency + (rflUrgReason ? ' \u2014 ' + rflUrgReason : ''));
+
+      S('Re: Patient');
+      R('Name', rflPatient);
+      R('Age',  rflAge ? rflAge + ' years' : '');
+      R('Sex',  rflSex);
+
+      S('Letter');
+      RA(rflLines.join('\n'));
       break;
     }
 
-    // ══════════════════════════════════════
     case 'retention': {
       S('Retention Follow-Up Visit');
       R('Patient',          get('ret-name'));
